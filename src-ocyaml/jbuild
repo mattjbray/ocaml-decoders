@@ -1,0 +1,8 @@
+(jbuild_version 1)
+
+(library
+ ((name decode_ocyaml)
+  (public_name decoders-ocyaml)
+  (libraries
+   (decoders
+    ocyaml))))

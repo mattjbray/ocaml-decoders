@@ -1,0 +1,17 @@
+opam-version: "1.2"
+name: "decoders-yojson"
+version: "0.0.1"
+maintainer: "Matt Bray <matt@aestheticintegration.com>"
+authors: ["Matt Bray <matt@aestheticintegration.com>"]
+homepage: "https://github.com/AestheticIntegration/imandra-analyser"
+bug-reports: "https://github.com/AestheticIntegration/imandra-analyser/issues"
+license: "LICENSE.md"
+dev-repo: "git@github.com:AestheticIntegration/imandra-analyser.git"
+build: [["jbuilder" "build" "-p" name "-j" jobs]]
+build-test: [["jbuilder" "runtest" "-p" name "-j" jobs]]
+depends: [
+  "jbuilder" {build}
+  "ounit" {test}
+  "decoders"
+  "ocyaml"
+]

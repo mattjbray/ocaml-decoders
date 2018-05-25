@@ -1,0 +1,10 @@
+(jbuild_version 1)
+
+(executable
+ ((name main)
+  (libraries (decoders-yojson oUnit yojson))))
+
+(alias
+ ((name runtest)
+  (deps (main.exe))
+  (action (run ${<}))))
