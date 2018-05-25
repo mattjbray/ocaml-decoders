@@ -4,6 +4,18 @@ module Yaml_decodeable : Decode.Decodeable with type t = Ocyaml.yaml = struct
   open Ocyaml
 
   type t = yaml
+
+  let rec pp fmt = function
+    | Scalar string -> Format.fprintf fmt "@[%S@]" string
+    | Collection xs ->
+      Format.fprintf fmt "@[%a@]"
+        (Format.pp_print_list (fun fmt yaml -> Format.fprintf fmt "- @[%a@]" pp yaml))
+        xs
+    | Structure xs ->
+      Format.fprintf fmt "@[%a@]"
+        (Format.pp_print_list (fun fmt (key, value) ->
+             Format.fprintf fmt "@[%a@]:@ @[%a@]" pp key pp value))
+        xs
 end
 
 

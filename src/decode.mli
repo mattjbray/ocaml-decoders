@@ -172,6 +172,7 @@ module Util : module type of Util
 (** Signature of things that can be decoded. *)
 module type Decodeable = sig
   type t
+  val pp : Format.formatter -> t -> unit
 end
 
 

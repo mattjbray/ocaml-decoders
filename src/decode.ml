@@ -5,6 +5,7 @@ module Util = Util
 (** Signature of things that can be decoded. *)
 module type Decodeable = sig
   type t
+  val pp : Format.formatter -> t -> unit
 end
 
 (** Basic decoder combinators. *)
@@ -45,12 +46,12 @@ module Make_Basic(Decodeable : Decodeable) : Basic with type t = Decodeable.t = 
     | Decoder_tag of string * error list
 
   let rec pp_error fmt = function
-    | Decoder_error (msg, _) -> Format.fprintf fmt "@[%s@]" msg
+    | Decoder_error (msg, t) -> Format.fprintf fmt "@[%s, but got@ @[%a@]@]" msg pp t
     | Decoder_tag (msg, errors) ->
       Format.fprintf fmt
         "@[<2>%s:@ @[%a@]@]"
         msg
-        (Format.pp_print_list ~pp_sep:(fun fmt () -> Format.fprintf fmt ";@ ") pp_error)
+        (Format.pp_print_list ~pp_sep:Format.pp_print_space pp_error)
         errors
 
   let tag_error (msg : string) (error : error) : error =
@@ -93,14 +94,13 @@ module Make_Basic(Decodeable : Decodeable) : Basic with type t = Decodeable.t = 
 
   let apply : ('a -> 'b) decoder -> 'a decoder -> 'b decoder =
     fun f decoder ->
-      { run = fun input ->
-          match f.run input with
-          | Error e -> Error e
-          | Ok g -> begin
-            match decoder.run input with
-            | Error e -> Error e
-            | Ok x -> Ok (g x)
-            end
+      { run =
+          fun input ->
+            match f.run input, decoder.run input with
+            | Error e1, Error e2 -> Error (tag_errors "apply" [e1; e2]) (* TODO *)
+            | Error e, _ -> Error e
+            | _, Error e -> Error e
+            | Ok g, Ok x -> Ok (g x)
       }
 
   let and_then (f : 'a -> 'b decoder) (decoder : 'a decoder) : 'b decoder =

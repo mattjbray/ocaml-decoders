@@ -2,6 +2,7 @@
 
 module Json_decodeable : Decode.Decodeable with type t = Yojson.Basic.json = struct
   type t = Yojson.Basic.json
+  let pp fmt json = Format.fprintf fmt "@[%s@]" (Yojson.Basic.pretty_to_string json)
 end
 
 
@@ -69,7 +70,7 @@ module Json_primitives : (Decode.Primitives with type t = Yojson.Basic.json) = s
         begin match sub_json with
           | Some sub_json ->
             decoder.run sub_json
-            |> Decode.Util.Result.map_error (tag_error ("'" ^ key ^ "':"))
+            |> Decode.Util.Result.map_error (tag_error (Printf.sprintf "in field %S" key))
           | None -> (fail ("Expected object to have an attribute '" ^ key ^ "'")).run json
         end
       | _ -> (fail "Expected an object").run json
