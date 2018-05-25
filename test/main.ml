@@ -2,16 +2,16 @@ open OUnit2
 
 type tree = Leaf of int | Node of tree * tree
 
-let yojson_suite =
-  let open Decode_yojson in
+let yojson_basic_suite =
+  let open Decode_yojson.Basic in
 
   let decoder_test ~decoder ~input ~expected test_ctxt =
-       match Decode_yojson.decode_string decoder input with
+       match Decode_yojson.Basic.decode_string decoder input with
        | Ok value -> assert_equal value expected
-       | Error error -> assert_string (Format.asprintf "%a" Decode_yojson.pp_error error)
+       | Error error -> assert_string (Format.asprintf "%a" Decode_yojson.Basic.pp_error error)
   in
 
-  "Yojson" >:::
+  "Yojson.Basic" >:::
   [ "list string" >::
     decoder_test
       ~decoder:(list string)
@@ -61,8 +61,70 @@ let yojson_suite =
       ~expected:None
   ]
 
+let yojson_raw_suite =
+  let open Decode_yojson.Raw in
+
+  let decoder_test ~decoder ~input ~expected test_ctxt =
+       match Decode_yojson.Raw.decode_string decoder input with
+       | Ok value -> assert_equal value expected
+       | Error error -> assert_string (Format.asprintf "%a" Decode_yojson.Raw.pp_error error)
+  in
+
+  "Yojson.Raw" >:::
+  [ "list string" >::
+    decoder_test
+      ~decoder:(list string)
+      ~input:"[\"Hello world\"]"
+      ~expected:["Hello world"]
+  ; "fix one_of" >::
+    (fun _ ->
+       let tree_decoder =
+         fix
+           (fun tree_decoder ->
+              let leaf_decoder =
+                int |> map (fun i -> Leaf i)
+              in
+              let node_decoder =
+                decode (fun left right -> Node (left, right))
+                |> required "left" tree_decoder
+                |> required "right" tree_decoder
+              in
+              one_of
+                [ ("leaf", leaf_decoder)
+                ; ("node", node_decoder)
+                ]
+           )
+       in
+    decoder_test
+      ~decoder:tree_decoder
+      ~input:"{\"left\":1, \"right\":{\"left\":2,\"right\":3}}"
+      ~expected:(
+        Node (Leaf 1, Node (Leaf 2, Leaf 3))
+      )
+      ()
+
+    )
+  ; "string or floatlit" >::
+    let empty_string =
+      string |> and_then (function
+      | "" -> succeed None
+      | _ -> fail "Expected an empty string")
+    in
+    decoder_test
+      ~decoder:(
+        list
+          (one_of
+             [ ("empty", empty_string)
+             ; ("floatlit", floatlit |> map (fun x -> Some x))
+             ])
+      )
+      ~input:{|["", 123, 123.45]|}
+      ~expected:[ None; Some "123"; Some "123.45" ]
+  ]
+
 let () =
   "decoders" >:::
-  [ yojson_suite
+  [ yojson_basic_suite
+  ; yojson_raw_suite
   ]
   |> run_test_tt_main

@@ -46,10 +46,15 @@ module Json_primitives : (Decode.Primitives with type t = Yojson.Basic.json) = s
     fun decoder ->
     { run = function
       | `List l ->
-        List.map decoder.run l
+        l
+        |> List.mapi (fun i value ->
+            decoder.run value
+            |> Decode.Util.Result.map_error
+              (tag_error (Printf.sprintf "element %i" i))
+          )
         |> combine_errors
         |> Decode.Util.Result.map_error
-           (tag_errors "Failed while decoding a list item")
+           (tag_errors "while decoding a list")
       | json -> (fail "Expected a list").run json
     }
 

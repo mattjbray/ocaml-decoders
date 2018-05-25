@@ -132,10 +132,10 @@ module Make_Basic(Decodeable : Decodeable) : Basic with type t = Decodeable.t = 
           | (name, decoder) :: rest ->
             (match decoder.run input with
             | Ok result -> Ok result
-            | Error error -> go (tag_errors (Printf.sprintf "%s decoder failed with:" name) [ error ] :: errors) rest)
+            | Error error -> go (tag_errors (Printf.sprintf "%S decoder" name) [ error ] :: errors) rest)
           | [] ->
             Error
-              (tag_errors "I tried several decoders but they all failed." errors)
+              (tag_errors "I tried the following decoders but they all failed" errors)
         in
         go [] decoders
       in { run }
