@@ -14,7 +14,8 @@ module type Basic = sig
 
   type error =
     | Decoder_error of string * t
-    | Decoder_tag of string * error list
+    | Decoder_errors of error list
+    | Decoder_tag of string * error
 
   val pp_error : Format.formatter -> error -> unit
   val tag_error : string -> error -> error
@@ -43,22 +44,31 @@ module Make_Basic(Decodeable : Decodeable) : Basic with type t = Decodeable.t = 
 
   type error =
     | Decoder_error of string * t
-    | Decoder_tag of string * error list
+    | Decoder_errors of error list
+    | Decoder_tag of string * error
 
   let rec pp_error fmt = function
     | Decoder_error (msg, t) -> Format.fprintf fmt "@[%s, but got@ @[%a@]@]" msg pp t
-    | Decoder_tag (msg, errors) ->
-      Format.fprintf fmt
-        "@[<2>%s:@ @[%a@]@]"
+    | Decoder_errors errors ->
+      Format.fprintf fmt "@[%a@]"
+        (Format.pp_print_list ~pp_sep:Format.pp_print_space pp_error) errors
+    | Decoder_tag (msg, error) ->
+      Format.fprintf fmt "@[<2>%s:@ @[%a@]@]"
         msg
-        (Format.pp_print_list ~pp_sep:Format.pp_print_space pp_error)
-        errors
+        pp_error error
 
   let tag_error (msg : string) (error : error) : error =
-    Decoder_tag (msg, [ error ])
+    Decoder_tag (msg, error)
 
   let tag_errors (msg : string) (errors : error list) : error =
-    Decoder_tag (msg, errors)
+    Decoder_tag (msg, Decoder_errors errors)
+
+  let merge_errors e1 e2 =
+    match e1, e2 with
+    | Decoder_errors e1s, Decoder_errors e2s -> Decoder_errors (e1s @ e2s)
+    | Decoder_errors e1s, _ -> Decoder_errors (e1s @ [e2])
+    | _, Decoder_errors e2s -> Decoder_errors ([e1] @ e2s )
+    | _ -> Decoder_errors [e1; e2]
 
   let rec combine_errors : ('a, error) result list -> ('a list, error list) result =
     function
@@ -97,7 +107,7 @@ module Make_Basic(Decodeable : Decodeable) : Basic with type t = Decodeable.t = 
       { run =
           fun input ->
             match f.run input, decoder.run input with
-            | Error e1, Error e2 -> Error (tag_errors "apply" [e1; e2]) (* TODO *)
+            | Error e1, Error e2 -> Error (merge_errors e1 e2)
             | Error e, _ -> Error e
             | _, Error e -> Error e
             | Ok g, Ok x -> Ok (g x)
@@ -239,7 +249,10 @@ module type S = sig
   (** The type of values to be decoded (e.g. JSON or Yaml). *)
   type t
 
-  type error
+  type error =
+    | Decoder_error of string * t
+    | Decoder_errors of error list
+    | Decoder_tag of string * error
 
   val pp_error : Format.formatter -> error -> unit
 

@@ -5,7 +5,11 @@ module type S = sig
   (** The type of values to be decoded (e.g. JSON or Yaml). *)
   type t
 
-  type error
+  type error =
+    | Decoder_error of string * t
+    | Decoder_errors of error list
+    | Decoder_tag of string * error
+
   val pp_error : Format.formatter -> error -> unit
 
   (** The type of decoders.
@@ -182,7 +186,8 @@ module type Basic = sig
 
   type error =
     | Decoder_error of string * t
-    | Decoder_tag of string * error list
+    | Decoder_errors of error list
+    | Decoder_tag of string * error
 
   val pp_error : Format.formatter -> error -> unit
   val tag_error : string -> error -> error

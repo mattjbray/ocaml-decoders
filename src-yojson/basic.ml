@@ -70,10 +70,11 @@ module Json_primitives : (Decode.Primitives with type t = Yojson.Basic.json) = s
         begin match sub_json with
           | Some sub_json ->
             decoder.run sub_json
-            |> Decode.Util.Result.map_error (tag_error (Printf.sprintf "in field %S" key))
-          | None -> (fail ("Expected object to have an attribute '" ^ key ^ "'")).run json
+            |> Decode.Util.Result.map_error (tag_error (Printf.sprintf "in field '%s'" key))
+          | None ->
+            (fail (Printf.sprintf "Expected an object with an attribute '%s'" key)).run json
         end
-      | _ -> (fail "Expected an object").run json
+      | _ -> (fail (Printf.sprintf "Expected an object with an attribute '%s'" key)).run json
     }
 
   let single_field : (string -> 'a decoder) -> 'a decoder = fun decoder ->
@@ -104,7 +105,7 @@ module Json_primitives : (Decode.Primitives with type t = Yojson.Basic.json) = s
     fun string ->
       try Ok (Yojson.Basic.from_string string) with
       | Yojson.Json_error error ->
-        Error (Decoder_tag ("Json parse error", [ Decoder_error (error, `Null) ]))
+        Error (Decoder_tag ("Json parse error", Decoder_error (error, `Null)))
 end
 
 include Decode.Make(Json_primitives)

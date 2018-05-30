@@ -6,18 +6,21 @@ let yojson_basic_suite =
   let open Decode_yojson.Basic in
 
   let decoder_test ~decoder ~input ~expected test_ctxt =
-       match Decode_yojson.Basic.decode_string decoder input with
-       | Ok value -> assert_equal value expected
-       | Error error -> assert_string (Format.asprintf "%a" Decode_yojson.Basic.pp_error error)
+    match Decode_yojson.Basic.decode_string decoder input with
+    | Ok value -> assert_equal value expected
+    | Error error -> assert_string (Format.asprintf "%a" Decode_yojson.Basic.pp_error error)
   in
 
-  "Yojson.Basic" >:::
-  [ "list string" >::
+  let list_string_test =
+    "list string" >::
     decoder_test
       ~decoder:(list string)
       ~input:"[\"Hello world\"]"
       ~expected:["Hello world"]
-  ; "fix one_of" >::
+  in
+
+  let fix_one_of_test =
+    "fix one_of" >::
     (fun _ ->
        let tree_decoder =
          fix
@@ -36,20 +39,22 @@ let yojson_basic_suite =
                 ]
            )
        in
-    decoder_test
-      ~decoder:tree_decoder
-      ~input:"{\"left\":1, \"right\":{\"left\":2,\"right\":3}}"
-      ~expected:(
-        Node (Leaf 1, Node (Leaf 2, Leaf 3))
-      )
-      ()
-
+       decoder_test
+         ~decoder:tree_decoder
+         ~input:"{\"left\":1, \"right\":{\"left\":2,\"right\":3}}"
+         ~expected:(
+           Node (Leaf 1, Node (Leaf 2, Leaf 3))
+         )
+         ()
     )
-  ; "string or floatlit" >::
+  in
+
+  let string_or_floatlit_test =
+    "string or floatlit" >::
     let empty_string =
       string |> and_then (function
-      | "" -> succeed ()
-      | _ -> fail "Expected an empty string")
+          | "" -> succeed ()
+          | _ -> fail "Expected an empty string")
     in
     decoder_test
       ~decoder:(
@@ -59,15 +64,106 @@ let yojson_basic_suite =
       )
       ~input:"\"\""
       ~expected:None
+  in
+
+  let grouping_errors_test =
+    "grouping errors" >:: fun test_ctxt ->
+      let decoder =
+        decode (fun x y z -> (x, y, z))
+        |> required "records"
+          (list
+             (decode (fun x y z -> (x, y, z))
+              |> required "x" (list string)
+              |> required "y" int
+              |> required "z" bool
+             ))
+        |> required "hello" int
+        |> required "another" int
+      in
+      let input = {|
+        {"records": [true, {"x": [1, "c", 3], "y": "hello"}], "hello": "world", "another": "error"}
+      |}
+      in
+      let expected_error =
+        Decoder_errors
+          [ Decoder_tag
+              ( "in field 'records'"
+              , Decoder_tag
+                  ( "while decoding a list"
+                  , Decoder_errors
+                      [ Decoder_tag
+                          ( "element 0"
+                          , Decoder_errors
+                              [ Decoder_error ("Expected an object with an attribute 'x'", `Bool true)
+                              ; Decoder_error ("Expected an object with an attribute 'y'", `Bool true)
+                              ; Decoder_error ("Expected an object with an attribute 'z'", `Bool true)
+                              ])
+                      ; Decoder_tag
+                          ( "element 1"
+                          , Decoder_errors
+                              [ Decoder_tag
+                                  ( "in field 'x'"
+                                  , Decoder_tag
+                                      ( "while decoding a list"
+                                      , Decoder_errors
+                                          [ Decoder_tag
+                                              ( "element 0"
+                                              , Decoder_error ("Expected a string", `Int 1)
+                                              )
+                                          ; Decoder_tag
+                                              ( "element 2"
+                                              , Decoder_error ("Expected a string", `Int 3)
+                                              )
+                                          ]
+                                      )
+                                  )
+                              ; Decoder_tag
+                                  ( "in field 'y'"
+                                  , Decoder_error ("Expected an int", `String "hello")
+                                  )
+                              ; Decoder_error
+                                  ( "Expected an object with an attribute 'z'"
+                                  , `Assoc
+                                      [ ("x", `List [ `Int 1; `String "c"; `Int 3 ])
+                                      ; ( "y", `String "hello" )
+                                      ]
+                                  )
+                              ]
+                          )
+                      ]
+                  )
+              )
+          ; Decoder_tag
+              ( "in field 'hello'"
+              , Decoder_error ("Expected an int", `String "world")
+              )
+          ; Decoder_tag
+              ( "in field 'another'"
+              , Decoder_error ("Expected an int", `String "error")
+              )
+          ]
+      in
+      match decode_string decoder input with
+      | Ok _ -> assert_string "Expected an error"
+      | Error error ->
+        assert_equal expected_error error
+          ~printer:(fun e -> Format.asprintf "@,@[%a@]" pp_error e)
+  in
+
+  "Yojson.Basic" >:::
+  [ list_string_test
+  ; fix_one_of_test
+  ; string_or_floatlit_test
+  ; grouping_errors_test
   ]
 
 let yojson_raw_suite =
   let open Decode_yojson.Raw in
 
   let decoder_test ~decoder ~input ~expected test_ctxt =
-       match Decode_yojson.Raw.decode_string decoder input with
-       | Ok value -> assert_equal value expected
-       | Error error -> assert_string (Format.asprintf "%a" Decode_yojson.Raw.pp_error error)
+    match Decode_yojson.Raw.decode_string decoder input with
+    | Ok value -> assert_equal value expected
+    | Error error -> assert_string (Format.asprintf "%a" Decode_yojson.Raw.pp_error error)
   in
 
   "Yojson.Raw" >:::
@@ -95,20 +191,20 @@ let yojson_raw_suite =
                 ]
            )
        in
-    decoder_test
-      ~decoder:tree_decoder
-      ~input:"{\"left\":1, \"right\":{\"left\":2,\"right\":3}}"
-      ~expected:(
-        Node (Leaf 1, Node (Leaf 2, Leaf 3))
-      )
-      ()
+       decoder_test
+         ~decoder:tree_decoder
+         ~input:"{\"left\":1, \"right\":{\"left\":2,\"right\":3}}"
+         ~expected:(
+           Node (Leaf 1, Node (Leaf 2, Leaf 3))
+         )
+         ()
 
     )
   ; "string or floatlit" >::
     let empty_string =
       string |> and_then (function
-      | "" -> succeed None
-      | _ -> fail "Expected an empty string")
+          | "" -> succeed None
+          | _ -> fail "Expected an empty string")
     in
     decoder_test
       ~decoder:(
