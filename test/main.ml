@@ -87,46 +87,47 @@ let yojson_basic_suite =
       let expected_error =
         Decoder_errors
           [ Decoder_tag
-              ( "in field 'records'"
+              ( {|in field "records"|}
               , Decoder_tag
                   ( "while decoding a list"
                   , Decoder_errors
                       [ Decoder_tag
                           ( "element 0"
                           , Decoder_errors
-                              [ Decoder_error ("Expected an object with an attribute 'x'", `Bool true)
-                              ; Decoder_error ("Expected an object with an attribute 'y'", `Bool true)
-                              ; Decoder_error ("Expected an object with an attribute 'z'", `Bool true)
+                              [ Decoder_error ({|Expected an object with an attribute "x"|}, Some (`Bool true))
+                              ; Decoder_error ({|Expected an object with an attribute "y"|}, Some (`Bool true))
+                              ; Decoder_error ({|Expected an object with an attribute "z"|}, Some (`Bool true))
                               ])
                       ; Decoder_tag
                           ( "element 1"
                           , Decoder_errors
                               [ Decoder_tag
-                                  ( "in field 'x'"
+                                  ( {|in field "x"|}
                                   , Decoder_tag
                                       ( "while decoding a list"
                                       , Decoder_errors
                                           [ Decoder_tag
                                               ( "element 0"
-                                              , Decoder_error ("Expected a string", `Int 1)
+                                              , Decoder_error ("Expected a string", Some (`Int 1))
                                               )
                                           ; Decoder_tag
                                               ( "element 2"
-                                              , Decoder_error ("Expected a string", `Int 3)
+                                              , Decoder_error ("Expected a string", Some (`Int 3))
                                               )
                                           ]
                                       )
                                   )
                               ; Decoder_tag
-                                  ( "in field 'y'"
-                                  , Decoder_error ("Expected an int", `String "hello")
+                                  ( {|in field "y"|}
+                                  , Decoder_error ("Expected an int", Some (`String "hello"))
                                   )
                               ; Decoder_error
-                                  ( "Expected an object with an attribute 'z'"
-                                  , `Assoc
-                                      [ ("x", `List [ `Int 1; `String "c"; `Int 3 ])
-                                      ; ( "y", `String "hello" )
-                                      ]
+                                  ( {|Expected an object with an attribute "z"|}
+                                  , Some
+                                      (`Assoc
+                                         [ ("x", `List [ `Int 1; `String "c"; `Int 3 ])
+                                         ; ( "y", `String "hello" )
+                                         ])
                                   )
                               ]
                           )
@@ -134,12 +135,12 @@ let yojson_basic_suite =
                   )
               )
           ; Decoder_tag
-              ( "in field 'hello'"
-              , Decoder_error ("Expected an int", `String "world")
+              ( {|in field "hello"|}
+              , Decoder_error ("Expected an int", Some (`String "world"))
               )
           ; Decoder_tag
-              ( "in field 'another'"
-              , Decoder_error ("Expected an int", `String "error")
+              ( {|in field "another"|}
+              , Decoder_error ("Expected an int", Some (`String "error"))
               )
           ]
       in

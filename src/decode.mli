@@ -6,11 +6,13 @@ module type S = sig
   type t
 
   type error =
-    | Decoder_error of string * t
+    | Decoder_error of string * t option
     | Decoder_errors of error list
     | Decoder_tag of string * error
 
   val pp_error : Format.formatter -> error -> unit
+
+  val of_string : string -> (t, error) result
 
   (** The type of decoders.
 
@@ -177,15 +179,26 @@ module Util : module type of Util
 module type Decodeable = sig
   type t
   val pp : Format.formatter -> t -> unit
+  val of_string : string -> (t, string) result
+
+  val get_string : t -> string option
+  val get_int : t -> int option
+  val get_float : t -> float option
+  val get_bool : t -> bool option
+  val get_null : t -> unit option
+  val get_list : t -> t list option
+  val get_field : string -> t -> t option
+  val get_single_field : t -> (string * t) option
 end
 
 
 (** Basic decoder combinators. *)
-module type Basic = sig
-  include Decodeable
+module type S_exposed = sig
+  type t
+  val pp : Format.formatter -> t -> unit
 
   type error =
-    | Decoder_error of string * t
+    | Decoder_error of string * t option
     | Decoder_errors of error list
     | Decoder_tag of string * error
 
@@ -193,6 +206,8 @@ module type Basic = sig
   val tag_error : string -> error -> error
   val tag_errors : string -> error list -> error
   val combine_errors : ('a, error) result list -> ('a list, error list) result
+
+  val of_string : string -> (t, error) result
 
   type 'a decoder = { run : t -> ('a, error) result }
 
@@ -208,15 +223,6 @@ module type Basic = sig
   val decode_value : 'a decoder -> t -> ('a, error) result
   val maybe : 'a decoder -> 'a option decoder
   val one_of : (string * 'a decoder) list -> 'a decoder
-end
-
-
-module Make_Basic(M : Decodeable) : Basic with type t = M.t
-
-
-(** Implementation-specific Decoders. *)
-module type Primitives = sig
-  include Basic
 
   val string : string decoder
   val int : int decoder
@@ -227,12 +233,6 @@ module type Primitives = sig
   val field : string -> 'a decoder -> 'a decoder
   val single_field : (string -> 'a decoder) -> 'a decoder
   val index : int -> 'a decoder -> 'a decoder
-  val of_string : string -> (t, error) result
-end
-
-
-module type S_exposed = sig
-  include Primitives
 
   val at : string list -> 'a decoder -> 'a decoder
   val decode : 'a -> 'a decoder
@@ -245,5 +245,4 @@ module type S_exposed = sig
   val decode_string : 'a decoder -> string -> ('a, error) result
 end
 
-
-module Make(M : Primitives) : S_exposed with type t = M.t
+module Make(M : Decodeable) : S_exposed with type t = M.t

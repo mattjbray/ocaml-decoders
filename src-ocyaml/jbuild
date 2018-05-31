@@ -5,4 +5,5 @@
   (public_name decoders-ocyaml)
   (libraries
    (decoders
+    containers
     ocyaml))))

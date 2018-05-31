@@ -3,118 +3,54 @@
 module Json_decodeable : Decode.Decodeable with type t = Yojson.Basic.json = struct
   type t = Yojson.Basic.json
   let pp fmt json = Format.fprintf fmt "@[%s@]" (Yojson.Basic.pretty_to_string json)
-end
 
+  let get_string = function
+    | `String value -> Some value
+    | _ -> None
 
-module Json_primitives : (Decode.Primitives with type t = Yojson.Basic.json) = struct
-  open Yojson.Basic
+  let get_int = function
+    | `Int value -> Some value
+    | _ -> None
 
-  include Decode.Make_Basic(Json_decodeable)
+  let get_float = function
+    | `Float value -> Some value
+    | `Int value -> Some (float_of_int value)
+    | _ -> None
 
-  let string : string decoder =
-    { run = function
-      | `String value -> Ok value
-      | json -> (fail "Expected a string").run json
-    }
+  let get_bool = function
+    | `Bool value -> Some value
+    | _ -> None
 
-  let int : int decoder =
-    { run = function
-      | `Int value -> Ok value
-      | json -> (fail "Expected an int").run json
-    }
+  let get_null = function
+    | `Null -> Some ()
+    | _ -> None
 
-  let float : float decoder =
-    { run = function
-      | `Float value -> Ok value
-      | `Int value -> Ok (float_of_int value)
-      | json -> (fail "Expected a float").run json
-    }
+  let get_list : t -> t list option = function
+    | `List l -> Some l
+    | _ -> None
 
-  let bool : bool decoder =
-    { run = function
-      | `Bool value -> Ok value
-      | json -> (fail "Expected a bool").run json
-    }
+  let get_field key = function
+    | `Assoc assoc -> CCList.assoc_opt ~eq:(=) key assoc
+    | _ -> None
 
-  let null : 'a -> 'a decoder =
-    fun default ->
-    { run = function
-      | `Null -> Ok default
-      | json -> (fail "Expected a null").run json
-    }
+  let get_single_field = function
+    | `Assoc [(key, value)] -> Some (key, value)
+    | _ -> None
 
-  let list : 'a decoder -> 'a list decoder =
-    fun decoder ->
-    { run = function
-      | `List l ->
-        l
-        |> List.mapi (fun i value ->
-            decoder.run value
-            |> Decode.Util.Result.map_error
-              (tag_error (Printf.sprintf "element %i" i))
-          )
-        |> combine_errors
-        |> Decode.Util.Result.map_error
-           (tag_errors "while decoding a list")
-      | json -> (fail "Expected a list").run json
-    }
-
-  let field : string -> 'a decoder -> 'a decoder = fun key decoder ->
-    { run = fun json ->
-    match json with
-      | `Assoc assoc ->
-        let sub_json =
-          try Some (List.assoc key assoc) with
-          | Not_found -> None
-        in
-        begin match sub_json with
-          | Some sub_json ->
-            decoder.run sub_json
-            |> Decode.Util.Result.map_error (tag_error (Printf.sprintf "in field '%s'" key))
-          | None ->
-            (fail (Printf.sprintf "Expected an object with an attribute '%s'" key)).run json
-        end
-      | _ -> (fail (Printf.sprintf "Expected an object with an attribute '%s'" key)).run json
-    }
-
-  let single_field : (string -> 'a decoder) -> 'a decoder = fun decoder ->
-    { run = function
-      | `Assoc [(key, value_json)] ->
-        (decoder key).run value_json
-        |> Decode.Util.Result.map_error (tag_error ("'" ^ key ^ "':"))
-      | json -> (fail "Expected an object with a single attribute").run json
-    }
-
-  let index : int -> 'a decoder -> 'a decoder = fun i decoder ->
-    { run = fun json ->
-      match json with
-      | `List l ->
-        let item =
-          try Some (List.nth l i) with
-          | Failure _-> None
-          | Invalid_argument _ -> None
-        in
-        begin match item with
-        | None -> (fail ("expected a list with at least " ^ string_of_int i ^ " elements")).run json
-        | Some item -> decoder.run item
-        end
-      | _ -> (fail "Expected a list").run json
-    }
-
-  let of_string : string -> (t, error) result =
+  let of_string : string -> (t, string) result =
     fun string ->
       try Ok (Yojson.Basic.from_string string) with
-      | Yojson.Json_error error ->
-        Error (Decoder_tag ("Json parse error", Decoder_error (error, `Null)))
+      | Yojson.Json_error msg -> Error msg
 end
 
-include Decode.Make(Json_primitives)
+
+include Decode.Make(Json_decodeable)
 
 open Yojson.Basic
 
 let json_of_file file =
   try Ok (from_file file) with
-  | e -> Error (Decoder_error (Printexc.to_string e, `Null))
+  | e -> Error (Decoder_error (Printexc.to_string e, None))
 
 let keys : string list decoder =
   { run =

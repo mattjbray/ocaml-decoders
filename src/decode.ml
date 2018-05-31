@@ -6,14 +6,25 @@ module Util = Util
 module type Decodeable = sig
   type t
   val pp : Format.formatter -> t -> unit
+  val of_string : string -> (t, string) result
+
+  val get_string : t -> string option
+  val get_int : t -> int option
+  val get_float : t -> float option
+  val get_bool : t -> bool option
+  val get_null : t -> unit option
+  val get_list : t -> t list option
+  val get_field : string -> t -> t option
+  val get_single_field : t -> (string * t) option
 end
 
 (** Basic decoder combinators. *)
-module type Basic = sig
-  include Decodeable
+module type S_exposed = sig
+  type t
+  val pp : Format.formatter -> t -> unit
 
   type error =
-    | Decoder_error of string * t
+    | Decoder_error of string * t option
     | Decoder_errors of error list
     | Decoder_tag of string * error
 
@@ -21,6 +32,8 @@ module type Basic = sig
   val tag_error : string -> error -> error
   val tag_errors : string -> error list -> error
   val combine_errors : ('a, error) result list -> ('a list, error list) result
+
+  val of_string : string -> (t, error) result
 
   type 'a decoder = { run : t -> ('a, error) result }
 
@@ -36,19 +49,42 @@ module type Basic = sig
   val decode_value : 'a decoder -> t -> ('a, error) result
   val maybe : 'a decoder -> 'a option decoder
   val one_of : (string * 'a decoder) list -> 'a decoder
+
+  val string : string decoder
+  val int : int decoder
+  val float : float decoder
+  val bool : bool decoder
+  val null : 'a -> 'a decoder
+  val list : 'a decoder -> 'a list decoder
+  val field : string -> 'a decoder -> 'a decoder
+  val single_field : (string -> 'a decoder) -> 'a decoder
+  val index : int -> 'a decoder -> 'a decoder
+
+  val at : string list -> 'a decoder -> 'a decoder
+  val decode : 'a -> 'a decoder
+  val required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+  val requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+  val optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
+  val optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
+  val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+
+  val decode_string : 'a decoder -> string -> ('a, error) result
 end
 
-module Make_Basic(Decodeable : Decodeable) : Basic with type t = Decodeable.t = struct
-  include Decodeable
+module Make(Decodeable : Decodeable) : S_exposed with type t = Decodeable.t = struct
+  type t = Decodeable.t
+  let pp = Decodeable.pp
+
   open Util.Result.Infix
 
   type error =
-    | Decoder_error of string * t
+    | Decoder_error of string * t option
     | Decoder_errors of error list
     | Decoder_tag of string * error
 
   let rec pp_error fmt = function
-    | Decoder_error (msg, t) -> Format.fprintf fmt "@[%s, but got@ @[%a@]@]" msg pp t
+    | Decoder_error (msg, Some t) -> Format.fprintf fmt "@[%s, but got@ @[%a@]@]" msg pp t
+    | Decoder_error (msg, None) -> Format.fprintf fmt "@[%s@]" msg
     | Decoder_errors errors ->
       Format.fprintf fmt "@[%a@]"
         (Format.pp_print_list ~pp_sep:Format.pp_print_space pp_error) errors
@@ -81,13 +117,20 @@ module Make_Basic(Decodeable : Decodeable) : Basic with type t = Decodeable.t = 
         | Ok _, Error es -> Error es
       end
 
+  let of_string : string -> (t, error) result =
+    fun string ->
+      Decodeable.of_string string
+      |> CCResult.map_err (fun msg ->
+          (Decoder_tag ("Json parse error", Decoder_error (msg, None)))
+        )
+
   type 'a decoder = { run : t -> ('a, error) result }
 
   let succeed x =
     { run = fun _ -> Ok x }
 
   let fail msg =
-    { run = fun input -> Error (Decoder_error (msg, input)) }
+    { run = fun input -> Error (Decoder_error (msg, Some input)) }
 
   let fail_with error =
     { run = fun _ -> Error error }
@@ -149,44 +192,100 @@ module Make_Basic(Decodeable : Decodeable) : Basic with type t = Decodeable.t = 
         in
         go [] decoders
       in { run }
-end
 
+  let primitive_decoder (get_value : t -> 'a option) (message : string) : 'a decoder =
+    { run =
+        fun t ->
+          match get_value t with
+          | Some value -> Ok value
+          | _ -> (fail message).run t
+    }
 
-(** Implementation-specific Decoders. *)
-module type Primitives = sig
-  include Basic
+  let string : string decoder =
+    primitive_decoder Decodeable.get_string "Expected a string"
 
-  val string : string decoder
-  val int : int decoder
-  val float : float decoder
-  val bool : bool decoder
-  val null : 'a -> 'a decoder
-  val list : 'a decoder -> 'a list decoder
-  val field : string -> 'a decoder -> 'a decoder
-  val single_field : (string -> 'a decoder) -> 'a decoder
-  val index : int -> 'a decoder -> 'a decoder
-  val of_string : string -> (t, error) result
-end
+  let int : int decoder =
+    primitive_decoder Decodeable.get_int "Expected an int"
 
-module type S_exposed = sig
-  include Primitives
+  let float : float decoder =
+    primitive_decoder Decodeable.get_float "Expected a float"
 
-  val at : string list -> 'a decoder -> 'a decoder
-  val decode : 'a -> 'a decoder
-  val required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-  val requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-  val optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
-  val optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
-  val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+  let bool : bool decoder =
+    primitive_decoder Decodeable.get_bool "Expected a bool"
 
-  val decode_string : 'a decoder -> string -> ('a, error) result
-end
+  let null : 'a -> 'a decoder =
+    fun default ->
+      primitive_decoder Decodeable.get_null "Expected a null"
+      |> map (CCFun.const default)
 
+  let list : 'a decoder -> 'a list decoder =
+    fun decoder ->
+      { run =
+          fun t ->
+            match Decodeable.get_list t with
+            | None -> (fail "Expected a list").run t
+            | Some values ->
+              (* let (_, results) = List.fold_left (fun (i, xs) x -> *)
+              (*     ( i + 1 *)
+              (*     , (decoder.run x *)
+              (*        |> Util.Result.map_error *)
+              (*          (tag_error (Printf.sprintf "element %i" i))) :: xs *)
+              (*     ) *)
+              (*   ) (0, []) values *)
+              (* in *)
+              (* results *)
+              (* |> List.rev *)
 
-module Make(Primitives : Primitives) : S_exposed with type t = Primitives.t = struct
-  open Util.Result.Infix
+              values
+              |> CCList.mapi (fun i x ->
+                  decoder.run x
+                  |> Util.Result.map_error
+                    (tag_error (Printf.sprintf "element %i" i))
+                )
+              |> combine_errors
+              |> Util.Result.map_error
+                (tag_errors "while decoding a list")
+      }
 
-  include Primitives
+  let field : string -> 'a decoder -> 'a decoder =
+    fun key value_decoder ->
+      { run =
+          fun t ->
+            match Decodeable.get_field key t with
+            | Some value ->
+              value_decoder.run value
+              |> Util.Result.map_error (tag_error (Printf.sprintf "in field %S" key))
+            | None -> (fail (Printf.sprintf "Expected an object with an attribute %S" key)).run t
+      }
+
+  let single_field : (string -> 'a decoder) -> 'a decoder =
+    fun value_decoder ->
+      { run =
+          fun t ->
+            match Decodeable.get_single_field t with
+            | Some (key, value) ->
+              (value_decoder key).run value
+              |> Util.Result.map_error (tag_error (Printf.sprintf "in field %S" key))
+            | None -> (fail "Expected an object with a single attribute").run t
+      }
+
+  let index : int -> 'a decoder -> 'a decoder =
+    fun i decoder ->
+      { run =
+          fun t ->
+            match Decodeable.get_list t with
+            | Some l ->
+              let item =
+                try Some (List.nth l i) with
+                | Failure _-> None
+                | Invalid_argument _ -> None
+              in
+              begin match item with
+                | None -> (fail ("expected a list with at least " ^ string_of_int i ^ " elements")).run t
+                | Some item -> decoder.run item
+              end
+            | None -> (fail "Expected a list").run t
+      }
 
   let rec at : string list -> 'a decoder -> 'a decoder = fun path decoder ->
     match path with
@@ -250,11 +349,13 @@ module type S = sig
   type t
 
   type error =
-    | Decoder_error of string * t
+    | Decoder_error of string * t option
     | Decoder_errors of error list
     | Decoder_tag of string * error
 
   val pp_error : Format.formatter -> error -> unit
+
+  val of_string : string -> (t, error) result
 
   (** The type of decoders.
 

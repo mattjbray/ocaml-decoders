@@ -16,116 +16,65 @@ module Yaml_decodeable : Decode.Decodeable with type t = Ocyaml.yaml = struct
         (Format.pp_print_list (fun fmt (key, value) ->
              Format.fprintf fmt "@[%a@]:@ @[%a@]" pp key pp value))
         xs
-end
+
+  let get_string : t -> string option = function
+    | Scalar value -> Some value
+    | _ -> None
+
+  let get_int : t -> int option =
+    fun t ->
+      try
+        get_string t
+        |> CCOpt.map int_of_string
+      with
+      | Failure _ -> None
 
 
-module Yaml_primitives : (Decode.Primitives with type t = Ocyaml.yaml) = struct
-  open Ocyaml
+  let get_float : t -> float option =
+    fun t ->
+      try
+        get_string t
+        |> CCOpt.map float_of_string
+      with
+      | Failure _ -> None
 
-  include Decode.Make_Basic(Yaml_decodeable)
+  let get_bool : t -> bool option =
+    fun t ->
+      try
+        get_string t
+        |> CCOpt.map bool_of_string
+      with
+      | Failure _ -> None
 
-  let string : string decoder =
-    { run =
-        function
-        | Scalar value -> Ok value
-        | yaml -> (fail "Expected a string").run yaml
-    }
+  let get_null : t -> unit option =
+    fun t ->
+      get_string t
+      |> CCOpt.flat_map (function
+          | "" -> Some ()
+          | _ -> None
+        )
 
-  let int : int decoder =
-    string |> and_then
-      (fun s ->
-         try succeed (int_of_string s) with
-         | Failure _ -> fail "Expected an integer")
+  let get_list = function
+    | Collection l -> Some l
+    | _ -> None
 
-  let float : float decoder =
-    string |> and_then
-      (fun s ->
-         try succeed (float_of_string s) with
-         | Failure _ -> fail "Expected a float")
+  let get_field key = function
+    | Structure assoc -> CCList.assoc_opt ~eq:Ocyaml.equal (Scalar key) assoc
+    | _ -> None
 
-  let bool : bool decoder =
-    string |> and_then
-      (fun s ->
-         try succeed (bool_of_string s) with
-         | Failure _ -> fail "Expected a bool")
+  let get_single_field = function
+    | Structure [(Scalar key, value)] -> Some (key, value)
+    | _ -> None
 
-  let null : 'a -> 'a decoder = fun x ->
-    string |> and_then
-      (fun s ->
-         if String.length s = 0 then
-           succeed x
-         else
-           fail "Expected a null")
-
-  let list : 'a decoder -> 'a list decoder = fun decoder ->
-    { run =
-        function
-        | Collection l ->
-          l
-        |> List.map decoder.run
-        |> combine_errors
-        |> Decode.Util.Result.map_error
-          (tag_errors "Failed while decoding a list item")
-        | yaml -> (fail "Expected a list").run yaml
-    }
-
-  let field : string -> 'a decoder -> 'a decoder = fun key decoder ->
-    { run = fun yaml ->
-        match yaml with
-        | Structure assoc ->
-          let sub_yaml =
-            try Some (List.assoc (Scalar key) assoc) with
-            | Not_found -> None
-          in
-          begin match sub_yaml with
-            | Some sub_yaml ->
-              decoder.run sub_yaml
-              |> Decode.Util.Result.map_error
-                (tag_error ("'" ^ key ^ "':"))
-           | None -> (fail ("Expected object to have an attribute '" ^ key ^ "'")).run yaml
-          end
-        | yaml -> (fail "Expected an object").run yaml
-    }
-
-  let single_field : (string -> 'a decoder) -> 'a decoder = fun decoder ->
-    { run =
-        function
-        | Structure [(Scalar key, value_yaml)] ->
-          (decoder key).run value_yaml
-          |> Decode.Util.Result.map_error
-            (tag_error ("'" ^ key ^ "':"))
-        | yaml -> (fail "Expected an object with a single attribute").run yaml
-    }
-
-  let index : int -> 'a decoder -> 'a decoder = fun i decoder ->
-    { run = fun yaml ->
-        match yaml with
-        | Collection l ->
-          let item =
-            try Some (List.nth l i) with
-            | Failure _-> None
-            | Invalid_argument _ -> None
-          in
-          (match item with
-            | None -> (fail ("expected a list with at least " ^ string_of_int i ^ " elements")).run yaml
-            | Some item ->
-              decoder.run item
-              |> Decode.Util.Result.map_error
-                (tag_error (Printf.sprintf "While decoding item at index %d" i))
-          )
-        | _ -> (fail "Expected a list").run yaml
-    }
-
-  let of_string : string -> (t, error) result =
+  let of_string : string -> (t, string) result =
     fun string ->
       try Ok (Ocyaml.of_string string) with
-      | exn -> Error (Decoder_error (Printexc.to_string exn, Scalar ""))
+      | exn -> Error (Printexc.to_string exn)
 end
-
 
 open Ocyaml
 
-module M = Decode.Make(Yaml_primitives)
+module M = Decode.Make(Yaml_decodeable)
 
 include M
 
