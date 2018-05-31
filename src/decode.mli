@@ -173,8 +173,6 @@ module type S = sig
   val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
 end
 
-module Util : module type of Util
-
 (** Signature of things that can be decoded. *)
 module type Decodeable = sig
   type t

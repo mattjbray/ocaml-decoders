@@ -75,7 +75,7 @@ module Make(Decodeable : Decodeable) : S_exposed with type t = Decodeable.t = st
   type t = Decodeable.t
   let pp = Decodeable.pp
 
-  open Util.Result.Infix
+  open CCResult.Infix
 
   type error =
     | Decoder_error of string * t option
@@ -143,7 +143,7 @@ module Make(Decodeable : Decodeable) : S_exposed with type t = Decodeable.t = st
     { run = fun input -> Ok input }
 
   let map f decoder =
-    { run = fun input -> decoder.run input >>| f }
+    { run = fun input -> decoder.run input >|= f }
 
   let apply : ('a -> 'b) decoder -> 'a decoder -> 'b decoder =
     fun f decoder ->
@@ -225,25 +225,14 @@ module Make(Decodeable : Decodeable) : S_exposed with type t = Decodeable.t = st
             match Decodeable.get_list t with
             | None -> (fail "Expected a list").run t
             | Some values ->
-              (* let (_, results) = List.fold_left (fun (i, xs) x -> *)
-              (*     ( i + 1 *)
-              (*     , (decoder.run x *)
-              (*        |> Util.Result.map_error *)
-              (*          (tag_error (Printf.sprintf "element %i" i))) :: xs *)
-              (*     ) *)
-              (*   ) (0, []) values *)
-              (* in *)
-              (* results *)
-              (* |> List.rev *)
-
               values
               |> CCList.mapi (fun i x ->
                   decoder.run x
-                  |> Util.Result.map_error
+                  |> CCResult.map_err
                     (tag_error (Printf.sprintf "element %i" i))
                 )
               |> combine_errors
-              |> Util.Result.map_error
+              |> CCResult.map_err
                 (tag_errors "while decoding a list")
       }
 
@@ -254,7 +243,7 @@ module Make(Decodeable : Decodeable) : S_exposed with type t = Decodeable.t = st
             match Decodeable.get_field key t with
             | Some value ->
               value_decoder.run value
-              |> Util.Result.map_error (tag_error (Printf.sprintf "in field %S" key))
+              |> CCResult.map_err (tag_error (Printf.sprintf "in field %S" key))
             | None -> (fail (Printf.sprintf "Expected an object with an attribute %S" key)).run t
       }
 
@@ -265,7 +254,7 @@ module Make(Decodeable : Decodeable) : S_exposed with type t = Decodeable.t = st
             match Decodeable.get_single_field t with
             | Some (key, value) ->
               (value_decoder key).run value
-              |> Util.Result.map_error (tag_error (Printf.sprintf "in field %S" key))
+              |> CCResult.map_err (tag_error (Printf.sprintf "in field %S" key))
             | None -> (fail "Expected an object with a single attribute").run t
       }
 

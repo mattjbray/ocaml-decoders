@@ -66,11 +66,11 @@ let key_value_pairs : 'a decoder -> (string * 'a) list decoder = fun decoder ->
       | `Assoc assoc ->
         assoc
         |> List.map
-          Decode.Util.Result.Infix.(fun (key, value_json) ->
-              decoder.run value_json >>| fun value -> (key, value)
+          CCResult.Infix.(fun (key, value_json) ->
+              decoder.run value_json >|= fun value -> (key, value)
             )
         |> combine_errors
-        |> Decode.Util.Result.map_error
+        |> CCResult.map_err
           (tag_errors (Printf.sprintf "Failed while decoding an object"))
       | json -> (fail "Expected an object").run json
   }
@@ -84,7 +84,7 @@ let key_value_pairs_seq : (string -> 'a decoder) -> 'a list decoder = fun decode
             (decoder key).run value_json
           )
         |> combine_errors
-        |> Decode.Util.Result.map_error
+        |> CCResult.map_err
           (tag_errors (Printf.sprintf "Failed while decoding an object"))
       | json -> (fail "Expected an object").run json
   }

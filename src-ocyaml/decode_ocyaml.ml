@@ -84,7 +84,7 @@ let keys_yaml : 'k decoder -> 'k list decoder = fun decoder ->
       | Structure assoc ->
         (List.map (fun (key_yaml, _) -> decoder.run key_yaml) assoc)
         |> combine_errors
-        |> Decode.Util.Result.map_error
+        |> CCResult.map_err
           (tag_errors "Failed while decoding the keys of an object")
       | yaml -> (fail "Expected an object").run yaml
   }
@@ -99,12 +99,12 @@ let key_value_pairs_yaml : 'k decoder -> 'v decoder -> ('k * 'v) list decoder =
         | Structure assoc ->
           assoc
           |> List.map
-            Decode.Util.Result.Infix.(fun (key_yaml, value_yaml) ->
+            CCResult.Infix.(fun (key_yaml, value_yaml) ->
                 key_decoder.run key_yaml >>= fun key ->
-                value_decoder.run value_yaml >>| fun value ->
+                value_decoder.run value_yaml >|= fun value ->
                 (key, value))
           |> combine_errors
-          |> Decode.Util.Result.map_error
+          |> CCResult.map_err
             (tag_errors "Failed while decoding key-value pairs")
         | yaml -> (fail "Expected an object").run yaml
     }
@@ -120,11 +120,11 @@ let key_value_pairs_seq_yaml : 'k decoder -> ('k -> 'v decoder) -> 'v list decod
         | Structure assoc ->
           assoc
           |> List.map
-            Decode.Util.Result.Infix.(fun (key_yaml, value_yaml) ->
+            CCResult.Infix.(fun (key_yaml, value_yaml) ->
                 key_decoder.run key_yaml >>= fun key ->
                 (value_decoder key).run value_yaml)
           |> combine_errors
-          |> Decode.Util.Result.map_error
+          |> CCResult.map_err
             (tag_errors "Failed while decoding key-value pairs")
         | yaml -> (fail "Expected an object").run yaml
     }
