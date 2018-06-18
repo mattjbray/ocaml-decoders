@@ -2,7 +2,11 @@
 
 (executable
  ((name main)
-  (libraries (decoders-yojson oUnit yojson))))
+  (libraries
+   (decoders-ezjsonm
+    decoders-yojson
+    oUnit
+    yojson))))
 
 (alias
  ((name runtest)
