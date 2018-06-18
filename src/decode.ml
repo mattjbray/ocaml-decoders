@@ -48,6 +48,7 @@ module type S_exposed = sig
   val fix : ('a decoder -> 'a decoder) -> 'a decoder
   val decode_value : 'a decoder -> t -> ('a, error) result
   val maybe : 'a decoder -> 'a option decoder
+  val nullable : 'a decoder -> 'a option decoder
   val one_of : (string * 'a decoder) list -> 'a decoder
 
   val string : string decoder
@@ -176,6 +177,17 @@ module Make(Decodeable : Decodeable) : S_exposed with type t = Decodeable.t = st
       match (decoder.run input) with
       | Ok result -> Ok (Some result)
       | Error err -> Ok None
+    }
+
+  let nullable (decoder : 'a decoder) : 'a option decoder =
+    { run =
+        fun input ->
+          match Decodeable.get_null input with
+          | Some () -> Ok None
+          | None ->
+            decoder.run input
+            |> CCResult.map CCOpt.return
+            |> CCResult.map_err (tag_error "Expected null or")
     }
 
   let one_of : (string * 'a decoder) list -> 'a decoder =
@@ -391,6 +403,8 @@ module type S = sig
 
   (** Helpful for dealing with optional fields. *)
   val maybe : 'a decoder -> 'a option decoder
+
+  val nullable : 'a decoder -> 'a option decoder
 
   (** Try a sequence of different decoders. *)
   val one_of : (string * 'a decoder) list -> 'a decoder

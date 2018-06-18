@@ -60,6 +60,8 @@ module type S = sig
   (** Helpful for dealing with optional fields. *)
   val maybe : 'a decoder -> 'a option decoder
 
+  val nullable : 'a decoder -> 'a option decoder
+
   (** Try a sequence of different decoders. *)
   val one_of : (string * 'a decoder) list -> 'a decoder
 
@@ -220,6 +222,7 @@ module type S_exposed = sig
   val fix : ('a decoder -> 'a decoder) -> 'a decoder
   val decode_value : 'a decoder -> t -> ('a, error) result
   val maybe : 'a decoder -> 'a option decoder
+  val nullable : 'a decoder -> 'a option decoder
   val one_of : (string * 'a decoder) list -> 'a decoder
 
   val string : string decoder
