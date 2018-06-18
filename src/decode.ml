@@ -1,7 +1,5 @@
 (** Functors for creating Decoders. *)
 
-module Util = Util
-
 (** Signature of things that can be decoded. *)
 module type Decodeable = sig
   type t
@@ -51,6 +49,12 @@ module type S_exposed = sig
   val nullable : 'a decoder -> 'a option decoder
   val one_of : (string * 'a decoder) list -> 'a decoder
 
+  module Infix : sig
+    val (>|=) : 'a decoder -> ('a -> 'b) -> 'b decoder
+    val (>>=) : 'a decoder -> ('a -> 'b decoder) -> 'b decoder
+    val (<*>) : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
+  end
+
   val string : string decoder
   val int : int decoder
   val float : float decoder
@@ -60,14 +64,16 @@ module type S_exposed = sig
   val field : string -> 'a decoder -> 'a decoder
   val single_field : (string -> 'a decoder) -> 'a decoder
   val index : int -> 'a decoder -> 'a decoder
-
   val at : string list -> 'a decoder -> 'a decoder
-  val decode : 'a -> 'a decoder
-  val required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-  val requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-  val optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
-  val optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
-  val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+
+  module Pipeline : sig
+    val decode : 'a -> 'a decoder
+    val required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+    val requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+    val optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
+    val optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
+    val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+  end
 
   val decode_string : 'a decoder -> string -> ('a, error) result
 end
@@ -169,8 +175,11 @@ module Make(Decodeable : Decodeable) : S_exposed with type t = Decodeable.t = st
     in
     r
 
-  let decode_value (decoder : 'a decoder) (input : t) : ('a, error) result =
-      decoder.run input
+  module Infix = struct
+    let (>|=) x f = map f x
+    let (>>=) x f = and_then f x
+    let (<*>) f x = apply f x
+  end
 
   let maybe (decoder : 'a decoder) : 'a option decoder =
     { run = fun input ->
@@ -294,51 +303,56 @@ module Make(Decodeable : Decodeable) : S_exposed with type t = Decodeable.t = st
     | key :: rest -> field key (at rest decoder)
     | [] -> fail "Must provide at least one key to 'at'"
 
-  let decode = succeed
-
-  let custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder =
-    fun customDecoder next ->
-      apply next customDecoder
-
-  let required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder =
-    fun key decoder next ->
-      custom (field key decoder) next
-
-  let requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder =
-    fun path decoder next ->
-      custom (at path decoder) next
-
-  let optional_decoder : t decoder -> 'a decoder -> 'a -> 'a decoder =
-    fun path_decoder val_decoder default ->
-      let null_or decoder =
-        one_of
-          [ ( "non-null", decoder )
-          ; ( "null", null default )
-          ] in
-      let handle_result : t -> 'a decoder =
-        fun input ->
-          match decode_value path_decoder input with
-          | Ok rawValue ->
-            (* The field was present. *)
-            decode_value (null_or val_decoder) rawValue
-            |> from_result
-          | Error _ ->
-            (* The field was not present. *)
-            succeed default
-      in
-      value |> and_then handle_result
-
-  let optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder =
-    fun key val_decoder default next ->
-      custom (optional_decoder (field key value) val_decoder default) next
-
-  let optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder =
-    fun path val_decoder default next ->
-      custom (optional_decoder (at path value) val_decoder default) next
+  let decode_value (decoder : 'a decoder) (input : t) : ('a, error) result =
+      decoder.run input
 
   let decode_string : 'a decoder -> string -> ('a, error) result =
     fun decoder string ->
       of_string string >>= decode_value decoder
+
+  module Pipeline = struct
+    let decode = succeed
+
+    let custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder =
+      fun customDecoder next ->
+        apply next customDecoder
+
+    let required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder =
+      fun key decoder next ->
+        custom (field key decoder) next
+
+    let requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder =
+      fun path decoder next ->
+        custom (at path decoder) next
+
+    let optional_decoder : t decoder -> 'a decoder -> 'a -> 'a decoder =
+      fun path_decoder val_decoder default ->
+        let null_or decoder =
+          one_of
+            [ ( "non-null", decoder )
+            ; ( "null", null default )
+            ] in
+        let handle_result : t -> 'a decoder =
+          fun input ->
+            match decode_value path_decoder input with
+            | Ok rawValue ->
+              (* The field was present. *)
+              decode_value (null_or val_decoder) rawValue
+              |> from_result
+            | Error _ ->
+              (* The field was not present. *)
+              succeed default
+        in
+        value |> and_then handle_result
+
+    let optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder =
+      fun key val_decoder default next ->
+        custom (optional_decoder (field key value) val_decoder default) next
+
+    let optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder =
+      fun path val_decoder default next ->
+        custom (optional_decoder (at path value) val_decoder default) next
+  end
 end
 
 
@@ -490,6 +504,12 @@ module type S = sig
   *)
   val fix : ('a decoder -> 'a decoder) -> 'a decoder
 
+  module Infix : sig
+    val (>|=) : 'a decoder -> ('a -> 'b) -> 'b decoder
+    val (>>=) : 'a decoder -> ('a -> 'b decoder) -> 'b decoder
+    val (<*>) : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
+  end
+
   (** {1 Running decoders} *)
 
   (** Run a decoder on some input. *)
@@ -499,22 +519,23 @@ module type S = sig
   val decode_string : 'a decoder -> string -> ('a, error) result
 
   (** {1 Pipeline Decoders} *)
+  module Pipeline : sig
+    (**
+        Pipeline decoders present an alternative to the [mapN] style. They read
+        more naturally, but can lead to harder-to-understand type errors.
+      {[
+        let person_decoder : person decoder =
+          decode as_person
+          |> required "name" string
+          |> required "age" int
+      ]}
+    *)
 
-  (**
-      Pipeline decoders present an alternative to the [mapN] style. They read
-      more naturally, but can lead to harder-to-understand type errors.
-     {[
-       let person_decoder : person decoder =
-         decode as_person
-         |> required "name" string
-         |> required "age" int
-     ]}
-  *)
-
-  val decode : 'a -> 'a decoder
-  val required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-  val requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-  val optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
-  val optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
-  val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+    val decode : 'a -> 'a decoder
+    val required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+    val requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+    val optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
+    val optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
+    val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+  end
 end

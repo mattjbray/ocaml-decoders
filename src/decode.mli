@@ -146,6 +146,12 @@ module type S = sig
   *)
   val fix : ('a decoder -> 'a decoder) -> 'a decoder
 
+  module Infix : sig
+    val (>|=) : 'a decoder -> ('a -> 'b) -> 'b decoder
+    val (>>=) : 'a decoder -> ('a -> 'b decoder) -> 'b decoder
+    val (<*>) : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
+  end
+
   (** {1 Running decoders} *)
 
   (** Run a decoder on some input. *)
@@ -155,24 +161,25 @@ module type S = sig
   val decode_string : 'a decoder -> string -> ('a, error) result
 
   (** {1 Pipeline Decoders} *)
+  module Pipeline : sig
+    (**
+        Pipeline decoders present an alternative to the [mapN] style. They read
+        more naturally, but can lead to harder-to-understand type errors.
+      {[
+        let person_decoder : person decoder =
+          decode as_person
+          |> required "name" string
+          |> required "age" int
+      ]}
+    *)
 
-  (**
-      Pipeline decoders present an alternative to the [mapN] style. They read
-      more naturally, but can lead to harder-to-understand type errors.
-     {[
-       let person_decoder : person decoder =
-         decode as_person
-         |> required "name" string
-         |> required "age" int
-     ]}
-  *)
-
-  val decode : 'a -> 'a decoder
-  val required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-  val requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-  val optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
-  val optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
-  val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+    val decode : 'a -> 'a decoder
+    val required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+    val requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+    val optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
+    val optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
+    val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+  end
 end
 
 (** Signature of things that can be decoded. *)
@@ -225,6 +232,12 @@ module type S_exposed = sig
   val nullable : 'a decoder -> 'a option decoder
   val one_of : (string * 'a decoder) list -> 'a decoder
 
+  module Infix : sig
+    val (>|=) : 'a decoder -> ('a -> 'b) -> 'b decoder
+    val (>>=) : 'a decoder -> ('a -> 'b decoder) -> 'b decoder
+    val (<*>) : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
+  end
+
   val string : string decoder
   val int : int decoder
   val float : float decoder
@@ -234,14 +247,16 @@ module type S_exposed = sig
   val field : string -> 'a decoder -> 'a decoder
   val single_field : (string -> 'a decoder) -> 'a decoder
   val index : int -> 'a decoder -> 'a decoder
-
   val at : string list -> 'a decoder -> 'a decoder
-  val decode : 'a -> 'a decoder
-  val required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-  val requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-  val optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
-  val optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
-  val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+
+  module Pipeline : sig
+    val decode : 'a -> 'a decoder
+    val required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+    val requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+    val optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
+    val optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
+    val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+  end
 
   val decode_string : 'a decoder -> string -> ('a, error) result
 end

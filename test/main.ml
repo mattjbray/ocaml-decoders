@@ -29,9 +29,10 @@ let yojson_basic_suite =
                 int |> map (fun i -> Leaf i)
               in
               let node_decoder =
-                decode (fun left right -> Node (left, right))
-                |> required "left" tree_decoder
-                |> required "right" tree_decoder
+                Pipeline.(
+                  decode (fun left right -> Node (left, right))
+                  |> required "left" tree_decoder
+                  |> required "right" tree_decoder)
               in
               one_of
                 [ ("leaf", leaf_decoder)
@@ -69,16 +70,17 @@ let yojson_basic_suite =
   let grouping_errors_test =
     "grouping errors" >:: fun test_ctxt ->
       let decoder =
-        decode (fun x y z -> (x, y, z))
-        |> required "records"
-          (list
-             (decode (fun x y z -> (x, y, z))
-              |> required "x" (list string)
-              |> required "y" int
-              |> required "z" bool
-             ))
-        |> required "hello" int
-        |> required "another" int
+        Pipeline.(
+          decode (fun x y z -> (x, y, z))
+          |> required "records"
+            (list
+               (decode (fun x y z -> (x, y, z))
+                |> required "x" (list string)
+                |> required "y" int
+                |> required "z" bool
+               ))
+          |> required "hello" int
+          |> required "another" int)
       in
       let input = {|
         {"records": [true, {"x": [1, "c", 3], "y": "hello"}], "hello": "world", "another": "error"}
@@ -182,9 +184,10 @@ let yojson_raw_suite =
                 int |> map (fun i -> Leaf i)
               in
               let node_decoder =
-                decode (fun left right -> Node (left, right))
-                |> required "left" tree_decoder
-                |> required "right" tree_decoder
+                Pipeline.(
+                  decode (fun left right -> Node (left, right))
+                  |> required "left" tree_decoder
+                  |> required "right" tree_decoder)
               in
               one_of
                 [ ("leaf", leaf_decoder)
