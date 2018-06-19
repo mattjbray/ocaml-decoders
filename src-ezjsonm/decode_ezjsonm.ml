@@ -1,5 +1,5 @@
-module Ezjsonm_decodeable : Decode.Decodeable with type t = Ezjsonm.value = struct
-  type t = Ezjsonm.value
+module Ezjsonm_decodeable : Decode.Decodeable with type value = Ezjsonm.value = struct
+  type value = Ezjsonm.value
 
   let pp_t fmt t =
     match t with
@@ -11,7 +11,7 @@ module Ezjsonm_decodeable : Decode.Decodeable with type t = Ezjsonm.value = stru
 
   let pp fmt t = Format.fprintf fmt "@[%a@]" pp_t t
 
-  let of_string (input : string) : (t, string) result =
+  let of_string (input : string) : (value, string) result =
     try Ok (Ezjsonm.from_string input) with
     | Ezjsonm.Parse_error (json, msg) -> Error msg
 

@@ -1,6 +1,6 @@
 (** Turn Yaml values into Ocaml values. *)
 
-include Decode.S with type t = Ocyaml.yaml
+include Decode.S with type value = Ocyaml.yaml
 
 (** {1 Yaml-specific decoders}
 

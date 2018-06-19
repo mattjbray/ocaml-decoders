@@ -1,7 +1,7 @@
 (** {2 Yojson implementation} *)
 
-module Json_decodeable : Decode.Decodeable with type t = Yojson.Raw.json = struct
-  type t = Yojson.Raw.json
+module Json_decodeable : Decode.Decodeable with type value = Yojson.Raw.json = struct
+  type value = Yojson.Raw.json
   let pp fmt json = Format.fprintf fmt "@[%s@]" (Yojson.Raw.pretty_to_string json)
 
   let get_string = function
@@ -27,7 +27,7 @@ module Json_decodeable : Decode.Decodeable with type t = Yojson.Raw.json = struc
     | `Null -> Some ()
     | _ -> None
 
-  let get_list : t -> t list option = function
+  let get_list : value -> value list option = function
     | `List l -> Some l
     | _ -> None
 
@@ -39,7 +39,7 @@ module Json_decodeable : Decode.Decodeable with type t = Yojson.Raw.json = struc
     | `Assoc [(key, value)] -> Some (key, value)
     | _ -> None
 
-  let of_string : string -> (t, string) result =
+  let of_string : string -> (value, string) result =
     fun string ->
       try Ok (Yojson.Raw.from_string string) with
       | Yojson.Json_error msg -> Error (msg)

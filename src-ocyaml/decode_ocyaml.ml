@@ -1,9 +1,9 @@
 (** {2 Ocyaml implementation} *)
 
-module Yaml_decodeable : Decode.Decodeable with type t = Ocyaml.yaml = struct
+module Yaml_decodeable : Decode.Decodeable with type value = Ocyaml.yaml = struct
   open Ocyaml
 
-  type t = yaml
+  type value = yaml
 
   let rec pp fmt = function
     | Scalar string -> Format.fprintf fmt "@[%S@]" string
@@ -17,11 +17,11 @@ module Yaml_decodeable : Decode.Decodeable with type t = Ocyaml.yaml = struct
              Format.fprintf fmt "@[%a@]:@ @[%a@]" pp key pp value))
         xs
 
-  let get_string : t -> string option = function
+  let get_string : value -> string option = function
     | Scalar value -> Some value
     | _ -> None
 
-  let get_int : t -> int option =
+  let get_int : value -> int option =
     fun t ->
       try
         get_string t
@@ -30,7 +30,7 @@ module Yaml_decodeable : Decode.Decodeable with type t = Ocyaml.yaml = struct
       | Failure _ -> None
 
 
-  let get_float : t -> float option =
+  let get_float : value -> float option =
     fun t ->
       try
         get_string t
@@ -38,7 +38,7 @@ module Yaml_decodeable : Decode.Decodeable with type t = Ocyaml.yaml = struct
       with
       | Failure _ -> None
 
-  let get_bool : t -> bool option =
+  let get_bool : value -> bool option =
     fun t ->
       try
         get_string t
@@ -46,7 +46,7 @@ module Yaml_decodeable : Decode.Decodeable with type t = Ocyaml.yaml = struct
       with
       | Failure _ -> None
 
-  let get_null : t -> unit option =
+  let get_null : value -> unit option =
     fun t ->
       get_string t
       |> CCOpt.flat_map (function
@@ -66,7 +66,7 @@ module Yaml_decodeable : Decode.Decodeable with type t = Ocyaml.yaml = struct
     | Structure [(Scalar key, value)] -> Some (key, value)
     | _ -> None
 
-  let of_string : string -> (t, string) result =
+  let of_string : string -> (value, string) result =
     fun string ->
       try Ok (Ocyaml.of_string string) with
       | exn -> Error (Printexc.to_string exn)

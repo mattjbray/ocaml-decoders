@@ -1,10 +1,10 @@
 (** Turn JSON values into Ocaml values. *)
 
-include Decode.S with type t = Yojson.Raw.json
+include Decode.S with type value = Yojson.Raw.json
 
 (** {1 JSON-specific decoders} *)
 
-val json_of_file : string -> (t, error) result
+val json_of_file : string -> (value, error) result
 
 (** {1 Yojson.Raw-specific decoders}*)
 

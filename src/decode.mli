@@ -3,16 +3,16 @@ module type S = sig
   (* Note: this signature is just S_exposed, but with the type [t] abstract. *)
 
   (** The type of values to be decoded (e.g. JSON or Yaml). *)
-  type t
+  type value
 
   type error =
-    | Decoder_error of string * t option
+    | Decoder_error of string * value option
     | Decoder_errors of error list
     | Decoder_tag of string * error
 
   val pp_error : Format.formatter -> error -> unit
 
-  val of_string : string -> (t, error) result
+  val of_string : string -> (value, error) result
 
   (** The type of decoders.
 
@@ -155,7 +155,7 @@ module type S = sig
   (** {1 Running decoders} *)
 
   (** Run a decoder on some input. *)
-  val decode_value : 'a decoder -> t -> ('a, error) result
+  val decode_value : 'a decoder -> value -> ('a, error) result
 
   (** Run a decoder on a string. *)
   val decode_string : 'a decoder -> string -> ('a, error) result
@@ -184,28 +184,28 @@ end
 
 (** Signature of things that can be decoded. *)
 module type Decodeable = sig
-  type t
-  val pp : Format.formatter -> t -> unit
-  val of_string : string -> (t, string) result
+  type value
+  val pp : Format.formatter -> value -> unit
+  val of_string : string -> (value, string) result
 
-  val get_string : t -> string option
-  val get_int : t -> int option
-  val get_float : t -> float option
-  val get_bool : t -> bool option
-  val get_null : t -> unit option
-  val get_list : t -> t list option
-  val get_field : string -> t -> t option
-  val get_single_field : t -> (string * t) option
+  val get_string : value -> string option
+  val get_int : value -> int option
+  val get_float : value -> float option
+  val get_bool : value -> bool option
+  val get_null : value -> unit option
+  val get_list : value -> value list option
+  val get_field : string -> value -> value option
+  val get_single_field : value -> (string * value) option
 end
 
 
 (** Basic decoder combinators. *)
 module type S_exposed = sig
-  type t
-  val pp : Format.formatter -> t -> unit
+  type value
+  val pp : Format.formatter -> value -> unit
 
   type error =
-    | Decoder_error of string * t option
+    | Decoder_error of string * value option
     | Decoder_errors of error list
     | Decoder_tag of string * error
 
@@ -214,20 +214,20 @@ module type S_exposed = sig
   val tag_errors : string -> error list -> error
   val combine_errors : ('a, error) result list -> ('a list, error list) result
 
-  val of_string : string -> (t, error) result
+  val of_string : string -> (value, error) result
 
-  type 'a decoder = { run : t -> ('a, error) result }
+  type 'a decoder = { run : value -> ('a, error) result }
 
   val succeed : 'a -> 'a decoder
   val fail : string -> 'a decoder
   val fail_with : error -> 'a decoder
   val from_result : ('a, error) result -> 'a decoder
-  val value : t decoder
+  val value : value decoder
   val map : ('a -> 'b) -> 'a decoder -> 'b decoder
   val apply : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
   val and_then : ('a -> 'b decoder) -> 'a decoder -> 'b decoder
   val fix : ('a decoder -> 'a decoder) -> 'a decoder
-  val decode_value : 'a decoder -> t -> ('a, error) result
+  val decode_value : 'a decoder -> value -> ('a, error) result
   val maybe : 'a decoder -> 'a option decoder
   val nullable : 'a decoder -> 'a option decoder
   val one_of : (string * 'a decoder) list -> 'a decoder
@@ -261,4 +261,4 @@ module type S_exposed = sig
   val decode_string : 'a decoder -> string -> ('a, error) result
 end
 
-module Make(M : Decodeable) : S_exposed with type t = M.t
+module Make(M : Decodeable) : S_exposed with type value = M.value
