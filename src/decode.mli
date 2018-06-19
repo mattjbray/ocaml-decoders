@@ -112,7 +112,7 @@ module type S = sig
   (** {1 Working with object keys} *)
 
   (** Decode all of the keys of an object to a list of strings. *)
-  val keys : string list decoder
+  val keys : 'a decoder -> 'a list decoder
 
   (** Decode an object into a list of key-value pairs. *)
   val key_value_pairs : 'a decoder -> (string * 'a) list decoder
@@ -194,6 +194,7 @@ module type Decodeable = sig
   val get_bool : value -> bool option
   val get_null : value -> unit option
   val get_list : value -> value list option
+  val get_key_value_pairs : value -> (value * value) list option
   val get_field : string -> value -> value option
   val get_single_field : value -> (string * value) option
 end
@@ -246,6 +247,7 @@ module type S_exposed = sig
   val list : 'a decoder -> 'a list decoder
   val field : string -> 'a decoder -> 'a decoder
   val single_field : (string -> 'a decoder) -> 'a decoder
+  val keys : 'a decoder -> 'a list decoder
   val index : int -> 'a decoder -> 'a decoder
   val at : string list -> 'a decoder -> 'a decoder
 

@@ -58,6 +58,10 @@ module Yaml_decodeable : Decode.Decodeable with type value = Ocyaml.yaml = struc
     | Collection l -> Some l
     | _ -> None
 
+  let get_key_value_pairs = function
+    | Structure assoc -> Some assoc
+    | _ -> None
+
   let get_field key = function
     | Structure assoc -> CCList.assoc_opt ~eq:Ocyaml.equal (Scalar key) assoc
     | _ -> None
@@ -77,20 +81,6 @@ open Ocyaml
 module M = Decode.Make(Yaml_decodeable)
 
 include M
-
-let keys_yaml : 'k decoder -> 'k list decoder = fun decoder ->
-  { run =
-      function
-      | Structure assoc ->
-        (List.map (fun (key_yaml, _) -> decoder.run key_yaml) assoc)
-        |> combine_errors
-        |> CCResult.map_err
-          (tag_errors "Failed while decoding the keys of an object")
-      | yaml -> (fail "Expected an object").run yaml
-  }
-
-let keys : string list decoder =
-  keys_yaml string
 
 let key_value_pairs_yaml : 'k decoder -> 'v decoder -> ('k * 'v) list decoder =
   fun key_decoder value_decoder ->

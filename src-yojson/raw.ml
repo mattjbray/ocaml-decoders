@@ -31,6 +31,10 @@ module Json_decodeable : Decode.Decodeable with type value = Yojson.Raw.json = s
     | `List l -> Some l
     | _ -> None
 
+  let get_key_value_pairs : value -> (value * value) list option = function
+    | `Assoc assoc -> Some (List.map (fun (key, value) -> (`Stringlit (Printf.sprintf "%S" key), value)) assoc)
+    | _ -> None
+
   let get_field key = function
     | `Assoc assoc -> CCList.assoc_opt ~eq:(=) key assoc
     | _ -> None
@@ -52,13 +56,6 @@ open Yojson.Raw
 let json_of_file file =
   try Ok (from_file file) with
   | e -> Error (Decoder_error (Printexc.to_string e, None))
-
-let keys : string list decoder =
-  { run =
-      function
-      | `Assoc assoc -> Ok (List.map fst assoc)
-      | json -> (fail "Expected an object").run json
-  }
 
 let key_value_pairs : 'a decoder -> (string * 'a) list decoder = fun decoder ->
   { run =

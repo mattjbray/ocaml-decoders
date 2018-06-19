@@ -41,6 +41,10 @@ module Ezjsonm_decodeable : Decode.Decodeable with type value = Ezjsonm.value = 
     | `A a -> Some a
     | _ -> None
 
+  let get_key_value_pairs = function
+    | `O assoc -> Some (List.map (fun (key, value) -> (`String key, value)) assoc)
+    | _ -> None
+
   let get_single_field = function
     | `O [(key, value)] -> Some (key, value)
     | _ -> None
@@ -51,13 +55,6 @@ module Ezjsonm_decodeable : Decode.Decodeable with type value = Ezjsonm.value = 
 end
 
 include Decode.Make(Ezjsonm_decodeable)
-
-let keys : string list decoder =
-  { run =
-      function
-      | `O assoc -> Ok (List.map fst assoc)
-      | json -> (fail "Expected an object").run json
-  }
 
 let key_value_pairs : 'a decoder -> (string * 'a) list decoder = fun decoder ->
   { run =

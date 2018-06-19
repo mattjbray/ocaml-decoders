@@ -12,6 +12,7 @@ module type Decodeable = sig
   val get_bool : value -> bool option
   val get_null : value -> unit option
   val get_list : value -> value list option
+  val get_key_value_pairs : value -> (value * value) list option
   val get_field : string -> value -> value option
   val get_single_field : value -> (string * value) option
 end
@@ -63,6 +64,7 @@ module type S_exposed = sig
   val list : 'a decoder -> 'a list decoder
   val field : string -> 'a decoder -> 'a decoder
   val single_field : (string -> 'a decoder) -> 'a decoder
+  val keys : 'a decoder -> 'a list decoder
   val index : int -> 'a decoder -> 'a decoder
   val at : string list -> 'a decoder -> 'a decoder
 
@@ -303,6 +305,20 @@ module Make(Decodeable : Decodeable) : S_exposed with type value = Decodeable.va
     | key :: rest -> field key (at rest decoder)
     | [] -> fail "Must provide at least one key to 'at'"
 
+  let keys : 'a decoder -> 'a list decoder =
+    fun key_decoder ->
+      { run =
+          fun value ->
+            match Decodeable.get_key_value_pairs value with
+            | Some assoc ->
+              assoc
+              |> List.map (fun (key, _) -> key_decoder.run key)
+              |> combine_errors
+              |> CCResult.map_err
+                (tag_errors "Failed while decoding the keys of an object")
+            | None -> (fail "Expected an object").run value
+      }
+
   let decode_value (decoder : 'a decoder) (input : value) : ('a, error) result =
       decoder.run input
 
@@ -469,8 +485,8 @@ module type S = sig
 
   (** {1 Working with object keys} *)
 
-  (** Decode all of the keys of an object to a list of strings. *)
-  val keys : string list decoder
+  (** Decode all of the keys of an object. *)
+  val keys : 'a decoder -> 'a list decoder
 
   (** Decode an object into a list of key-value pairs. *)
   val key_value_pairs : 'a decoder -> (string * 'a) list decoder
