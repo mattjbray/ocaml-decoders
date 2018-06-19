@@ -1,14 +1,16 @@
+type 'value exposed_error =
+  | Decoder_error of string * 'value option
+  | Decoder_errors of 'value exposed_error list
+  | Decoder_tag of string * 'value exposed_error
+
+type ('value, 'a) exposed_decoder = { run : 'value -> ('a, 'value exposed_error) result }
+
 (** User-facing Decoder interface. *)
 module type S = sig
-  (* Note: this signature is just S_exposed, but with the type [t] abstract. *)
-
   (** The type of values to be decoded (e.g. JSON or Yaml). *)
   type value
 
-  type error =
-    | Decoder_error of string * value option
-    | Decoder_errors of error list
-    | Decoder_tag of string * error
+  type error = value exposed_error
 
   val pp_error : Format.formatter -> error -> unit
 
@@ -182,6 +184,11 @@ module type S = sig
   end
 end
 
+(** {2} Creating a Decoder implementation
+
+    The following are useful only if you are creating a new Decoder implementation.
+*)
+
 (** Signature of things that can be decoded. *)
 module type Decodeable = sig
   type value
@@ -199,70 +206,6 @@ module type Decodeable = sig
   val get_single_field : value -> (string * value) option
 end
 
-
-(** Basic decoder combinators. *)
-module type S_exposed = sig
-  type value
-  val pp : Format.formatter -> value -> unit
-
-  type error =
-    | Decoder_error of string * value option
-    | Decoder_errors of error list
-    | Decoder_tag of string * error
-
-  val pp_error : Format.formatter -> error -> unit
-  val tag_error : string -> error -> error
-  val tag_errors : string -> error list -> error
-  val combine_errors : ('a, error) result list -> ('a list, error list) result
-
-  val of_string : string -> (value, error) result
-
-  type 'a decoder = { run : value -> ('a, error) result }
-
-  val succeed : 'a -> 'a decoder
-  val fail : string -> 'a decoder
-  val fail_with : error -> 'a decoder
-  val from_result : ('a, error) result -> 'a decoder
-  val value : value decoder
-  val map : ('a -> 'b) -> 'a decoder -> 'b decoder
-  val apply : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
-  val and_then : ('a -> 'b decoder) -> 'a decoder -> 'b decoder
-  val fix : ('a decoder -> 'a decoder) -> 'a decoder
-  val decode_value : 'a decoder -> value -> ('a, error) result
-  val maybe : 'a decoder -> 'a option decoder
-  val nullable : 'a decoder -> 'a option decoder
-  val one_of : (string * 'a decoder) list -> 'a decoder
-
-  module Infix : sig
-    val (>|=) : 'a decoder -> ('a -> 'b) -> 'b decoder
-    val (>>=) : 'a decoder -> ('a -> 'b decoder) -> 'b decoder
-    val (<*>) : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
-  end
-
-  val string : string decoder
-  val int : int decoder
-  val float : float decoder
-  val bool : bool decoder
-  val null : 'a -> 'a decoder
-  val list : 'a decoder -> 'a list decoder
-  val field : string -> 'a decoder -> 'a decoder
-  val single_field : (string -> 'a decoder) -> 'a decoder
-  val keys : 'k decoder -> 'k list decoder
-  val key_value_pairs : 'k decoder -> 'v decoder -> ('k * 'v) list decoder
-  val key_value_pairs_seq : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder
-  val index : int -> 'a decoder -> 'a decoder
-  val at : string list -> 'a decoder -> 'a decoder
-
-  module Pipeline : sig
-    val decode : 'a -> 'a decoder
-    val required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-    val requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-    val optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
-    val optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
-    val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-  end
-
-  val decode_string : 'a decoder -> string -> ('a, error) result
-end
-
-module Make(M : Decodeable) : S_exposed with type value = M.value
+(** Derive decoders for a [Decodeable.value]. *)
+module Make(M : Decodeable) : S with type value = M.value
+                                 and type 'a decoder = (M.value, 'a) exposed_decoder

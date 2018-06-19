@@ -55,7 +55,7 @@ open Yojson.Raw
 
 let json_of_file file =
   try Ok (from_file file) with
-  | e -> Error (Decoder_error (Printexc.to_string e, None))
+  | e -> Error (Decode.Decoder_error (Printexc.to_string e, None))
 
 (* Yojson.Raw specific decoders *)
 

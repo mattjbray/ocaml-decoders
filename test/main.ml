@@ -87,6 +87,7 @@ let yojson_basic_suite =
       |}
       in
       let expected_error =
+        let open Decode in
         Decoder_errors
           [ Decoder_tag
               ( {|in field "records"|}
