@@ -20,8 +20,6 @@ module type Decodeable = sig
   val get_null : value -> unit option
   val get_list : value -> value list option
   val get_key_value_pairs : value -> (value * value) list option
-  val get_field : string -> value -> value option
-  val get_single_field : value -> (string * value) option
 end
 
 (** User-facing Decoder interface. *)
@@ -380,7 +378,15 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
     fun key value_decoder ->
       { run =
           fun t ->
-            match Decodeable.get_field key t with
+            let value =
+              Decodeable.get_key_value_pairs t
+              |> CCOpt.flat_map (CCList.find_map (fun (k, v) ->
+                  match Decodeable.get_string k with
+                  | Some s when s = key -> Some v
+                  | _ -> None
+                ))
+            in
+            match value with
             | Some value ->
               value_decoder.run value
               |> CCResult.map_err (tag_error (Printf.sprintf "in field %S" key))
@@ -391,11 +397,15 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
     fun value_decoder ->
       { run =
           fun t ->
-            match Decodeable.get_single_field t with
-            | Some (key, value) ->
-              (value_decoder key).run value
-              |> CCResult.map_err (tag_error (Printf.sprintf "in field %S" key))
-            | None -> (fail "Expected an object with a single attribute").run t
+            match Decodeable.get_key_value_pairs t with
+            | Some [(key, value)] ->
+              begin match Decodeable.get_string key with
+                | Some key ->
+                  (value_decoder key).run value
+                  |> CCResult.map_err (tag_error (Printf.sprintf "in field %S" key))
+                | None -> (fail "Expected an object with a string key").run t
+              end
+            | _ -> (fail "Expected an object with a single attribute").run t
       }
 
   let index : int -> 'a decoder -> 'a decoder =

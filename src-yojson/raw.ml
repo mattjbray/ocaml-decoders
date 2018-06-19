@@ -35,14 +35,6 @@ module Json_decodeable : Decode.Decodeable with type value = Yojson.Raw.json = s
     | `Assoc assoc -> Some (List.map (fun (key, value) -> (`Stringlit (Printf.sprintf "%S" key), value)) assoc)
     | _ -> None
 
-  let get_field key = function
-    | `Assoc assoc -> CCList.assoc_opt ~eq:(=) key assoc
-    | _ -> None
-
-  let get_single_field = function
-    | `Assoc [(key, value)] -> Some (key, value)
-    | _ -> None
-
   let of_string : string -> (value, string) result =
     fun string ->
       try Ok (Yojson.Raw.from_string string) with

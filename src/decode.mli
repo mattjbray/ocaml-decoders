@@ -207,8 +207,6 @@ module type Decodeable = sig
   val get_null : value -> unit option
   val get_list : value -> value list option
   val get_key_value_pairs : value -> (value * value) list option
-  val get_field : string -> value -> value option
-  val get_single_field : value -> (string * value) option
 end
 
 (** Derive decoders for a [Decodeable.value]. *)

@@ -62,14 +62,6 @@ module Yaml_decodeable : Decode.Decodeable with type value = Ocyaml.yaml = struc
     | Structure assoc -> Some assoc
     | _ -> None
 
-  let get_field key = function
-    | Structure assoc -> CCList.assoc_opt ~eq:Ocyaml.equal (Scalar key) assoc
-    | _ -> None
-
-  let get_single_field = function
-    | Structure [(Scalar key, value)] -> Some (key, value)
-    | _ -> None
-
   let of_string : string -> (value, string) result =
     fun string ->
       try Ok (Ocyaml.of_string string) with
