@@ -115,11 +115,11 @@ module type S = sig
   val keys : 'a decoder -> 'a list decoder
 
   (** Decode an object into a list of key-value pairs. *)
-  val key_value_pairs : 'a decoder -> (string * 'a) list decoder
+  val key_value_pairs : 'k decoder -> 'v decoder -> ('k * 'v) list decoder
 
   (** Decode an object into a list of values, where the value
       decoder depends on the key. *)
-  val key_value_pairs_seq : (string -> 'a decoder) -> 'a list decoder
+  val key_value_pairs_seq : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder
 
   (** Decode an object into a [String.Map.t]. *)
   (* val string_map : 'a decoder -> 'a Core.String.Map.t decoder *)
@@ -247,7 +247,9 @@ module type S_exposed = sig
   val list : 'a decoder -> 'a list decoder
   val field : string -> 'a decoder -> 'a decoder
   val single_field : (string -> 'a decoder) -> 'a decoder
-  val keys : 'a decoder -> 'a list decoder
+  val keys : 'k decoder -> 'k list decoder
+  val key_value_pairs : 'k decoder -> 'v decoder -> ('k * 'v) list decoder
+  val key_value_pairs_seq : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder
   val index : int -> 'a decoder -> 'a decoder
   val at : string list -> 'a decoder -> 'a decoder
 

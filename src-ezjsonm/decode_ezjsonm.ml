@@ -55,32 +55,3 @@ module Ezjsonm_decodeable : Decode.Decodeable with type value = Ezjsonm.value = 
 end
 
 include Decode.Make(Ezjsonm_decodeable)
-
-let key_value_pairs : 'a decoder -> (string * 'a) list decoder = fun decoder ->
-  { run =
-      function
-      | `O assoc ->
-        assoc
-        |> List.map
-          CCResult.Infix.(fun (key, value_json) ->
-              decoder.run value_json >|= fun value -> (key, value)
-            )
-        |> combine_errors
-        |> CCResult.map_err
-          (tag_errors (Printf.sprintf "Failed while decoding an object"))
-      | json -> (fail "Expected an object").run json
-  }
-
-let key_value_pairs_seq : (string -> 'a decoder) -> 'a list decoder = fun decoder ->
-  { run =
-      function
-      | `O assoc ->
-        assoc
-        |> List.map (fun (key, value_json) ->
-            (decoder key).run value_json
-          )
-        |> combine_errors
-        |> CCResult.map_err
-          (tag_errors (Printf.sprintf "Failed while decoding an object"))
-      | json -> (fail "Expected an object").run json
-  }

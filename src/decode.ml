@@ -65,6 +65,8 @@ module type S_exposed = sig
   val field : string -> 'a decoder -> 'a decoder
   val single_field : (string -> 'a decoder) -> 'a decoder
   val keys : 'a decoder -> 'a list decoder
+  val key_value_pairs : 'k decoder -> 'v decoder -> ('k * 'v) list decoder
+  val key_value_pairs_seq : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder
   val index : int -> 'a decoder -> 'a decoder
   val at : string list -> 'a decoder -> 'a decoder
 
@@ -305,7 +307,7 @@ module Make(Decodeable : Decodeable) : S_exposed with type value = Decodeable.va
     | key :: rest -> field key (at rest decoder)
     | [] -> fail "Must provide at least one key to 'at'"
 
-  let keys : 'a decoder -> 'a list decoder =
+  let keys : 'k decoder -> 'k list decoder =
     fun key_decoder ->
       { run =
           fun value ->
@@ -318,6 +320,44 @@ module Make(Decodeable : Decodeable) : S_exposed with type value = Decodeable.va
                 (tag_errors "Failed while decoding the keys of an object")
             | None -> (fail "Expected an object").run value
       }
+
+  let key_value_pairs : 'k decoder -> 'v decoder -> ('k * 'v) list decoder =
+    fun key_decoder value_decoder ->
+      { run =
+          fun value ->
+            match Decodeable.get_key_value_pairs value with
+            | Some assoc ->
+              assoc
+              |> List.map
+                CCResult.Infix.(fun (key_val, value_val) ->
+                    key_decoder.run key_val >>= fun key ->
+                    value_decoder.run value_val >|= fun value ->
+                    (key, value)
+                  )
+              |> combine_errors
+              |> CCResult.map_err
+                (tag_errors "Failed while decoding key-value pairs")
+            | None -> (fail "Expected an object").run value
+      }
+
+  let key_value_pairs_seq : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder =
+    fun key_decoder value_decoder ->
+      { run =
+          fun value ->
+            match Decodeable.get_key_value_pairs value with
+            | Some assoc ->
+              assoc
+              |> List.map
+                CCResult.Infix.(fun (key_val, value_val) ->
+                    key_decoder.run key_val >>= fun key ->
+                    (value_decoder key).run value_val
+                  )
+              |> combine_errors
+              |> CCResult.map_err
+                (tag_errors "Failed while decoding key-value pairs")
+            | None -> (fail "Expected an object").run value
+      }
+
 
   let decode_value (decoder : 'a decoder) (input : value) : ('a, error) result =
       decoder.run input
@@ -489,14 +529,11 @@ module type S = sig
   val keys : 'a decoder -> 'a list decoder
 
   (** Decode an object into a list of key-value pairs. *)
-  val key_value_pairs : 'a decoder -> (string * 'a) list decoder
+  val key_value_pairs : 'k decoder -> 'v decoder -> ('k * 'v) list decoder
 
   (** Decode an object into a list of values, where the value
       decoder depends on the key. *)
-  val key_value_pairs_seq : (string -> 'a decoder) -> 'a list decoder
-
-  (** Decode an object into a [String.Map.t]. *)
-  (* val string_map : 'a decoder -> 'a Core.String.Map.t decoder *)
+  val key_value_pairs_seq : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder
 
   (** {1 Fancy decoding} *)
 
