@@ -114,14 +114,19 @@ module type S = sig
   (** {1 Working with object keys} *)
 
   (** Decode all of the keys of an object to a list of strings. *)
-  val keys : 'a decoder -> 'a list decoder
+  val keys : string list decoder
 
   (** Decode an object into a list of key-value pairs. *)
-  val key_value_pairs : 'k decoder -> 'v decoder -> ('k * 'v) list decoder
+  val key_value_pairs : 'v decoder -> (string * 'v) list decoder
 
   (** Decode an object into a list of values, where the value
       decoder depends on the key. *)
-  val key_value_pairs_seq : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder
+  val key_value_pairs_seq : (string -> 'v decoder) -> 'v list decoder
+
+  (** [keys'] is for when your keys might not be strings - probably only likely for Yaml. *)
+  val keys' : 'k decoder -> 'k list decoder
+  val key_value_pairs' : 'k decoder -> 'v decoder -> ('k * 'v) list decoder
+  val key_value_pairs_seq' : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder
 
   (** Decode an object into a [String.Map.t]. *)
   (* val string_map : 'a decoder -> 'a Core.String.Map.t decoder *)

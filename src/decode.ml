@@ -132,15 +132,13 @@ module type S = sig
 
   (** {1 Working with object keys} *)
 
-  (** Decode all of the keys of an object. *)
-  val keys : 'a decoder -> 'a list decoder
+  val keys : string list decoder
+  val key_value_pairs : 'v decoder -> (string * 'v) list decoder
+  val key_value_pairs_seq : (string -> 'v decoder) -> 'v list decoder
 
-  (** Decode an object into a list of key-value pairs. *)
-  val key_value_pairs : 'k decoder -> 'v decoder -> ('k * 'v) list decoder
-
-  (** Decode an object into a list of values, where the value
-      decoder depends on the key. *)
-  val key_value_pairs_seq : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder
+  val keys' : 'k decoder -> 'k list decoder
+  val key_value_pairs' : 'k decoder -> 'v decoder -> ('k * 'v) list decoder
+  val key_value_pairs_seq' : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder
 
   (** {1 Fancy decoding} *)
 
@@ -424,7 +422,7 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
     | key :: rest -> field key (at rest decoder)
     | [] -> fail "Must provide at least one key to 'at'"
 
-  let keys : 'k decoder -> 'k list decoder =
+  let keys' : 'k decoder -> 'k list decoder =
     fun key_decoder ->
       { run =
           fun value ->
@@ -438,7 +436,9 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
             | None -> (fail "Expected an object").run value
       }
 
-  let key_value_pairs : 'k decoder -> 'v decoder -> ('k * 'v) list decoder =
+  let keys = keys' string
+
+  let key_value_pairs' : 'k decoder -> 'v decoder -> ('k * 'v) list decoder =
     fun key_decoder value_decoder ->
       { run =
           fun value ->
@@ -457,7 +457,9 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
             | None -> (fail "Expected an object").run value
       }
 
-  let key_value_pairs_seq : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder =
+  let key_value_pairs value_decoder = key_value_pairs' string value_decoder
+
+  let key_value_pairs_seq' : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder =
     fun key_decoder value_decoder ->
       { run =
           fun value ->
@@ -475,6 +477,7 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
             | None -> (fail "Expected an object").run value
       }
 
+  let key_value_pairs_seq value_decoder = key_value_pairs_seq' string value_decoder
 
   let decode_value (decoder : 'a decoder) (input : value) : ('a, error) result =
       decoder.run input
