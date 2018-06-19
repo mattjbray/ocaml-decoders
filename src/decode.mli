@@ -15,6 +15,7 @@ module type S = sig
   val pp_error : Format.formatter -> error -> unit
 
   val of_string : string -> (value, error) result
+  val of_file : string -> (value, error) result
 
   (** The type of decoders.
 
@@ -167,6 +168,9 @@ module type S = sig
   (** Run a decoder on a string. *)
   val decode_string : 'a decoder -> string -> ('a, error) result
 
+  (** Run a decoder on a file. *)
+  val decode_file : 'a decoder -> string -> ('a, error) result
+
   (** {1 Pipeline Decoders} *)
   module Pipeline : sig
     (**
@@ -199,6 +203,7 @@ module type Decodeable = sig
   type value
   val pp : Format.formatter -> value -> unit
   val of_string : string -> (value, string) result
+  val of_file : string -> (value, string) result
 
   val get_string : value -> string option
   val get_int : value -> int option

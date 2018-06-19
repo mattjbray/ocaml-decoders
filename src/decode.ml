@@ -12,6 +12,7 @@ module type Decodeable = sig
   type value
   val pp : Format.formatter -> value -> unit
   val of_string : string -> (value, string) result
+  val of_file : string -> (value, string) result
 
   val get_string : value -> string option
   val get_int : value -> int option
@@ -32,6 +33,7 @@ module type S = sig
   val pp_error : Format.formatter -> error -> unit
 
   val of_string : string -> (value, error) result
+  val of_file : string -> (value, error) result
 
   (** The type of decoders.
 
@@ -174,6 +176,9 @@ module type S = sig
   (** Run a decoder on a string. *)
   val decode_string : 'a decoder -> string -> ('a, error) result
 
+  (** Run a decoder on a file. *)
+  val decode_file : 'a decoder -> string -> ('a, error) result
+
   (** {1 Pipeline Decoders} *)
   module Pipeline : sig
     (**
@@ -246,6 +251,13 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
       Decodeable.of_string string
       |> CCResult.map_err (fun msg ->
           (Decoder_tag ("Json parse error", Decoder_error (msg, None)))
+        )
+
+  let of_file : string -> (value, error) result =
+    fun file ->
+      Decodeable.of_file file
+      |> CCResult.map_err (fun msg ->
+          (Decoder_tag (Printf.sprintf "While reading %s" file, Decoder_error (msg, None)))
         )
 
   type 'a decoder = (value, 'a) exposed_decoder
@@ -495,6 +507,10 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
   let decode_string : 'a decoder -> string -> ('a, error) result =
     fun decoder string ->
       of_string string >>= decode_value decoder
+
+  let decode_file : 'a decoder -> string -> ('a, error) result =
+    fun decoder file ->
+      of_file file >>= decode_value decoder
 
   module Pipeline = struct
     let decode = succeed

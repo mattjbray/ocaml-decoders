@@ -4,6 +4,15 @@ module Json_decodeable : Decode.Decodeable with type value = Yojson.Raw.json = s
   type value = Yojson.Raw.json
   let pp fmt json = Format.fprintf fmt "@[%s@]" (Yojson.Raw.pretty_to_string json)
 
+  let of_string : string -> (value, string) result =
+    fun string ->
+      try Ok (Yojson.Raw.from_string string) with
+      | Yojson.Json_error msg -> Error (msg)
+
+  let of_file file =
+    try Ok (Yojson.Raw.from_file file) with
+    | e -> Error (Printexc.to_string e)
+
   let get_string = function
     | `Stringlit s ->
       (* Stringlits are wrapped in double-quotes. *)
@@ -34,20 +43,9 @@ module Json_decodeable : Decode.Decodeable with type value = Yojson.Raw.json = s
   let get_key_value_pairs : value -> (value * value) list option = function
     | `Assoc assoc -> Some (List.map (fun (key, value) -> (`Stringlit (Printf.sprintf "%S" key), value)) assoc)
     | _ -> None
-
-  let of_string : string -> (value, string) result =
-    fun string ->
-      try Ok (Yojson.Raw.from_string string) with
-      | Yojson.Json_error msg -> Error (msg)
 end
 
 include Decode.Make(Json_decodeable)
-
-open Yojson.Raw
-
-let json_of_file file =
-  try Ok (from_file file) with
-  | e -> Error (Decode.Decoder_error (Printexc.to_string e, None))
 
 (* Yojson.Raw specific decoders *)
 

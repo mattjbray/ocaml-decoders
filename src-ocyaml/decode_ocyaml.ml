@@ -17,6 +17,15 @@ module Yaml_decodeable : Decode.Decodeable with type value = Ocyaml.yaml = struc
              Format.fprintf fmt "@[%a@]:@ @[%a@]" pp key pp value))
         xs
 
+  let of_string : string -> (value, string) result =
+    fun string ->
+      try Ok (Ocyaml.of_string string) with
+      | exn -> Error (Printexc.to_string exn)
+
+  let of_file file =
+    try Ok (Ocyaml.of_file file) with
+    | e -> Error (Printexc.to_string e)
+
   let get_string : value -> string option = function
     | Scalar value -> Some value
     | _ -> None
@@ -61,11 +70,6 @@ module Yaml_decodeable : Decode.Decodeable with type value = Ocyaml.yaml = struc
   let get_key_value_pairs = function
     | Structure assoc -> Some assoc
     | _ -> None
-
-  let of_string : string -> (value, string) result =
-    fun string ->
-      try Ok (Ocyaml.of_string string) with
-      | exn -> Error (Printexc.to_string exn)
 end
 
 include Decode.Make(Yaml_decodeable)
