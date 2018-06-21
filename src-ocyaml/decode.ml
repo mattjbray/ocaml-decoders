@@ -1,5 +1,7 @@
 (** {2 Ocyaml implementation} *)
 
+open Decoders
+
 module Yaml_decodeable : Decode.Decodeable with type value = Ocyaml.yaml = struct
   open Ocyaml
 

@@ -1,5 +1,7 @@
 (** {2 Yojson implementation} *)
 
+open Decoders
+
 module Json_decodeable : Decode.Decodeable with type value = Yojson.Raw.json = struct
   type value = Yojson.Raw.json
   let pp fmt json = Format.fprintf fmt "@[%s@]" (Yojson.Raw.pretty_to_string json)
@@ -45,21 +47,52 @@ module Json_decodeable : Decode.Decodeable with type value = Yojson.Raw.json = s
     | _ -> None
 end
 
-include Decode.Make(Json_decodeable)
+module Decode = struct
+  include Decode.Make(Json_decodeable)
 
-(* Yojson.Raw specific decoders *)
+  (* Yojson.Raw specific decoders *)
 
-let intlit : string decoder =
-  { run =
-      function
-      | `Intlit value -> Ok value
-      | json -> (fail "Expected an int").run json
-  }
+  let intlit : string decoder =
+    { run =
+        function
+        | `Intlit value -> Ok value
+        | json -> (fail "Expected an int").run json
+    }
 
-let floatlit : string decoder =
-  { run =
-      function
-      | `Floatlit value -> Ok value
-      | `Intlit value -> Ok value
-      | json -> (fail "Expected a float").run json
-  }
+  let floatlit : string decoder =
+    { run =
+        function
+        | `Floatlit value -> Ok value
+        | `Intlit value -> Ok value
+        | json -> (fail "Expected a float").run json
+    }
+end
+
+
+module Json_encodeable = struct
+  type value = Yojson.Raw.json
+
+  let to_string json = Yojson.Raw.to_string json
+
+  let of_string x = `Stringlit (Printf.sprintf "%S" x)
+  let of_int x = `Intlit (string_of_int x)
+  let of_float x = `Floatlit (string_of_float x)
+  let of_bool x = `Bool x
+  let null = `Null
+
+  let of_list xs = `List xs
+  let of_key_value_pairs xs =
+    `Assoc
+      (xs
+       |> CCList.filter_map (fun (k, v) ->
+           Json_decodeable.get_string k
+           |> CCOpt.map (fun k -> (k, v))
+         ))
+end
+
+module Encode = struct
+  include Encode.Make(Json_encodeable)
+
+  let intlit x = `Intlit x
+  let floatlit x = `Floatlit x
+end

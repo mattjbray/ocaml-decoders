@@ -1,5 +1,7 @@
 (** {2 Yojson implementation} *)
 
+open Decoders
+
 module Json_decodeable : Decode.Decodeable with type value = Yojson.Basic.json = struct
   type value = Yojson.Basic.json
   let pp fmt json = Format.fprintf fmt "@[%s@]" (Yojson.Basic.pretty_to_string json)
@@ -43,4 +45,27 @@ module Json_decodeable : Decode.Decodeable with type value = Yojson.Basic.json =
     | _ -> None
 end
 
-include Decode.Make(Json_decodeable)
+module Decode = Decode.Make(Json_decodeable)
+
+module Json_encodeable = struct
+  type value = Yojson.Basic.json
+
+  let to_string json = Yojson.Basic.to_string json
+
+  let of_string x = `String x
+  let of_int x = `Int x
+  let of_float x = `Float x
+  let of_bool x = `Bool x
+  let null = `Null
+
+  let of_list xs = `List xs
+  let of_key_value_pairs xs =
+    `Assoc
+      (xs
+       |> CCList.filter_map (fun (k, v) ->
+           match k with
+           | `String k -> Some (k, v)
+           | _ -> None))
+end
+
+module Encode = Encode.Make(Json_encodeable)

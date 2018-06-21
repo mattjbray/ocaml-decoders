@@ -1,6 +1,6 @@
 (jbuild_version 1)
 
 (library
- ((name decode)
+ ((name decoders)
   (public_name decoders)
   (libraries (containers))))

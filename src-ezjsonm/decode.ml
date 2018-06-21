@@ -1,3 +1,5 @@
+open Decoders
+
 module Ezjsonm_decodeable : Decode.Decodeable with type value = Ezjsonm.value = struct
   type value = Ezjsonm.value
 

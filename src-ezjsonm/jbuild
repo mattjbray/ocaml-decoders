@@ -1,7 +1,7 @@
 (jbuild_version 1)
 
 (library
- ((name decode_ezjsonm)
+ ((name decoders_ezjsonm)
   (public_name decoders-ezjsonm)
   (libraries
    (decoders

@@ -1,7 +1,7 @@
 (jbuild_version 1)
 
 (library
- ((name decode_ocyaml)
+ ((name decoders_ocyaml)
   (public_name decoders-ocyaml)
   (libraries
    (decoders

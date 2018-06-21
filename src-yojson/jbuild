@@ -1,7 +1,7 @@
 (jbuild_version 1)
 
 (library
- ((name decode_yojson)
+ ((name decoders_yojson)
   (public_name decoders-yojson)
   (libraries
    (decoders

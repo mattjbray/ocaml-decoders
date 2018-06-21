@@ -3,12 +3,12 @@ open OUnit2
 type tree = Leaf of int | Node of tree * tree
 
 let yojson_basic_suite =
-  let open Decode_yojson.Basic in
+  let open Decoders_yojson.Basic.Decode in
 
   let decoder_test ~decoder ~input ~expected test_ctxt =
-    match Decode_yojson.Basic.decode_string decoder input with
+    match decode_string decoder input with
     | Ok value -> assert_equal value expected
-    | Error error -> assert_string (Format.asprintf "%a" Decode_yojson.Basic.pp_error error)
+    | Error error -> assert_string (Format.asprintf "%a" pp_error error)
   in
 
   let list_string_test =
@@ -87,7 +87,7 @@ let yojson_basic_suite =
       |}
       in
       let expected_error =
-        let open Decode in
+        let open Decoders.Decode in
         Decoder_errors
           [ Decoder_tag
               ( {|in field "records"|}
@@ -162,12 +162,12 @@ let yojson_basic_suite =
   ]
 
 let yojson_raw_suite =
-  let open Decode_yojson.Raw in
+  let open Decoders_yojson.Raw.Decode in
 
   let decoder_test ~decoder ~input ~expected test_ctxt =
-    match Decode_yojson.Raw.decode_string decoder input with
+    match decode_string decoder input with
     | Ok value -> assert_equal value expected
-    | Error error -> assert_string (Format.asprintf "%a" Decode_yojson.Raw.pp_error error)
+    | Error error -> assert_string (Format.asprintf "%a" pp_error error)
   in
 
   "Yojson.Raw" >:::
@@ -224,12 +224,12 @@ let yojson_raw_suite =
   ]
 
 let ezjsonm_suite =
-  let open Decode_ezjsonm in
+  let open Decoders_ezjsonm.Decode in
 
   let decoder_test ~decoder ~input ~expected test_ctxt =
-    match Decode_ezjsonm.decode_string decoder input with
+    match decode_string decoder input with
     | Ok value -> assert_equal value expected
-    | Error error -> assert_string (Format.asprintf "%a" Decode_ezjsonm.pp_error error)
+    | Error error -> assert_string (Format.asprintf "%a" pp_error error)
   in
 
   "Ezjsonm" >:::
@@ -240,10 +240,28 @@ let ezjsonm_suite =
       ~expected:["hello"; "world"]
   ]
 
+let ezjsonm_encoders_suite =
+  let open Decoders_ezjsonm.Encode in
+  "Ezjsonm encoders" >:::
+  [ "list string" >::
+    (fun _ctxt ->
+       assert_equal ~printer:CCFun.id
+         {|["hello","world"]|}
+         (encode_string (list string) ["hello"; "world"])
+    )
+  ; "string" >::
+    (fun _ctxt ->
+       assert_equal ~printer:CCFun.id
+         {|"hello"|}
+         (encode_string string "hello")
+    )
+  ]
+
 let () =
   "decoders" >:::
   [ yojson_basic_suite
   ; yojson_raw_suite
   ; ezjsonm_suite
+  ; ezjsonm_encoders_suite
   ]
   |> run_test_tt_main
