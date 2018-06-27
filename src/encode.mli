@@ -9,6 +9,8 @@ module type S = sig
   val bool : bool encoder
   val null : value
 
+  val option : 'a encoder -> 'a option encoder
+
   val list : 'a encoder -> 'a list encoder
   val obj : (string * value) list encoder
   val obj' : (value * value) list encoder

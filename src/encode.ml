@@ -9,6 +9,8 @@ module type S = sig
   val bool : bool encoder
   val null : value
 
+  val option : 'a encoder -> 'a option encoder
+
   val list : 'a encoder -> 'a list encoder
   val obj : (string * value) list encoder
   val obj' : (value * value) list encoder
@@ -43,6 +45,11 @@ module Make(E : Encodeable) : S with type value = E.value = struct
   let float x = E.of_float x
   let bool x = E.of_bool x
   let null = E.null
+
+  let option encoder =
+    function
+    | None -> E.null
+    | Some x -> encoder x
 
   let list encoder xs =
     xs
