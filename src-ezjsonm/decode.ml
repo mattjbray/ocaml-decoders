@@ -15,7 +15,7 @@ module Ezjsonm_decodeable : Decode.Decodeable with type value = Ezjsonm.value = 
 
   let of_string (input : string) : (value, string) result =
     try Ok (Ezjsonm.from_string input) with
-    | Ezjsonm.Parse_error (json, msg) -> Error msg
+    | Ezjsonm.Parse_error (_json, msg) -> Error msg
 
   let of_file (file : string) : (value, string) result =
     try Ok (CCIO.with_in file Ezjsonm.from_channel) with

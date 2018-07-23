@@ -314,7 +314,7 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
     { run = fun input ->
       match (decoder.run input) with
       | Ok result -> Ok (Some result)
-      | Error err -> Ok None
+      | Error _ -> Ok None
     }
 
   let nullable (decoder : 'a decoder) : 'a option decoder =

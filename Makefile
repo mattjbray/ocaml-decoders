@@ -1,10 +1,10 @@
 .PHONY: build
 build:
-	jbuilder build
+	jbuilder build --dev
 
 .PHONY: test
 test:
-	jbuilder runtest
+	jbuilder runtest --dev
 
 .PHONY: clean
 clean:
@@ -20,7 +20,7 @@ install-dependencies: _opam
 
 .PHONY: doc
 doc:
-	jbuilder build @doc
+	jbuilder build --dev @doc
 
 DOCS_WORKTREE_PATH=../ocaml-decoders-doc
 
