@@ -57,6 +57,9 @@ module type S = sig
   (** Decode a [bool]. *)
   val bool : bool decoder
 
+  (** Decode a literal [value]. *)
+  val value : value decoder
+
   (** {1 Data structures} *)
 
   (** Decode a collection into an OCaml list. *)
