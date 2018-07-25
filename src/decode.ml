@@ -218,8 +218,11 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
     | Decoder_error (msg, Some t) -> Format.fprintf fmt "@[%s, but got@ @[%a@]@]" msg pp t
     | Decoder_error (msg, None) -> Format.fprintf fmt "@[%s@]" msg
     | Decoder_errors errors ->
-      Format.fprintf fmt "@[%a@]"
-        (Format.pp_print_list ~pp_sep:Format.pp_print_space pp_error) errors
+      let errors_trunc = CCList.take 5 errors in
+      let not_shown = List.length errors - 5 in
+      Format.fprintf fmt "@[%a@ %s@]"
+        (Format.pp_print_list ~pp_sep:Format.pp_print_space pp_error) errors_trunc
+        (if not_shown > 0 then Printf.sprintf "(...%d errors not shown...)" not_shown else "")
     | Decoder_tag (msg, error) ->
       Format.fprintf fmt "@[<2>%s:@ @[%a@]@]"
         msg
