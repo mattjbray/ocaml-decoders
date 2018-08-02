@@ -168,6 +168,8 @@ module type S = sig
     val (<*>) : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
   end
 
+  include module type of Infix
+
   (** {1 Running decoders} *)
 
   (** Run a decoder on some input. *)

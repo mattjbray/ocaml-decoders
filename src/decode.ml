@@ -173,6 +173,8 @@ module type S = sig
     val (<*>) : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
   end
 
+  include module type of Infix
+
   (** {1 Running decoders} *)
 
   (** Run a decoder on some input. *)
@@ -587,4 +589,6 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
       fun path val_decoder default next ->
         custom (optional_decoder (at path value) val_decoder default) next
   end
+
+  include Infix
 end
