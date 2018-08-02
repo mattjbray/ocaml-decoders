@@ -47,6 +47,11 @@ module type S = sig
   (** Decode a collection into an OCaml list. *)
   val list : 'a decoder -> 'a list decoder
 
+  (** Decode a collection into an OCaml list, skipping elements for which the
+      decoder returns None.
+  *)
+  val list_filter : 'a option decoder -> 'a list decoder
+
   (** {1 Object primitives} *)
 
   (** Decode an object, requiring a particular field. *)

@@ -65,6 +65,8 @@ module type S = sig
   (** Decode a collection into an OCaml list. *)
   val list : 'a decoder -> 'a list decoder
 
+  val list_filter : 'a option decoder -> 'a list decoder
+
   (** {1 Object primitives} *)
 
   (** Decode an object, requiring a particular field. *)
@@ -390,6 +392,30 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
               |> combine_errors
               |> CCResult.map_err
                 (tag_errors "while decoding a list")
+      }
+
+  let list_filter : 'a option decoder -> 'a list decoder =
+    fun decoder ->
+      let rec go i = function
+        | [] -> Ok []
+        | v :: vs ->
+         CCResult.Infix.(
+           decoder.run v
+           |> CCResult.map_err
+             (tag_error (Printf.sprintf "element %i" i)) >>= function
+           | Some x ->
+             go (i + 1) vs >>= fun xs ->
+             CCResult.return (x :: xs)
+           | None -> go (i + 1) vs
+         )
+      in
+      { run =
+          fun t ->
+            match Decodeable.get_list t with
+            | None -> (fail "Expected a list").run t
+            | Some values ->
+              go 0 values
+              |> CCResult.map_err (tag_error "while decoding a list")
       }
 
   let field : string -> 'a decoder -> 'a decoder =
