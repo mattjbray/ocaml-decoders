@@ -4,6 +4,7 @@ version: "0.0.1"
 maintainer: "Matt Bray <matt@aestheticintegration.com>"
 authors: ["Matt Bray <matt@aestheticintegration.com>"]
 homepage: "https://github.com/mattjbray/ocaml-decoders"
+doc: "https://mattjbray.github.io/ocaml-decoders/decoders-ezjsonm"
 bug-reports: "https://github.com/mattjbray/ocaml-decoders/issues"
 license: "LICENSE.md"
 dev-repo: "git@github.com:mattjbray/ocaml-decoders.git"
