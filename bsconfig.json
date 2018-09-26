@@ -1,5 +1,5 @@
 {
-  "name": "ocaml-decoders",
+  "name": "bs-decoders",
   "version": "0.1.0",
   "sources": [{
     "dir" : "src",

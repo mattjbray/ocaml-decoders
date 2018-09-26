@@ -1,6 +1,6 @@
 {
-  "name": "ocaml-decoders",
-  "version": "1.0.0",
+  "name": "bs-decoders",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "directories": {
