@@ -196,9 +196,9 @@ module type S = sig
 
     val decode : 'a -> 'a decoder
     val required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-    val requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+    val required_at : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
     val optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
-    val optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
+    val optional_at : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
     val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
   end
 end

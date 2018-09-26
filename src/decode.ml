@@ -201,9 +201,9 @@ module type S = sig
 
     val decode : 'a -> 'a decoder
     val required : string -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
-    val requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
+    val required_at : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder
     val optional : string -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
-    val optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
+    val optional_at : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder
     val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
   end
 end
@@ -557,7 +557,7 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
       fun key decoder next ->
         custom (field key decoder) next
 
-    let requiredAt : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder =
+    let required_at : string list -> 'a decoder -> ('a -> 'b) decoder -> 'b decoder =
       fun path decoder next ->
         custom (at path decoder) next
 
@@ -585,7 +585,7 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
       fun key val_decoder default next ->
         custom (optional_decoder (field key value) val_decoder default) next
 
-    let optionalAt : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder =
+    let optional_at : string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder =
       fun path val_decoder default next ->
         custom (optional_decoder (at path value) val_decoder default) next
   end
