@@ -2,3 +2,7 @@
 .merlin
 _build
 _opam
+*.bs.js
+.bsb.lock
+/lib/
+/node_modules/

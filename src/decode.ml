@@ -1,11 +1,15 @@
 (** Functors for creating Decoders. *)
 
+open Util
+
 type 'value exposed_error =
   | Decoder_error of string * 'value option
   | Decoder_errors of 'value exposed_error list
   | Decoder_tag of string * 'value exposed_error
 
 type ('value, 'a) exposed_decoder = { run : 'value -> ('a, 'value exposed_error) result }
+
+type ('good, 'bad) result = ('good, 'bad) Result.t = Ok of 'good | Error of 'bad
 
 (** Signature of things that can be decoded. *)
 module type Decodeable = sig
@@ -214,15 +218,13 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
   type value = Decodeable.value
   let pp = Decodeable.pp
 
-  open CCResult.Infix
-
   type error = value exposed_error
 
   let rec pp_error fmt = function
     | Decoder_error (msg, Some t) -> Format.fprintf fmt "@[%s, but got@ @[%a@]@]" msg pp t
     | Decoder_error (msg, None) -> Format.fprintf fmt "@[%s@]" msg
     | Decoder_errors errors ->
-      let errors_trunc = CCList.take 5 errors in
+      let errors_trunc = My_list.take 5 errors in
       let not_shown = List.length errors - 5 in
       Format.fprintf fmt "@[%a@ %s@]"
         (Format.pp_print_list ~pp_sep:Format.pp_print_space pp_error) errors_trunc
@@ -259,14 +261,14 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
   let of_string : string -> (value, error) result =
     fun string ->
       Decodeable.of_string string
-      |> CCResult.map_err (fun msg ->
+      |> Result.map_err (fun msg ->
           (Decoder_tag ("Json parse error", Decoder_error (msg, None)))
         )
 
   let of_file : string -> (value, error) result =
     fun file ->
       Decodeable.of_file file
-      |> CCResult.map_err (fun msg ->
+      |> Result.map_err (fun msg ->
           (Decoder_tag (Printf.sprintf "While reading %s" file, Decoder_error (msg, None)))
         )
 
@@ -289,7 +291,7 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
     { run = fun input -> Ok input }
 
   let map f decoder =
-    { run = fun input -> decoder.run input >|= f }
+    { run = fun input -> Result.Infix.(decoder.run input >|= f) }
 
   let apply : ('a -> 'b) decoder -> 'a decoder -> 'b decoder =
     fun f decoder ->
@@ -304,8 +306,9 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
 
   let and_then (f : 'a -> 'b decoder) (decoder : 'a decoder) : 'b decoder =
     { run = fun input ->
-      decoder.run input >>= fun result ->
-      (f result).run input
+          Result.Infix.(
+            decoder.run input >>= fun result ->
+            (f result).run input)
     }
 
   let fix (f : 'a decoder -> 'a decoder) : 'a decoder =
@@ -334,8 +337,8 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
           | Some () -> Ok None
           | None ->
             decoder.run input
-            |> CCResult.map CCOpt.return
-            |> CCResult.map_err (tag_error "Expected null or")
+            |> Result.map Opt.return
+            |> Result.map_err (tag_error "Expected null or")
     }
 
   let one_of : (string * 'a decoder) list -> 'a decoder =
@@ -376,7 +379,7 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
   let null : 'a -> 'a decoder =
     fun default ->
       primitive_decoder Decodeable.get_null "Expected a null"
-      |> map (CCFun.const default)
+      |> map (fun _ -> default)
 
   let list : 'a decoder -> 'a list decoder =
     fun decoder ->
@@ -386,13 +389,13 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
             | None -> (fail "Expected a list").run t
             | Some values ->
               values
-              |> CCList.mapi (fun i x ->
+              |> My_list.mapi (fun i x ->
                   decoder.run x
-                  |> CCResult.map_err
+                  |> Result.map_err
                     (tag_error (Printf.sprintf "element %i" i))
                 )
               |> combine_errors
-              |> CCResult.map_err
+              |> Result.map_err
                 (tag_errors "while decoding a list")
       }
 
@@ -401,13 +404,13 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
       let rec go i = function
         | [] -> Ok []
         | v :: vs ->
-         CCResult.Infix.(
+         Result.Infix.(
            decoder.run v
-           |> CCResult.map_err
+           |> Result.map_err
              (tag_error (Printf.sprintf "element %i" i)) >>= function
            | Some x ->
              go (i + 1) vs >>= fun xs ->
-             CCResult.return (x :: xs)
+             Result.return (x :: xs)
            | None -> go (i + 1) vs
          )
       in
@@ -417,7 +420,7 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
             | None -> (fail "Expected a list").run t
             | Some values ->
               go 0 values
-              |> CCResult.map_err (tag_error "while decoding a list")
+              |> Result.map_err (tag_error "while decoding a list")
       }
 
   let field : string -> 'a decoder -> 'a decoder =
@@ -426,7 +429,7 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
           fun t ->
             let value =
               Decodeable.get_key_value_pairs t
-              |> CCOpt.flat_map (CCList.find_map (fun (k, v) ->
+              |> Opt.flat_map (My_list.find_map (fun (k, v) ->
                   match Decodeable.get_string k with
                   | Some s when s = key -> Some v
                   | _ -> None
@@ -435,7 +438,7 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
             match value with
             | Some value ->
               value_decoder.run value
-              |> CCResult.map_err (tag_error (Printf.sprintf "in field %S" key))
+              |> Result.map_err (tag_error (Printf.sprintf "in field %S" key))
             | None -> (fail (Printf.sprintf "Expected an object with an attribute %S" key)).run t
       }
 
@@ -448,7 +451,7 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
               begin match Decodeable.get_string key with
                 | Some key ->
                   (value_decoder key).run value
-                  |> CCResult.map_err (tag_error (Printf.sprintf "in field %S" key))
+                  |> Result.map_err (tag_error (Printf.sprintf "in field %S" key))
                 | None -> (fail "Expected an object with a string key").run t
               end
             | _ -> (fail "Expected an object with a single attribute").run t
@@ -487,7 +490,7 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
               assoc
               |> List.map (fun (key, _) -> key_decoder.run key)
               |> combine_errors
-              |> CCResult.map_err
+              |> Result.map_err
                 (tag_errors "Failed while decoding the keys of an object")
             | None -> (fail "Expected an object").run value
       }
@@ -502,13 +505,13 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
             | Some assoc ->
               assoc
               |> List.map
-                CCResult.Infix.(fun (key_val, value_val) ->
+                Result.Infix.(fun (key_val, value_val) ->
                     key_decoder.run key_val >>= fun key ->
                     value_decoder.run value_val >|= fun value ->
                     (key, value)
                   )
               |> combine_errors
-              |> CCResult.map_err
+              |> Result.map_err
                 (tag_errors "Failed while decoding key-value pairs")
             | None -> (fail "Expected an object").run value
       }
@@ -523,12 +526,12 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
             | Some assoc ->
               assoc
               |> List.map
-                CCResult.Infix.(fun (key_val, value_val) ->
+                Result.Infix.(fun (key_val, value_val) ->
                     key_decoder.run key_val >>= fun key ->
                     (value_decoder key).run value_val
                   )
               |> combine_errors
-              |> CCResult.map_err
+              |> Result.map_err
                 (tag_errors "Failed while decoding key-value pairs")
             | None -> (fail "Expected an object").run value
       }
@@ -540,11 +543,11 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
 
   let decode_string : 'a decoder -> string -> ('a, error) result =
     fun decoder string ->
-      of_string string >>= decode_value decoder
+      Result.Infix.(of_string string >>= decode_value decoder)
 
   let decode_file : 'a decoder -> string -> ('a, error) result =
     fun decoder file ->
-      of_file file >>= decode_value decoder
+      Result.Infix.(of_file file >>= decode_value decoder)
 
   module Pipeline = struct
     let decode = succeed
