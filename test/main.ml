@@ -5,7 +5,7 @@ type tree = Leaf of int | Node of tree * tree
 let yojson_basic_suite =
   let open Decoders_yojson.Basic.Decode in
 
-  let decoder_test ~decoder ~input ~expected test_ctxt =
+  let decoder_test ~decoder ~input ~expected _test_ctxt =
     match decode_string decoder input with
     | Ok value -> assert_equal value expected
     | Error error -> assert_string (Format.asprintf "%a" pp_error error)
@@ -68,7 +68,7 @@ let yojson_basic_suite =
   in
 
   let grouping_errors_test =
-    "grouping errors" >:: fun test_ctxt ->
+    "grouping errors" >:: fun _test_ctxt ->
       let decoder =
         Pipeline.(
           decode (fun x y z -> (x, y, z))
@@ -164,7 +164,7 @@ let yojson_basic_suite =
 let yojson_raw_suite =
   let open Decoders_yojson.Raw.Decode in
 
-  let decoder_test ~decoder ~input ~expected test_ctxt =
+  let decoder_test ~decoder ~input ~expected _test_ctxt =
     match decode_string decoder input with
     | Ok value -> assert_equal value expected
     | Error error -> assert_string (Format.asprintf "%a" pp_error error)
@@ -226,7 +226,7 @@ let yojson_raw_suite =
 let ezjsonm_suite =
   let open Decoders_ezjsonm.Decode in
 
-  let decoder_test ~decoder ~input ~expected test_ctxt =
+  let decoder_test ~decoder ~input ~expected _test_ctxt =
     match decode_string decoder input with
     | Ok value -> assert_equal value expected
     | Error error -> assert_string (Format.asprintf "%a" pp_error error)
