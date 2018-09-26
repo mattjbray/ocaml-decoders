@@ -3,4 +3,5 @@
 (library
  ((name decoders)
   (public_name decoders)
+  (preprocess (action (run cppo ${<} -o ${@})))
   (libraries (containers))))

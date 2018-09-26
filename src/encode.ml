@@ -1,3 +1,5 @@
+open Util
+
 module type S = sig
   type value
 
@@ -53,7 +55,7 @@ module Make(E : Encodeable) : S with type value = E.value = struct
 
   let list encoder xs =
     xs
-    |> CCList.map (fun x -> encoder x)
+    |> My_list.map (fun x -> encoder x)
     |> E.of_list
 
   let obj' xs = E.of_key_value_pairs xs

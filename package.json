@@ -1,0 +1,25 @@
+{
+  "name": "ocaml-decoders",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mattjbray/ocaml-decoders.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mattjbray/ocaml-decoders/issues"
+  },
+  "homepage": "https://github.com/mattjbray/ocaml-decoders#readme",
+  "devDependencies": {
+    "bs-platform": "^4.0.5"
+  }
+}
