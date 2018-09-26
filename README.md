@@ -145,3 +145,13 @@ Error
 ```
 
 We get a nice pointer that we forgot to handle the `SUPER_USER` role.
+
+## Release
+
+After updating CHANGES.md:
+
+```
+npm version <newversion>
+dune-release tag
+dune-release bistro -p decoders,decoders-ezjsonm,decoders-yojson
+```
