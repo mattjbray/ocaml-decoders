@@ -223,45 +223,9 @@ let yojson_raw_suite =
       ~expected:[ None; Some "123"; Some "123.45" ]
   ]
 
-let ezjsonm_suite =
-  let open Decoders_ezjsonm.Decode in
-
-  let decoder_test ~decoder ~input ~expected _test_ctxt =
-    match decode_string decoder input with
-    | Ok value -> assert_equal value expected
-    | Error error -> assert_string (Format.asprintf "%a" pp_error error)
-  in
-
-  "Ezjsonm" >:::
-  [ "list string" >::
-    decoder_test
-      ~decoder:(list string)
-      ~input:{|["hello", "world"]|}
-      ~expected:["hello"; "world"]
-  ]
-
-let ezjsonm_encoders_suite =
-  let open Decoders_ezjsonm.Encode in
-  "Ezjsonm encoders" >:::
-  [ "list string" >::
-    (fun _ctxt ->
-       assert_equal ~printer:CCFun.id
-         {|["hello","world"]|}
-         (encode_string (list string) ["hello"; "world"])
-    )
-  ; "string" >::
-    (fun _ctxt ->
-       assert_equal ~printer:CCFun.id
-         {|"hello"|}
-         (encode_string string "hello")
-    )
-  ]
-
 let () =
   "decoders" >:::
   [ yojson_basic_suite
   ; yojson_raw_suite
-  ; ezjsonm_suite
-  ; ezjsonm_encoders_suite
   ]
   |> run_test_tt_main

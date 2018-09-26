@@ -4,11 +4,10 @@
  ((name main)
   (libraries
    (decoders-ezjsonm
-    decoders-yojson
-    oUnit
-    yojson))))
+    oUnit))))
 
 (alias
  ((name runtest)
+  (package decoders-ezjsonm)
   (deps (main.exe))
   (action (run ${<}))))
