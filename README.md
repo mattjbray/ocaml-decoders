@@ -1,4 +1,4 @@
-# ocaml-decoders
+# ocaml-decoders: Elm-inspired decoders for Ocaml
 
 A combinator library for "decoding" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.
 
