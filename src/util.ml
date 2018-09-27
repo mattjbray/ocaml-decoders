@@ -1,5 +1,5 @@
 #ifdef IS_BUCKLESCRIPT
-module Result = struct
+module My_result = struct
   type ('good, 'bad) t = ('good, 'bad) Belt.Result.t = | Ok of 'good | Error of 'bad
 
   let return x = Ok x
@@ -14,7 +14,7 @@ module Result = struct
   end
 end
 
-module Opt = struct
+module My_opt = struct
   let return x = Some x
   let flat_map f x = Belt.Option.flatMap x f
 end
@@ -36,7 +36,7 @@ module My_list = struct
     |. Belt.Option.flatMap f
 end
 #else
-module Result = struct
+module My_result = struct
   type ('good, 'bad) t = ('good, 'bad) CCResult.result = | Ok of 'good | Error of 'bad
 
   let return x = Ok x
@@ -49,7 +49,7 @@ module Result = struct
   end
 end
 
-module Opt = struct
+module My_opt = struct
   let return = CCOpt.return
   let flat_map = CCOpt.flat_map
 end
@@ -61,5 +61,3 @@ module My_list = struct
   let find_map = CCList.find_map
 end
 #endif
-
-type ('good, 'bad) result = ('good, 'bad) Result.t = Ok of 'good | Error of 'bad
