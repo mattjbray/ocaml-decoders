@@ -153,5 +153,5 @@ After updating CHANGES.md:
 ```
 npm version <newversion>
 dune-release tag
-dune-release bistro -p decoders,decoders-ezjsonm,decoders-yojson
+dune-release -p decoders,decoders-ezjsonm,decoders-yojson
 ```
