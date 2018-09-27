@@ -37,7 +37,7 @@ module My_list = struct
 end
 #else
 module Result = struct
-  type ('good, 'bad) t = ('good, 'bad) Pervasives.result = | Ok of 'good | Error of 'bad
+  type ('good, 'bad) t = ('good, 'bad) CCResult.result = | Ok of 'good | Error of 'bad
 
   let return x = Ok x
   let map : ('a -> 'b) -> ('a, 'err) t -> ('b, 'err) t = CCResult.map

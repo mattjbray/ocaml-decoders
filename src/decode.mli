@@ -5,6 +5,8 @@ type 'value exposed_error =
 
 #ifdef IS_BUCKLESCRIPT
 type ('good, 'bad) result = ('good, 'bad) Belt.Result.t = Ok of 'good | Error of 'bad
+#else
+type ('good, 'bad) result = ('good, 'bad) CCResult.t = Ok of 'good | Error of 'bad
 #endif
 
 type ('value, 'a) exposed_decoder = { run : 'value -> ('a, 'value exposed_error) result }

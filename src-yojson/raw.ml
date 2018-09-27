@@ -6,13 +6,13 @@ module Json_decodeable : Decode.Decodeable with type value = Yojson.Raw.json = s
   type value = Yojson.Raw.json
   let pp fmt json = Format.fprintf fmt "@[%s@]" (Yojson.Raw.pretty_to_string json)
 
-  let of_string : string -> (value, string) result =
+  let of_string : string -> (value, string) CCResult.t =
     fun string ->
-      try Ok (Yojson.Raw.from_string string) with
+      try CCResult.Ok (Yojson.Raw.from_string string) with
       | Yojson.Json_error msg -> Error (msg)
 
   let of_file file =
-    try Ok (Yojson.Raw.from_file file) with
+    try CCResult.Ok (Yojson.Raw.from_file file) with
     | e -> Error (Printexc.to_string e)
 
   let get_string = function
