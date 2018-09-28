@@ -8,6 +8,7 @@ bug-reports: "https://github.com/mattjbray/ocaml-decoders/issues"
 license: "ISC"
 dev-repo: "git@github.com:mattjbray/ocaml-decoders.git"
 build: [["jbuilder" "build" "-p" name "-j" jobs]]
+build-test: [["jbuilder" "runtest" "-p" name "-j" jobs]]
 depends: [
   "jbuilder" {build}
   "ounit" {test}
