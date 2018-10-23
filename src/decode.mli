@@ -74,9 +74,31 @@ module type S = sig
 
   (** {1 Inconsistent structure} *)
 
-  (** Helpful for dealing with optional fields. *)
+  (** [maybe d] is a decoder that always succeeds. If [d] succeeds with [x],
+      then [maybe d] succeeds with [Some x], otherwise if [d] fails, then [maybe d]
+      succeeds with [None].
+
+      For example, [maybe (field "hello" int)]:
+
+      - when run on [{"hello": 123}], will succeed with [Some 123]
+      - when run on [{"hello": null}], will succeed with [None]
+      - when run on [{"world": 123}], will succeed with [None]
+      - when run on [["a", "list", "of", "strings"]], will succeed with [None]
+
+  *)
   val maybe : 'a decoder -> 'a option decoder
 
+  (** [nullable d] will succeed with [None] if the JSON value is [null]. If the
+      JSON value is non-[null], it wraps the result of running [x] in a [Some].
+
+      For example, [field "hello" (nullable int)]:
+
+      - when run on [{"hello": 123}], will succeed with [Some 123]
+      - when run on [{"hello": null}], will succeed with [None]
+      - when run on [{"world": 123}], will fail
+      - when run on [["a", "list", "of", "strings"]], will fail
+
+  *)
   val nullable : 'a decoder -> 'a option decoder
 
   (** Try a sequence of different decoders. *)
@@ -84,45 +106,11 @@ module type S = sig
 
   (** {1 Mapping} *)
 
-  (** Map functions are useful for decoding complex objects.
-
-      For example, given an object with structure
-      {[
-        {
-          "name": "Joe"
-              "age": 42
-        }
-      ]}
-      we want to decode it to our OCaml type
-      {[
-        type person =
-          { name : string
-          ; age : int
-          }
-      ]}
-
-      We define a helper function to construct values of this type:
-      {[
-        let as_person name age =
-          { name = name
-          ; age = age
-          }
-      ]}
-
-      The decoder looks like this:
-      {[
-        let person_decoder : person decoder =
-          map2 as_person
-            (field "name" string)
-            (field "age" int)
-      ]}
-  *)
-
-  (** Transform a decoder. *)
+  (** Map over the result of a decoder. *)
   val map : ('a -> 'b) -> 'a decoder -> 'b decoder
 
   (** Try two decoders and then combine the result. We can use this to decode
-      objects with many fields.
+      objects with many fields (but it's preferable to use [Infix.(>>=)] - see the README).
   *)
   val apply : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
 

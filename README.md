@@ -74,6 +74,86 @@ utop # D.decode_string D.(list int) "[1,2,true]";;
 Error while decoding a list: element 2: Expected an int, but got true
 ```
 
+## Complicated JSON structure
+
+To decode a JSON object with many fields, we can use the bind operator (`>>=`) from the `Infix` module.
+
+```ocaml
+type my_user =
+  { name : string
+  ; age : int
+  }
+
+let my_user_decoder : my_user decoder =
+  let open D in
+  field "name" string >>= fun name ->
+  field "age" int >>= fun age ->
+  succeed { name; age }
+```
+
+We can also use bind to decode objects with inconsistent structure. Say, for
+example, our JSON is a list of shapes. Squares have a side length, circles have
+a radius, and triangles have a base and a height.
+
+```json
+[{ "shape": "square", "side": 11 },
+ { "shape": "circle", "radius": 5 },
+ { "shape": "triange", "base": 3, "height": 7 }]
+```
+
+We could represent these types in OCaml and decode them like this:
+
+```ocaml
+type shape =
+  | Square of int
+  | Circle of int
+  | Triangle of int * int
+
+let square_decoder : shape decoder =
+  D.(field "side" int >>= fun s -> succeed (Square side))
+
+let circle_decoder : shape decoder =
+  D.(field "radius" int >>= fun r -> succeed (Circle r))
+
+let triangle_decoder : shape decoder =
+  D.(
+    field "base" int >>= fun b ->
+    field "height" int >>= fun h ->
+    succeed (Triangle (b, h))
+  )
+
+let shape_decoder : shape decoder =
+  let open D in
+  field "shape" string >>= function
+  | "square" -> square_decoder
+  | "circle" -> circle_decoder
+  | "triangle" -> triangle_decoder
+  | _ -> fail "Expected a shape"
+
+
+let decode_list (json_string : string) : (shape list, _) result =
+  D.(decode_string (list shape_decoder) json_string)
+```
+
+Now, say that we didn't have the benefit of the `"shape"` field describing the
+type of the shape in our JSON list. We can still decode the shapes by trying
+each decoder in turn using the `one_of` combinator.
+
+`one_of` takes a list of `string * 'a decoder` pairs and tries each decoder in
+turn. The `string` element of each pair is just used to name the decoder in
+error messages.
+
+```ocaml
+let shape_decoder_2 : shape decoder =
+  D.(
+    one_of
+      [ ("a square", sqaure_decoder)
+      ; ("a circle", circle_decoder)
+      ; ("a triangle", triangle_decoder)
+      ]
+  )
+```
+
 ## Generic decoders
 
 
@@ -96,13 +176,13 @@ Bucklescript.
 ```ocaml
 module My_decoders(D : Decoders.Decode.S) = struct
   open D
-  
+
   let role : role decoder =
     string >>= function
     | "ADMIN" -> succeed Admin
     | "USER" -> succeed User
     | _ -> fail "Expected a role"
-    
+
   let user : user decoder =
     field "name" string >>= fun name ->
     field "roles" (list role) >>= fun roles ->
@@ -121,7 +201,7 @@ utop # D.decode_string role {| "USER" |};;
 
 utop # D.decode_string D.(field "users" (list user))
          {| {"users": [{"name": "Alice", "roles": ["ADMIN", "USER"]},
-                       {"name": "Bob", "roles": ["USER"]}]} 
+                       {"name": "Bob", "roles": ["USER"]}]}
           |};;
 - : (user list, error) result =
 Ok [{name = "Alice"; roles = [Admin; User]}; {name = "Bob"; roles = [User]}]
