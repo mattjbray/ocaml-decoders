@@ -16,12 +16,23 @@ This library helps with step 3.
 
 Install one of the supported decoder backends:
 
+### For ocaml
+
 ```
 opam install decoders-ezjsonm      # For Ezjsonm
 opam install decoders-ocyaml       # For Ocyaml
 opam install decoders-yojson       # For Yojson
-npm install --save-dev bs-decoders # For Bucklescript
 ```
+
+### For bucklescript
+
+You'll need `cppo` available on your path for bs-decoders to build. If you've got an `opam` switch (for `merlin` etc) it's likely to already be installed, otherwise you can `opam install cppo`. Then just run `eval $(opam env)` before kicking off the bucklescript build.
+
+```
+npm install --save-dev bs-decoders
+```
+
+## Decoding
 
 Now we can start decoding stuff!
 
