@@ -12,7 +12,7 @@ build: [["jbuilder" "build" "-p" name "-j" jobs]]
 build-test: [["jbuilder" "runtest" "-p" name "-j" jobs]]
 depends: [
   "jbuilder" {build}
-  "ounit" {test}
+  "ounit" {with-test}
   "decoders"
   "ezjsonm" {>= "0.4.0"}
 ]
