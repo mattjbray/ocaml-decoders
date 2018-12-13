@@ -5,6 +5,7 @@ module Decode : sig
 
   (** {1 Yojson.Raw-specific decoders}*)
 
+  val stringlit : string decoder
   val intlit : string decoder
   val floatlit : string decoder
 end
@@ -14,6 +15,7 @@ module Encode : sig
 
   (** {1 Yojson.Raw-specific encoders}*)
 
+  val stringlit : string encoder
   val intlit : string encoder
   val floatlit : string encoder
 end

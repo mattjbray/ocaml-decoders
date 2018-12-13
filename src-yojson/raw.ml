@@ -52,6 +52,13 @@ module Decode = struct
 
   (* Yojson.Raw specific decoders *)
 
+  let stringlit : string decoder =
+    { run =
+        function
+        | `Stringlit value -> Ok value
+        | json -> (fail "Expected a string").run json
+    }
+
   let intlit : string decoder =
     { run =
         function
@@ -93,6 +100,7 @@ end
 module Encode = struct
   include Encode.Make(Json_encodeable)
 
+  let stringlit x = `Stringlit x
   let intlit x = `Intlit x
   let floatlit x = `Floatlit x
 end
