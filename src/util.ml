@@ -25,8 +25,8 @@ module My_list = struct
     |. Belt.List.take i
     |. Belt.Option.getWithDefault []
 
-  let map = List.map
-  let mapi = List.mapi
+  let map f xs = Belt.List.map xs f
+  let mapi f xs = Belt.List.mapWithIndex xs f
   let find_map f xs =
     xs
     |. Belt.List.getBy (fun x ->
