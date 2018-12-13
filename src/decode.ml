@@ -247,16 +247,24 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
     | _, Decoder_errors e2s -> Decoder_errors ([e1] @ e2s )
     | _ -> Decoder_errors [e1; e2]
 
-  let rec combine_errors : ('a, error) result list -> ('a list, error list) result =
-    function
-    | [] -> Ok []
-    | result :: rest ->
-      begin match result, combine_errors rest with
-        | Ok x, Ok xs -> Ok (x :: xs)
-        | Error e, Error es -> Error (e :: es)
-        | Error e, Ok _ -> Error [e]
-        | Ok _, Error es -> Error es
-      end
+  let combine_errors (results : ('a, error) result list) : ('a list, error list) result =
+    let rec aux combined =
+      function
+      | [] ->
+        (match combined with
+         | Ok xs -> Ok (List.rev xs)
+         | Error es -> Error (List.rev es))
+      | result :: rest ->
+        let combined =
+          match result, combined with
+          | Ok x, Ok xs -> Ok (x :: xs)
+          | Error e, Error es -> Error (e :: es)
+          | Error e, Ok _ -> Error [e]
+          | Ok _, Error es -> Error es
+        in
+        aux combined rest
+    in
+    aux (Ok []) results
 
   let of_string : string -> (value, error) result =
     fun string ->
