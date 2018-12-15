@@ -5,9 +5,9 @@ type tree = Leaf of int | Node of tree * tree
 let yojson_basic_suite =
   let open Decoders_yojson.Basic.Decode in
 
-  let decoder_test ~decoder ~input ~expected _test_ctxt =
+  let decoder_test ~decoder ~input ~expected ?printer _test_ctxt =
     match decode_string decoder input with
-    | Ok value -> assert_equal value expected
+    | Ok value -> assert_equal value expected ?printer
     | Error error -> assert_string (Format.asprintf "%a" pp_error error)
   in
 
@@ -50,21 +50,66 @@ let yojson_basic_suite =
     )
   in
 
+  let mut_rec_test =
+    "mutual recursion" >:: fun _ ->
+      let module M = struct
+        type t1 = T1_end | T1_more of t2
+        and t2 = T2_end | T2_more of t1
+        let rec t1_to_string =
+          function
+          | T1_end -> "T1_end"
+          | T1_more t2 -> Printf.sprintf "(T1_more %s)" (t2_to_string t2)
+        and t2_to_string =
+          function
+          | T2_end -> "T2_end"
+          | T2_more t1 -> Printf.sprintf "(T2_more %s)" (t1_to_string t1)
+      end in
+      let open M in
+      let t1_decoder =
+        fix (fun t1_decoder ->
+            let t2 =
+              nullable (field "t1" t1_decoder)
+              |> map (function
+                  | None -> T2_end
+                  | Some t1 -> T2_more t1)
+            in
+            let t1 =
+              nullable (field "t2" t2)
+              |> map (function
+                  | None -> T1_end
+                  | Some t2 -> T1_more t2)
+            in
+            t1
+          )
+      in
+      decoder_test ()
+        ~decoder:t1_decoder
+        ~input:{|
+          { "t2": { "t1": { "t2": null } } }
+         |}
+        ~expected:(
+          T1_more (T2_more (T1_more T2_end))
+        )
+        ~printer:t1_to_string
+  in
+
   let string_or_floatlit_test =
     "string or floatlit" >::
-    let empty_string =
-      string |> and_then (function
-          | "" -> succeed ()
-          | _ -> fail "Expected an empty string")
-    in
-    decoder_test
-      ~decoder:(
-        one_of
-          [ "empty", empty_string |> map (fun () -> None)
-          ]
-      )
-      ~input:"\"\""
-      ~expected:None
+    fun _ ->
+      let empty_string =
+        string |> and_then (function
+            | "" -> succeed ()
+            | _ -> fail "Expected an empty string")
+      in
+      decoder_test
+        ~decoder:(
+          one_of
+            [ "empty", empty_string |> map (fun () -> None)
+            ]
+        )
+        ~input:"\"\""
+        ~expected:None
+        ()
   in
 
   let grouping_errors_test =
@@ -157,6 +202,7 @@ let yojson_basic_suite =
   "Yojson.Basic" >:::
   [ list_string_test
   ; fix_one_of_test
+  ; mut_rec_test
   ; string_or_floatlit_test
   ; grouping_errors_test
   ]
