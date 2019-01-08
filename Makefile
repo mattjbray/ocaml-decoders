@@ -1,14 +1,14 @@
 .PHONY: build
 build:
-	jbuilder build --dev
+	dune build
 
 .PHONY: test
 test:
-	jbuilder runtest --dev
+	dune runtest
 
 .PHONY: clean
 clean:
-	jbuilder clean
+	dune clean
 
 _opam:
 	opam switch create . --empty
@@ -20,7 +20,7 @@ install-dependencies: _opam
 
 .PHONY: doc
 doc:
-	jbuilder build --dev @doc
+	dune build @doc
 
 DOCS_WORKTREE_PATH=../ocaml-decoders-doc
 

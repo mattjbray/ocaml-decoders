@@ -1,0 +1,6 @@
+(library
+ (name decoders_yojson)
+ (public_name decoders-yojson)
+ (libraries
+  decoders
+  yojson))

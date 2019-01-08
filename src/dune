@@ -1,0 +1,5 @@
+(library
+ (name decoders)
+  (public_name decoders)
+  (preprocess (action (run %{bin:cppo} %{input-file})))
+  (libraries containers))

@@ -7,9 +7,9 @@ doc: "https://mattjbray.github.io/ocaml-decoders/decoders-ocyaml"
 bug-reports: "https://github.com/mattjbray/ocaml-decoders/issues"
 license: "ISC"
 dev-repo: "git@github.com:mattjbray/ocaml-decoders.git"
-build: [["jbuilder" "build" "-p" name "-j" jobs]]
+build: [["dune" "build" "-p" name "-j" jobs]]
 depends: [
-  "jbuilder" {build}
+  "dune" {build}
   "containers"
   "decoders"
   "ocyaml"
