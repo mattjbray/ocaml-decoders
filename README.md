@@ -26,8 +26,6 @@ opam install decoders-yojson       # For Yojson
 
 ### For bucklescript
 
-You'll need `cppo` available on your path for bs-decoders to build. If you've got an `opam` switch (for `merlin` etc) it's likely to already be installed, otherwise you can `opam install cppo`. Then just run `eval $(opam env)` before kicking off the bucklescript build.
-
 ```
 npm install --save-dev bs-decoders
 ```

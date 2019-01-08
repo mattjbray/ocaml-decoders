@@ -3,10 +3,17 @@
   "version": "0.1.0",
   "sources": [{
     "dir" : "src",
-    "subdirs" : true
+    "files" : [
+      "encode.mli",
+      "decode.ml",
+      "decode.mli",
+      "decoders.ml",
+      "encode.ml"
+    ],
+    "public" : ["Decoders"]
   }, {
     "dir" : "src-bs",
-    "subdirs" : true
+    "public" : ["Decoders_bs"]
   }],
   "package-specs": {
     "module": "commonjs",
@@ -15,7 +22,6 @@
   "suffix": ".bs.js",
   "bs-dependencies": [
   ],
-  "bsc-flags": ["-pp", "\"cppo -D \\\"IS_BUCKLESCRIPT 1\\\"\""],
   "warnings": {
     "error" : "+101"
   },
