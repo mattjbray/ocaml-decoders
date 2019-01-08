@@ -1,6 +1,6 @@
 (** Functors for creating Decoders. *)
 
-open Util
+open Decoders_util
 
 type 'value exposed_error =
   | Decoder_error of string * 'value option

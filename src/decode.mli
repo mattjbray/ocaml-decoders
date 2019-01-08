@@ -3,11 +3,7 @@ type 'value exposed_error =
   | Decoder_errors of 'value exposed_error list
   | Decoder_tag of string * 'value exposed_error
 
-#ifdef IS_BUCKLESCRIPT
-type ('good, 'bad) result = ('good, 'bad) Belt.Result.t = Ok of 'good | Error of 'bad
-#else
-type ('good, 'bad) result = ('good, 'bad) CCResult.t = Ok of 'good | Error of 'bad
-#endif
+type ('good, 'bad) result = ('good, 'bad) Decoders_util.My_result.t = Ok of 'good | Error of 'bad
 
 type ('value, 'a) exposed_decoder = { run : 'value -> ('a, 'value exposed_error) result }
 

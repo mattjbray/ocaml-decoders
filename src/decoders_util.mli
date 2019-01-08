@@ -1,9 +1,6 @@
+(** Util module used for native builds (excluded in bs-config.json) *)
 module My_result : sig
-  #ifdef IS_BUCKLESCRIPT
-  type ('good, 'bad) t = ('good, 'bad) Belt.Result.t = Ok of 'good | Error of 'bad
-  #else
   type ('good, 'bad) t = ('good, 'bad) CCResult.t = Ok of 'good | Error of 'bad
-  #endif
 
   val return : 'good -> ('good, 'bad) t
   val map : ('a -> 'b) -> ('a, 'err) t -> ('b, 'err) t
