@@ -3,7 +3,7 @@ type 'value exposed_error =
   | Decoder_errors of 'value exposed_error list
   | Decoder_tag of string * 'value exposed_error
 
-type ('good, 'bad) result = ('good, 'bad) Util.My_result.t = Ok of 'good | Error of 'bad
+type ('good, 'bad) result = ('good, 'bad) Decoders_util.My_result.t = Ok of 'good | Error of 'bad
 
 type ('value, 'a) exposed_decoder = { run : 'value -> ('a, 'value exposed_error) result }
 

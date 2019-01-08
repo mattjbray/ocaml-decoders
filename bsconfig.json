@@ -9,11 +9,9 @@
       "decode.mli",
       "decoders.ml",
       "encode.ml"
-    ],
-    "public" : ["Decoders"]
+    ]
   }, {
-    "dir" : "src-bs",
-    "public" : ["Decoders_bs"]
+    "dir" : "src-bs"
   }],
   "package-specs": {
     "module": "commonjs",
