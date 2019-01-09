@@ -7,7 +7,7 @@ A combinator library for "decoding" JSON-like values into your own Ocaml types, 
 An Ocaml program having a JSON (or YAML) data source usually goes something like this:
 
 1. Get your data from somewhere. Now you have a `string`.
-2. *Parse* the `string` as JSON (or YAML). Now you have a `Yojson.Basic.json`, or maybe an `Ezjsonm.value`, or perhaps a `Ocaml.yaml`.
+2. *Parse* the `string` as JSON (or YAML). Now you have a `Yojson.Basic.json`, or maybe an `Ezjsonm.value`, or perhaps a `Ocyaml.yaml`.
 3. *Decode* the JSON value to an Ocaml type that's actually useful for your program's domain.
 
 This library helps with step 3.
