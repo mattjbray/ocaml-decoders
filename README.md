@@ -235,6 +235,45 @@ Error
 
 We get a nice pointer that we forgot to handle the `SUPER_USER` role.
 
+## Encoding
+
+`ocaml-decoders` also has support for defining backend-agnostic encoders, for
+turning your OCaml values into JSON values.
+
+```ocaml
+module My_encoders(E : Decoders.Encode.S) = struct
+  open E
+
+  let role : role encoder =
+    function
+    | Admin -> string "ADMIN"
+    | User -> string "USER"
+
+  let user : user encoder =
+    fun u ->
+      obj
+        [ ("name", string u.name)
+        ; ("roles", list role u.roles)
+        ]
+end
+
+module My_yojson_encoders = My_encoders(Decoders_yojson.Basic.Encode)
+```
+
+```ocaml
+utop # module E = Decoders_yojson.Basic.Encode;;
+utop # open My_yojson_encoders;;
+utop # let users =
+  [ {name = "Alice"; roles = [Admin; User]}
+  ; {name = "Bob"; roles = [User]}
+  ];;
+utop # E.encode_string E.obj [("users", E.list user users)];;
+- : string =
+"{\"users\":[{\"name\":\"Alice\",\"roles\":[\"ADMIN\",\"USER\"]},{\"name\":\"Bob\",\"roles\":[\"USER\"]}]}"
+```
+
+See also the [API docs](https://mattjbray.github.io/ocaml-decoders/decoders/decoders/Decoders/Encode/module-type-S/index.html).
+
 ## Release
 
 After updating CHANGES.md:
@@ -242,5 +281,7 @@ After updating CHANGES.md:
 ```
 npm version <newversion>
 dune-release tag
+git push
 dune-release -p decoders,decoders-ezjsonm,decoders-yojson
+npm publish
 ```
