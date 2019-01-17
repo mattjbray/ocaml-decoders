@@ -59,7 +59,15 @@ module type S = sig
   (** Decode an object, requiring a particular field. *)
   val field : string -> 'a decoder -> 'a decoder
 
-  (** Decode an object, where a particular field may or may not be present. *)
+  (** Decode an object, where a particular field may or may not be present.
+
+      For example, [(field_opt "hello" int)]:
+
+      - when run on [{"hello": 123}], will succeed with [Some 123]
+      - when run on [{"hello": null}], will fail
+      - when run on [{"world": 123}], will succeed with [None]
+      - when run on [["a", "list", "of", "strings"]], will fail
+  *)
   val field_opt : string -> 'a decoder -> 'a option decoder
 
   (** Decode an object, requiring exactly one field. *)
