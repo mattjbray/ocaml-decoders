@@ -17,6 +17,26 @@ let ezjsonm_suite =
       ~decoder:(list string)
       ~input:{|["hello", "world"]|}
       ~expected:["hello"; "world"]
+  ; "field_opt present" >::
+    decoder_test
+      ~decoder:(field_opt "optional" string)
+      ~input:{|{"optional": "hello"}|}
+      ~expected:(Some "hello")
+  ; "field_opt missing" >::
+    decoder_test
+      ~decoder:(field_opt "optional" string)
+      ~input:{|{"missing": "hello"}|}
+      ~expected:None
+  ; "field_opt decode error" >::
+    fun _ ->
+      match decode_string (field_opt "optional" string) {|{"optional": 123}|} with
+      | Ok _ ->
+        assert_string
+          "expected decode error"
+      | Error e ->
+        assert_equal ~printer:CCFun.id
+          {|in field "optional": Expected a string, but got 123.|}
+          (Format.asprintf "%a" pp_error e)
   ]
 
 let ezjsonm_encoders_suite =
