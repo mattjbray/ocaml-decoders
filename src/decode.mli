@@ -59,6 +59,9 @@ module type S = sig
   (** Decode an object, requiring a particular field. *)
   val field : string -> 'a decoder -> 'a decoder
 
+  (** Decode an object, where a particular field may or may not be present. *)
+  val field_opt : string -> 'a decoder -> 'a option decoder
+
   (** Decode an object, requiring exactly one field. *)
   val single_field : (string -> 'a decoder) -> 'a decoder
 

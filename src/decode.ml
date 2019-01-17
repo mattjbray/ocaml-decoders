@@ -76,6 +76,9 @@ module type S = sig
   (** Decode an object, requiring a particular field. *)
   val field : string -> 'a decoder -> 'a decoder
 
+  (** Decode an object, where a particular field may or may not be present. *)
+  val field_opt : string -> 'a decoder -> 'a option decoder
+
   (** Decode an object, requiring exactly one field. *)
   val single_field : (string -> 'a decoder) -> 'a decoder
 
@@ -448,6 +451,26 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
               value_decoder.run value
               |> My_result.map_err (tag_error (Printf.sprintf "in field %S" key))
             | None -> (fail (Printf.sprintf "Expected an object with an attribute %S" key)).run t
+      }
+
+  let field_opt : string -> 'a decoder -> 'a option decoder =
+    fun key value_decoder ->
+      { run =
+          fun t ->
+            let value =
+              Decodeable.get_key_value_pairs t
+              |> My_opt.flat_map (My_list.find_map (fun (k, v) ->
+                  match Decodeable.get_string k with
+                  | Some s when s = key -> Some v
+                  | _ -> None
+                ))
+            in
+            match value with
+            | Some value ->
+              value_decoder.run value
+              |> My_result.map (fun v -> Some v)
+              |> My_result.map_err (tag_error (Printf.sprintf "in field %S" key))
+            | None -> Ok None
       }
 
   let single_field : (string -> 'a decoder) -> 'a decoder =
