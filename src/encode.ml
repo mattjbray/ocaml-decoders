@@ -16,6 +16,7 @@ module type S = sig
   val list : 'a encoder -> 'a list encoder
   val obj : (string * value) list encoder
   val obj' : (value * value) list encoder
+  val kv_opt : (string * 'a encoder) -> 'a option -> (string * value) list -> (string * value) list
 
   val value : value encoder
 
@@ -64,6 +65,19 @@ module Make(E : Encodeable) : S with type value = E.value = struct
     xs
     |> List.map (fun (k, v) -> (E.of_string k, v))
     |> E.of_key_value_pairs
+
+  (** Helpful for dealing with optional fields, e.g:
+
+      type my_obj = { always_there : string; sometimes_there : string option }
+
+      let my_obj (x : my_obj) =
+        obj ([("always_there", string x.always_there)]
+             |> kv_opt ("sometimes_there", string) x.sometimes_there)
+  *)
+  let kv_opt (k, vf) v_opt kvs =
+    match v_opt with
+    | None -> kvs
+    | Some v -> kvs @ [(k, vf v)]
 
   let value x = x
 

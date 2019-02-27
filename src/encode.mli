@@ -15,6 +15,16 @@ module type S = sig
   val obj : (string * value) list encoder
   val obj' : (value * value) list encoder
 
+  (** Helpful for dealing with optional fields, e.g:
+
+      type my_obj = { always_there : string; sometimes_there : string option }
+
+      let my_obj (x : my_obj) =
+        obj ([("always_there", string x.always_there)]
+             |> kv_opt ("sometimes_there", string) x.sometimes_there)
+  *)
+  val kv_opt : (string * 'a encoder) -> 'a option -> (string * value) list -> (string * value) list
+
   val value : value encoder
 
   val encode_value : 'a encoder -> 'a -> value
