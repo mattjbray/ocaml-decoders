@@ -44,7 +44,7 @@ module type S = sig
   (** Decode a literal [value]. *)
   val value : value decoder
 
-  (** {1 Data structures} *)
+  (** {1 Lists} *)
 
   (** Decode a collection into an OCaml list. *)
   val list : 'a decoder -> 'a list decoder
@@ -53,6 +53,9 @@ module type S = sig
       decoder returns None.
   *)
   val list_filter : 'a option decoder -> 'a list decoder
+
+  (** Decode a collection, requiring a particular index. *)
+  val index : int -> 'a decoder -> 'a decoder
 
   (** {1 Object primitives} *)
 
@@ -72,9 +75,6 @@ module type S = sig
 
   (** Decode an object, requiring exactly one field. *)
   val single_field : (string -> 'a decoder) -> 'a decoder
-
-  (** Decode an array, requiring a particular index. *)
-  val index : int -> 'a decoder -> 'a decoder
 
   (** Decode a nested object, requiring certain fields. *)
   val at : string list -> 'a decoder -> 'a decoder
