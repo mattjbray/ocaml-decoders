@@ -138,9 +138,6 @@ module type S = sig
   val key_value_pairs' : 'k decoder -> 'v decoder -> ('k * 'v) list decoder
   val key_value_pairs_seq' : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder
 
-  (** Decode an object into a [String.Map.t]. *)
-  (* val string_map : 'a decoder -> 'a Core.String.Map.t decoder *)
-
   (** {1 Fancy decoding} *)
 
   (** A decoder that always succeeds with the argument, ignoring the input. *)
