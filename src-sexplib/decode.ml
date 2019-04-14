@@ -34,6 +34,7 @@ module Sexplib_decodeable : Decode.Decodeable with type value = Sexp.t = struct
     | Sexp.List lst ->
       lst |> CCList.map (function
           | Sexp.List [key; value] -> Some (key, value)
+          | Sexp.List (key :: values) -> Some (key, Sexp.List values)
           | _ -> None)
       |> CCList.all_some
     | _ -> None

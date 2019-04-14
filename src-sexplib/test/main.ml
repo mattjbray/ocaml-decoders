@@ -15,6 +15,11 @@ let sexplib_suite =
       ~decoder:(list string)
       ~input:"(hello world)"
       ~expected:["hello"; "world"]
+  ; "list string (one element)" >::
+    decoder_test
+      ~decoder:(list string)
+      ~input:"(hello)"
+      ~expected:["hello"]
   ; "field_opt present" >::
     decoder_test
       ~decoder:(field_opt "optional" string)
@@ -26,13 +31,23 @@ let sexplib_suite =
       ~input:"()"
       ~expected:None
   ; "uncons" >::
+    let (>>=::) head tail = uncons tail head in
     decoder_test
-      ~decoder:(string |> uncons (function
-          | "library" -> field "name" string
-          | _ -> fail "Expected 'library'"
-        ))
-      ~input:"(library (name decoders))"
-      ~expected:"decoders"
+      ~input:"(library \
+              (name decoders-sexplib) \
+              (libraries decoders sexplib0))"
+      ~decoder:(string >>=:: function
+        | "library" ->
+          field "name" string >>= fun name ->
+          field "libraries"
+            (one_of
+               [ ("list", list string)
+               ; ("string", string >|= fun s -> [s])
+               ])
+          >>= fun libs ->
+          succeed (name, libs)
+        | _ -> fail "Expected 'library'")
+      ~expected:("decoders-sexplib", [ "decoders"; "sexplib0" ])
   ]
 
 let () =
