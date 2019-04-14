@@ -50,6 +50,8 @@ module Ezjsonm_decodeable : Decode.Decodeable with type value = Ezjsonm.value = 
   let get_key_value_pairs = function
     | `O assoc -> Some (List.map (fun (key, value) -> (`String key, value)) assoc)
     | _ -> None
+
+  let to_list values = `A values
 end
 
 include Decode.Make(Ezjsonm_decodeable)

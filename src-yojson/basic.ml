@@ -43,6 +43,8 @@ module Json_decodeable : Decode.Decodeable with type value = Yojson.Basic.json =
   let get_key_value_pairs : value -> (value * value) list option = function
     | `Assoc assoc -> Some (List.map (fun (key, value) -> (`String key, value)) assoc)
     | _ -> None
+
+  let to_list values = `List values
 end
 
 module Decode = Decode.Make(Json_decodeable)

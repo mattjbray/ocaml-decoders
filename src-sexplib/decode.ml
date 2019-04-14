@@ -37,6 +37,8 @@ module Sexplib_decodeable : Decode.Decodeable with type value = Sexp.t = struct
           | _ -> None)
       |> CCList.all_some
     | _ -> None
+
+  let to_list values = Sexp.List values
 end
 
 include Decode.Make(Sexplib_decodeable)

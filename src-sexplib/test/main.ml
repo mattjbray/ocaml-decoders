@@ -25,6 +25,14 @@ let sexplib_suite =
       ~decoder:(field_opt "optional" string)
       ~input:"()"
       ~expected:None
+  ; "uncons" >::
+    decoder_test
+      ~decoder:(string |> uncons (function
+          | "library" -> field "name" string
+          | _ -> fail "Expected 'library'"
+        ))
+      ~input:"(library (name decoders))"
+      ~expected:"decoders"
   ]
 
 let () =
