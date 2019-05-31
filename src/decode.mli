@@ -54,8 +54,18 @@ module type S = sig
   *)
   val list_filter : 'a option decoder -> 'a list decoder
 
-  (** Decode a collection into an OCaml list and pass a function to act on the elements, returning
-  the result*)
+  (** Decode a collection with an accumulator.
+
+      If we consider that an ['a decoder] is basically a type alias for
+      [json -> ('a, error) result], the signature of this function is comparable
+      to that of [List.fold_left]:
+
+      {[
+      val List.fold_left : ('a ->   'b ->                 'a) -> 'a -> 'b list ->                 'a
+      val list_fold_left : ('a -> json -> ('a, error) result) -> 'a ->    json -> ('a, error) result
+      val list_fold_left : ('a ->                 'a decoder) -> 'a ->                    'a decoder
+      ]}
+  *)
   val list_fold_left: ('a -> 'a decoder) -> 'a -> 'a decoder
 
   (** Decode a collection, requiring a particular index. *)
