@@ -3,7 +3,7 @@
 module Decode : sig
   include Decoders.Decode.S with type value = Yojson.Raw.json
 
-  (** {1 Yojson.Raw-specific decoders}*)
+  (** {2 Yojson.Raw-specific decoders}*)
 
   val stringlit : string decoder
   val intlit : string decoder
@@ -13,7 +13,7 @@ end
 module Encode : sig
   include Decoders.Encode.S with type value = Yojson.Raw.json
 
-  (** {1 Yojson.Raw-specific encoders}*)
+  (** {2 Yojson.Raw-specific encoders}*)
 
   val stringlit : string encoder
   val intlit : string encoder

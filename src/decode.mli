@@ -27,7 +27,7 @@ module type S = sig
   *)
   type 'a decoder
 
-  (** {1 Primitives} *)
+  (** {2 Primitives} *)
 
   (** Decode a [string]. *)
   val string : string decoder
@@ -44,7 +44,7 @@ module type S = sig
   (** Decode a literal [value]. *)
   val value : value decoder
 
-  (** {1 Lists} *)
+  (** {2 Lists} *)
 
   (** Decode a collection into an OCaml list. *)
   val list : 'a decoder -> 'a list decoder
@@ -61,7 +61,7 @@ module type S = sig
   (** Decode a collection, requiring a particular index. *)
   val index : int -> 'a decoder -> 'a decoder
 
-  (** {1 Object primitives} *)
+  (** {2 Object primitives} *)
 
   (** Decode an object, requiring a particular field. *)
   val field : string -> 'a decoder -> 'a decoder
@@ -83,7 +83,7 @@ module type S = sig
   (** Decode a nested object, requiring certain fields. *)
   val at : string list -> 'a decoder -> 'a decoder
 
-  (** {1 Inconsistent structure} *)
+  (** {2 Inconsistent structure} *)
 
   (** [maybe d] is a decoder that always succeeds. If [d] succeeds with [x],
       then [maybe d] succeeds with [Some x], otherwise if [d] fails, then [maybe d]
@@ -115,7 +115,7 @@ module type S = sig
   (** Try a sequence of different decoders. *)
   val one_of : (string * 'a decoder) list -> 'a decoder
 
-  (** {1 Mapping} *)
+  (** {2 Mapping} *)
 
   (** Map over the result of a decoder. *)
   val map : ('a -> 'b) -> 'a decoder -> 'b decoder
@@ -125,7 +125,7 @@ module type S = sig
   *)
   val apply : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
 
-  (** {1 Working with object keys} *)
+  (** {2 Working with object keys} *)
 
   (** Decode all of the keys of an object to a list of strings. *)
   val keys : string list decoder
@@ -142,7 +142,7 @@ module type S = sig
   val key_value_pairs' : 'k decoder -> 'v decoder -> ('k * 'v) list decoder
   val key_value_pairs_seq' : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder
 
-  (** {1 Fancy decoding} *)
+  (** {2 Fancy decoding} *)
 
   (** A decoder that always succeeds with the argument, ignoring the input. *)
   val succeed : 'a -> 'a decoder
@@ -172,7 +172,7 @@ module type S = sig
 
   include module type of Infix
 
-  (** {1 Running decoders} *)
+  (** {2 Running decoders} *)
 
   (** Run a decoder on some input. *)
   val decode_value : 'a decoder -> value -> ('a, error) result
@@ -183,7 +183,7 @@ module type S = sig
   (** Run a decoder on a file. *)
   val decode_file : 'a decoder -> string -> ('a, error) result
 
-  (** {1 Pipeline Decoders} *)
+  (** {2 Pipeline Decoders} *)
   module Pipeline : sig
     (**
         Pipeline decoders present an alternative to the [mapN] style. They read
@@ -205,7 +205,7 @@ module type S = sig
   end
 end
 
-(** {2} Creating a Decoder implementation
+(** {2 Creating a Decoder implementation}
 
     The following are useful only if you are creating a new Decoder implementation.
 *)
