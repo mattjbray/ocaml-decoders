@@ -54,6 +54,10 @@ module type S = sig
   *)
   val list_filter : 'a option decoder -> 'a list decoder
 
+  (** Decode a collection into an OCaml list and pass a function to act on the elements, returning
+  the result*)
+  val list_fold_left: ('a -> 'a decoder) -> 'a -> 'a decoder
+
   (** Decode a collection, requiring a particular index. *)
   val index : int -> 'a decoder -> 'a decoder
 

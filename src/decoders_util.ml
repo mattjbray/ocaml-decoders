@@ -22,4 +22,5 @@ module My_list = struct
   let map = CCList.map
   let mapi = CCList.mapi
   let find_map = CCList.find_map
+  let fold_left = CCList.fold_left
 end
