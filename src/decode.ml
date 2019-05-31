@@ -310,18 +310,18 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
             |> My_result.map_err (tag_error "while decoding a list")
     }
 
-  let list_fold_left : ('a -> 'a decoder) -> 'a -> 'a decoder = 
+  let list_fold_left : ('a -> 'a decoder) -> 'a -> 'a decoder =
     fun decoder_func init ->
     {
-      run = 
+      run =
         fun t ->
           match Decodeable.get_list t with
           | None -> (fail "Expected a list").run t
           | Some values ->
-            values 
+            values
             |> My_result.Infix.(My_list.fold_left (fun (acc,i) el ->
                 (acc >>= fun acc ->
-                 (acc |> decoder_func).run el 
+                 (acc |> decoder_func).run el
                  |> My_result.map_err (tag_error (Printf.sprintf "element %i" i))),i+1
               )  (Ok init,0)) |> fst
             |> My_result.map_err (tag_error "while decoding a list")
