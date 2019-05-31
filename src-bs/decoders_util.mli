@@ -21,4 +21,5 @@ module My_list : sig
   val map : ('a -> 'b) -> 'a list -> 'b list
   val mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
   val find_map : ('a -> 'b option) -> 'a list -> 'b option
+  val fold_left : ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a
 end

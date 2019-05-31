@@ -33,4 +33,6 @@ module My_list = struct
         | Some _ -> true
         | None -> false)
     |. Belt.Option.flatMap f
+
+  let fold_left f init xs = Belt.List.reduce xs init f
 end
