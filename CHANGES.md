@@ -1,3 +1,8 @@
+## 0.2.0 (2019-06-24)
+
+* Add `field_opt` decoder (#5, @actionshrimp)
+* Add `list_fold_left` decoder (#8, @ewenmaclean)
+
 ## 0.1.2 (2019-01-09)
 
 * Upgrade from `jbuilder` to `dune`

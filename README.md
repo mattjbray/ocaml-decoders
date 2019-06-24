@@ -280,8 +280,7 @@ After updating CHANGES.md:
 
 ```
 npm version <newversion>
-dune-release tag
-git push
+git push --tags
 dune-release -p decoders,decoders-ezjsonm,decoders-yojson
 npm publish
 ```
