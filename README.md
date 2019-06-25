@@ -12,7 +12,7 @@ An Ocaml program having a JSON (or YAML) data source usually goes something like
 
 This library helps with step 3.
 
-## Getting started
+# Getting started
 
 Install one of the supported decoder backends:
 
@@ -274,7 +274,7 @@ utop # E.encode_string E.obj [("users", E.list user users)];;
 
 See also the [API docs](https://mattjbray.github.io/ocaml-decoders/decoders/decoders/Decoders/Encode/module-type-S/index.html).
 
-## Release
+# Release
 
 After updating CHANGES.md:
 
