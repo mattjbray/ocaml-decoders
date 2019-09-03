@@ -1,9 +1,9 @@
 opam-version: "1.2"
 synopsis: "Elm-inspired decoders for Ocaml"
-maintainer: "Matt Bray <matt@aestheticintegration.com>"
-authors: ["Matt Bray <matt@aestheticintegration.com>"]
+maintainer: "Matt Bray <mattjbray@gmail.com>"
+authors: ["Matt Bray <mattjbray@gmail.com>"]
 homepage: "https://github.com/mattjbray/ocaml-decoders"
-doc: "https://mattjbray.github.io/ocaml-decoders/decoders-yojson"
+doc: "https://mattjbray.github.io/ocaml-decoders/decoders-cbor"
 bug-reports: "https://github.com/mattjbray/ocaml-decoders/issues"
 license: "ISC"
 dev-repo: "git@github.com:mattjbray/ocaml-decoders.git"
