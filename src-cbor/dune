@@ -1,0 +1,4 @@
+(library
+ (name decoders_cbor)
+ (public_name decoders-cbor)
+ (libraries decoders cbor))
