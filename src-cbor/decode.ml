@@ -60,7 +60,7 @@ let simple : int decoder =
       | json -> (fail "Expected Simple").run json
   }
 
-let bytes : bytes decoder =
+let bytes : string decoder =
   { run =
       function
       | `Bytes b -> Ok b
