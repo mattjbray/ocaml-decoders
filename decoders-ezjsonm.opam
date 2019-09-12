@@ -1,17 +1,22 @@
-opam-version: "1.2"
-synopsis: "Elm-inspired decoders for Ocaml"
+opam-version: "2.0"
 maintainer: "Matt Bray <matt@aestheticintegration.com>"
 authors: ["Matt Bray <matt@aestheticintegration.com>"]
 homepage: "https://github.com/mattjbray/ocaml-decoders"
+synopsis: "Interface to ezjsonm for decoders"
 doc: "https://mattjbray.github.io/ocaml-decoders/decoders-ezjsonm"
 bug-reports: "https://github.com/mattjbray/ocaml-decoders/issues"
 license: "ISC"
-dev-repo: "git@github.com:mattjbray/ocaml-decoders.git"
-build: [["dune" "build" "-p" name "-j" jobs]]
-build-test: [["dune" "runtest" "-p" name "-j" jobs]]
+dev-repo: "git+https://github.com/mattjbray/ocaml-decoders.git"
+build: [
+  ["dune" "build" "-p" name "-j" jobs]
+  ["dune" "runtest" "-p" name "-j" jobs] {with-test}
+  ["dune" "build" "@doc" "-p" name "-j" jobs] {with-doc}
+]
 depends: [
   "dune" {build}
   "ounit" {with-test}
   "decoders"
   "ezjsonm" {>= "0.4.0"}
+  "odoc" {with-doc}
+  "ocaml" { >= "4.03.0" }
 ]
