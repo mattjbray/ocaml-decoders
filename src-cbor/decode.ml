@@ -40,6 +40,8 @@ module Cbor_decodeable : Decode.Decodeable with type value = CBOR.Simple.t = str
   let get_key_value_pairs = function
     | `Map assoc -> Some assoc
     | _ -> None
+
+  let to_list vs = `Array vs
 end
 
 include Decode.Make(Cbor_decodeable)
