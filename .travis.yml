@@ -5,13 +5,20 @@ services:
 - docker
 env:
   global:
-  - PINS="decoders:. decoders-yojson:."
+  - PINS="decoders:. decoders-ezjsonm:. decoders-sexplib:. decoders-yojson:."
   - DISTRO="ubuntu-16.04"
   matrix:
-    #- PACKAGE="decoders-yojson" OCAML_VERSION="4.02.3"
+  - PACKAGE="decoders-ezjsonm" OCAML_VERSION="4.03"
+  - PACKAGE="decoders-ezjsonm" OCAML_VERSION="4.04"
+  - PACKAGE="decoders-ezjsonm" OCAML_VERSION="4.06"
+  - PACKAGE="decoders-ezjsonm" OCAML_VERSION="4.08"
+
+  - PACKAGE="decoders-sexplib" OCAML_VERSION="4.03"
+  - PACKAGE="decoders-sexplib" OCAML_VERSION="4.04"
+  - PACKAGE="decoders-sexplib" OCAML_VERSION="4.06"
+  - PACKAGE="decoders-sexplib" OCAML_VERSION="4.08"
+
   - PACKAGE="decoders-yojson" OCAML_VERSION="4.03"
   - PACKAGE="decoders-yojson" OCAML_VERSION="4.04"
-    #- PACKAGE="decoders" OCAML_VERSION="4.05"
-  - PACKAGE="decoders" OCAML_VERSION="4.06"
-    #- PACKAGE="decoders" OCAML_VERSION="4.07"
-  - PACKAGE="decoders" OCAML_VERSION="4.08"
+  - PACKAGE="decoders-yojson" OCAML_VERSION="4.06"
+  - PACKAGE="decoders-yojson" OCAML_VERSION="4.08"
