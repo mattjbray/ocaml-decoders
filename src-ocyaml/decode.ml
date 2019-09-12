@@ -72,6 +72,8 @@ module Yaml_decodeable : Decode.Decodeable with type value = Ocyaml.yaml = struc
   let get_key_value_pairs = function
     | Structure assoc -> Some assoc
     | _ -> None
+
+  let to_list values = Collection values
 end
 
 include Decode.Make(Yaml_decodeable)

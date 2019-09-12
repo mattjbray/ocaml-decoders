@@ -25,6 +25,8 @@ module type Decodeable = sig
   val get_null : value -> unit option
   val get_list : value -> value list option
   val get_key_value_pairs : value -> (value * value) list option
+
+  val to_list : value list -> value
 end
 
 (** User-facing Decoder interface. *)
@@ -47,6 +49,7 @@ module type S = sig
   val list_filter : 'a option decoder -> 'a list decoder
   val list_fold_left: ('a -> 'a decoder) -> 'a -> 'a decoder
   val index : int -> 'a decoder -> 'a decoder
+  val uncons : ('a -> 'b decoder) -> 'a decoder -> 'b decoder
   val field : string -> 'a decoder -> 'a decoder
   val field_opt : string -> 'a decoder -> 'a option decoder
   val single_field : (string -> 'a decoder) -> 'a decoder
@@ -397,6 +400,22 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
               | Some item -> decoder.run item
             end
           | None -> (fail "Expected a list").run t
+    }
+
+  let uncons (tail : 'a -> 'b decoder) (head : 'a decoder) : 'b decoder =
+    { run =
+        fun value ->
+          match Decodeable.get_list value with
+        | Some (x :: rest) ->
+          My_result.Infix.(
+            head.run x
+            |> My_result.map_err (tag_error "while consuming a list element")
+            >>= fun x ->
+            (tail x).run (Decodeable.to_list rest)
+            |> My_result.map_err (tag_error "after consuming a list element")
+          )
+        | Some [] -> (fail "Expected a non-empty list").run value
+        | None -> (fail "Expected a list").run value
     }
 
   let rec at : string list -> 'a decoder -> 'a decoder = fun path decoder ->

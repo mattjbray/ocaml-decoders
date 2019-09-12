@@ -39,6 +39,8 @@ module Json_decodeable : Decode.Decodeable with type value = Js.Json.t = struct
         Js.Dict.entries dict
         |. Array.to_list
         |> List.map (fun (key, value) -> (Js.Json.string key, value)))
+
+  let to_list values = Js.Json.array (Array.of_list values)
 end
 
 module Decode = Decode.Make(Json_decodeable)

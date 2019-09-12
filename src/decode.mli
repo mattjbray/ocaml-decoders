@@ -71,7 +71,41 @@ module type S = sig
   (** Decode a collection, requiring a particular index. *)
   val index : int -> 'a decoder -> 'a decoder
 
-  (** {2 Object primitives} *)
+  (** [fst |> uncons rest] decodes the first element of a list using [fst], then
+      decodes the remainder of the list using [rest].
+
+      For example, to decode this s-expression:
+
+          (library
+            (name decoders))
+
+      we can use this decoder:
+
+          string |> uncons (function
+            | "library" -> field "name" string
+            | _ -> fail "Expected a library stanza")
+
+      As another example, say you have a JSON array that starts with a string,
+      then a bool, then a list of integers:
+
+          ["hello", true, 1, 2, 3, 4]
+
+      We could decode it like this:
+
+          let (>>=::) fst rest = uncons rest fst
+
+          let decoder : (string * bool * int list) decoder =
+            string >>=:: fun the_string ->
+            bool >>=:: fun the_bool ->
+            list int >>= fun the_ints ->
+            succeed (the_string, the_bool, the_ints)
+
+      (If you squint, the uncons operator [>>=::] kind of looks like the cons
+      operator [::].)
+  *)
+  val uncons : ('a -> 'b decoder) -> 'a decoder -> 'b decoder
+
+  (** {1 Object primitives} *)
 
   (** Decode an object, requiring a particular field. *)
   val field : string -> 'a decoder -> 'a decoder
@@ -217,7 +251,7 @@ end
 
 (** {2 Creating a Decoder implementation}
 
-    The following are useful only if you are creating a new Decoder implementation.
+    The following is useful only if you are creating a new Decoder implementation.
 *)
 
 (** Signature of things that can be decoded. *)
@@ -234,6 +268,8 @@ module type Decodeable = sig
   val get_null : value -> unit option
   val get_list : value -> value list option
   val get_key_value_pairs : value -> (value * value) list option
+
+  val to_list : value list -> value
 end
 
 (** Derive decoders for a [Decodeable.value]. *)

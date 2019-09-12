@@ -45,6 +45,8 @@ module Json_decodeable : Decode.Decodeable with type value = Yojson.Raw.json = s
   let get_key_value_pairs : value -> (value * value) list option = function
     | `Assoc assoc -> Some (List.map (fun (key, value) -> (`Stringlit (Printf.sprintf "%S" key), value)) assoc)
     | _ -> None
+
+  let to_list values = `List values
 end
 
 module Decode = struct
