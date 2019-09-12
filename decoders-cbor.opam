@@ -1,0 +1,22 @@
+opam-version: "2.0"
+maintainer: "Matt Bray <mattjbray@gmail.com>"
+authors: ["Matt Bray <mattjbray@gmail.com>"]
+synopsis: "CBOR interface for decoders"
+homepage: "https://github.com/mattjbray/ocaml-decoders"
+doc: "https://mattjbray.github.io/ocaml-decoders/decoders-cbor"
+bug-reports: "https://github.com/mattjbray/ocaml-decoders/issues"
+license: "ISC"
+dev-repo: "git+https://github.com/mattjbray/ocaml-decoders.git"
+build: [
+  ["dune" "build" "-p" name "-j" jobs]
+  ["dune" "runtest" "-p" name "-j" jobs] {with-test}
+  ["dune" "build" "@doc" "-p" name "-j" jobs] {with-doc}
+]
+depends: [
+  "dune" {build}
+  "ounit" {with-test}
+  "decoders"
+  "cbor"
+  "odoc" {with-doc}
+  "ocaml" { >= "4.03.0" }
+]

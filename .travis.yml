@@ -8,6 +8,11 @@ env:
   - PINS="decoders:. decoders-ezjsonm:. decoders-sexplib:. decoders-yojson:."
   - DISTRO="ubuntu-16.04"
   matrix:
+  - PACKAGE="decoders-cbor" OCAML_VERSION="4.03"
+  - PACKAGE="decoders-cbor" OCAML_VERSION="4.04"
+  - PACKAGE="decoders-cbor" OCAML_VERSION="4.06"
+  - PACKAGE="decoders-cbor" OCAML_VERSION="4.08"
+
   - PACKAGE="decoders-ezjsonm" OCAML_VERSION="4.03"
   - PACKAGE="decoders-ezjsonm" OCAML_VERSION="4.04"
   - PACKAGE="decoders-ezjsonm" OCAML_VERSION="4.06"

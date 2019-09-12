@@ -1,6 +1,6 @@
 .PHONY: build
 build:
-	dune build decoders.install decoders-ezjsonm.install decoders-yojson.install
+	dune build decoders.install decoders-cbor.install decoders-ezjsonm.install decoders-sexplib.install decoders-yojson.install
 
 .PHONY: test
 test:
