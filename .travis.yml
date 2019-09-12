@@ -13,7 +13,7 @@ env:
   - PACKAGE="decoders-ezjsonm" OCAML_VERSION="4.06"
   - PACKAGE="decoders-ezjsonm" OCAML_VERSION="4.08"
 
-  - PACKAGE="decoders-sexplib" OCAML_VERSION="4.03"
+  # - PACKAGE="decoders-sexplib" OCAML_VERSION="4.03"
   - PACKAGE="decoders-sexplib" OCAML_VERSION="4.04"
   - PACKAGE="decoders-sexplib" OCAML_VERSION="4.06"
   - PACKAGE="decoders-sexplib" OCAML_VERSION="4.08"
