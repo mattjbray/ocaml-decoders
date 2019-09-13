@@ -34,6 +34,7 @@ module type S = sig
   type value
   type error = value exposed_error
   val pp_error : Format.formatter -> error -> unit
+  val string_of_error : error -> string
 
   val of_string : string -> (value, error) result
   val of_file : string -> (value, error) result
@@ -115,6 +116,9 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
       Format.fprintf fmt "@[<2>%s:@ @[%a@]@]"
         msg
         pp_error error
+
+  let string_of_error e : string =
+    Format.asprintf "@[<2>%a@?@]" pp_error e
 
   let tag_error (msg : string) (error : error) : error =
     Decoder_tag (msg, error)
