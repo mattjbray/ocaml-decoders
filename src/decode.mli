@@ -77,22 +77,29 @@ module type S = sig
 
       For example, to decode this s-expression:
 
+      {[
           (library
             (name decoders))
+      ]}
 
       we can use this decoder:
 
+      {[
           string |> uncons (function
             | "library" -> field "name" string
             | _ -> fail "Expected a library stanza")
+      ]}
 
       As another example, say you have a JSON array that starts with a string,
       then a bool, then a list of integers:
 
+      {[
           ["hello", true, 1, 2, 3, 4]
+      ]}
 
       We could decode it like this:
 
+      {[
           let (>>=::) fst rest = uncons rest fst
 
           let decoder : (string * bool * int list) decoder =
@@ -100,6 +107,7 @@ module type S = sig
             bool >>=:: fun the_bool ->
             list int >>= fun the_ints ->
             succeed (the_string, the_bool, the_ints)
+      ]}
 
       (If you squint, the uncons operator [>>=::] kind of looks like the cons
       operator [::].)
