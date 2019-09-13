@@ -1,0 +1,4 @@
+(test
+ (name main)
+ (package decoders-bencode)
+ (libraries decoders-bencode oUnit))
