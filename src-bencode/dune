@@ -1,0 +1,4 @@
+(library
+ (name decoders_bencode)
+ (public_name decoders-bencode)
+ (libraries decoders bencode))
