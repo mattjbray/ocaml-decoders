@@ -1,6 +1,8 @@
+ALL_TARGETS=decoders.install decoders-cbor.install decoders-ezjsonm.install decoders-sexplib.install decoders-yojson.install decoders-cbor.install decoders-bencode.install
+
 .PHONY: build
 build:
-	dune build decoders.install decoders-cbor.install decoders-ezjsonm.install decoders-sexplib.install decoders-yojson.install
+	dune build $(ALL_TARGETS)
 
 .PHONY: test
 test:
@@ -32,3 +34,7 @@ publish-doc: doc
 	cp -r _build/default/_doc/_html/* "$(DOCS_WORKTREE_PATH)"
 	COMMIT_SHA=$$(git rev-parse HEAD) && cd "$(DOCS_WORKTREE_PATH)" && git add . && git commit -m "Update docs from revision $${COMMIT_SHA}"
 	cd "$(DOCS_WORKTREE_PATH)" && git push origin gh-pages
+
+.PHONY: watch
+watch:
+	@dune build --watch $(ALL_TARGETS)
