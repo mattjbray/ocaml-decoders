@@ -61,7 +61,7 @@ let encoders_suite =
   ]
 
 let () =
-  "CBOR" >:::
+  "Bencode" >:::
   [ decoders_suite
   ; encoders_suite
   ]
