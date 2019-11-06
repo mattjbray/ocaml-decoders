@@ -6,13 +6,13 @@ module Json_decodeable : Decode.Decodeable with type value = Yojson.Raw.json = s
   type value = Yojson.Raw.json
   let pp fmt json = Format.fprintf fmt "@[%s@]" (Yojson.Raw.pretty_to_string json)
 
-  let of_string : string -> (value, string) CCResult.t =
+  let of_string : string -> (value, string) result =
     fun string ->
-      try CCResult.Ok (Yojson.Raw.from_string string) with
+      try Ok (Yojson.Raw.from_string string) with
       | Yojson.Json_error msg -> Error (msg)
 
   let of_file file =
-    try CCResult.Ok (Yojson.Raw.from_file file) with
+    try Ok (Yojson.Raw.from_file file) with
     | e -> Error (Printexc.to_string e)
 
   let get_string = function
@@ -93,9 +93,9 @@ module Json_encodeable = struct
   let of_key_value_pairs xs =
     `Assoc
       (xs
-       |> CCList.filter_map (fun (k, v) ->
+       |> Decoders_util.My_list.filter_map (fun (k, v) ->
            Json_decodeable.get_string k
-           |> CCOpt.map (fun k -> (k, v))
+           |> Decoders_util.My_opt.map (fun k -> (k, v))
          ))
 end
 

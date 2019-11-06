@@ -3,4 +3,5 @@
  (package decoders-ezjsonm)
  (libraries
   decoders-ezjsonm
+  containers
   oUnit))

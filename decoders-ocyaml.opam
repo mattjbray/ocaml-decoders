@@ -14,7 +14,7 @@ build: [
 ]
 depends: [
   "dune" {build}
-  "containers"
+  "containers" {with-test}
   "decoders"
   "ocyaml"
   "odoc" {with-doc}

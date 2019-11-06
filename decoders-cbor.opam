@@ -15,6 +15,7 @@ build: [
 depends: [
   "dune" {build}
   "ounit" {with-test}
+  "containers" {with-test}
   "decoders"
   "cbor"
   "odoc" {with-doc}

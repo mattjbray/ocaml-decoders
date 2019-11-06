@@ -1,3 +1,4 @@
+open Decoders
 module Bencode_encodeable = struct
   type value = Bencode.t
 
@@ -12,7 +13,7 @@ module Bencode_encodeable = struct
   let of_list xs = Bencode.List xs
   let of_key_value_pairs xs =
     let xs =
-      CCList.filter_map
+      Decoders_util.My_list.filter_map
         (function 
           | Bencode.String s, v -> Some (s,v)
           | _ -> None)

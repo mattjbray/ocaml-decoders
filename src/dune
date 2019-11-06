@@ -1,4 +1,3 @@
 (library
  (name decoders)
-  (public_name decoders)
-  (libraries containers))
+  (public_name decoders))

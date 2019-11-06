@@ -13,12 +13,12 @@ module Ezjsonm_decodeable : Decode.Decodeable with type value = Ezjsonm.value = 
 
   let pp fmt t = Format.fprintf fmt "@[%a@]" pp_t t
 
-  let of_string (input : string) : (value, string) CCResult.t =
+  let of_string (input : string) : (value, string) result =
     try Ok (Ezjsonm.from_string input) with
     | Ezjsonm.Parse_error (_json, msg) -> Error msg
 
-  let of_file (file : string) : (value, string) CCResult.t =
-    try Ok (CCIO.with_in file Ezjsonm.from_channel) with
+  let of_file (file : string) : (value, string) result =
+    try Ok (Decoders_util.with_file_in file Ezjsonm.from_channel) with
     | e -> Error (Printexc.to_string e)
 
   let get_string = function

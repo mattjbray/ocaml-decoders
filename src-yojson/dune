@@ -1,6 +1,7 @@
 (library
  (name decoders_yojson)
  (public_name decoders-yojson)
+ (flags :standard -warn-error -3)
  (libraries
   decoders
   yojson))

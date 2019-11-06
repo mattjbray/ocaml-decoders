@@ -1,6 +1,6 @@
 (** Util module used for native builds (excluded in bs-config.json) *)
 module My_result : sig
-  type ('good, 'bad) t = ('good, 'bad) CCResult.t = Ok of 'good | Error of 'bad
+  type ('good, 'bad) t = ('good, 'bad) result = Ok of 'good | Error of 'bad
 
   val return : 'good -> ('good, 'bad) t
   val map : ('a -> 'b) -> ('a, 'err) t -> ('b, 'err) t
@@ -14,6 +14,7 @@ end
 
 module My_opt : sig
   val return : 'a -> 'a option
+  val map : ('a -> 'b) -> 'a option -> 'b option
   val flat_map : ('a -> 'b option) -> 'a option -> 'b option
 end
 
@@ -21,6 +22,11 @@ module My_list : sig
   val take : int -> 'a list -> 'a list
   val map : ('a -> 'b) -> 'a list -> 'b list
   val mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
+  val filter_map : ('a -> 'b option) -> 'a list -> 'b list
   val find_map : ('a -> 'b option) -> 'a list -> 'b option
   val fold_left : ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a
 end
+
+val with_file_in : string -> (in_channel -> 'a) -> 'a
+
+val read_all : in_channel -> string
