@@ -1,3 +1,11 @@
+## 0.3.0 (2019-06-24)
+
+* Add `uncons` primitive (#7, @mattjbray)
+* Add `Decoders_sexplib` (#7, @mattjbray)
+* Add `Decoders_cbor` (#9, @mattjbray)
+* Add `Decoders_bencode` (#14, @c-cube)
+* Remove `containers` dependency (#16, @c-cube)
+
 ## 0.2.0 (2019-06-24)
 
 * Add `field_opt` decoder (#5, @actionshrimp)

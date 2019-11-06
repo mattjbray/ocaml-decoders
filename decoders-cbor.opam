@@ -2,6 +2,19 @@ opam-version: "2.0"
 maintainer: "Matt Bray <mattjbray@gmail.com>"
 authors: ["Matt Bray <mattjbray@gmail.com>"]
 synopsis: "CBOR interface for decoders"
+description: """
+A combinator library for "decoding" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.
+
+> Eh?
+
+An Ocaml program having a JSON (or YAML) data source usually goes something like this:
+
+1. Get your data from somewhere. Now you have a `string`.
+2. *Parse* the `string` as JSON (or YAML). Now you have a `Yojson.Basic.json`, or maybe an `Ezjsonm.value`, or perhaps a `Ocyaml.yaml`.
+3. *Decode* the JSON value to an Ocaml type that's actually useful for your program's domain.
+
+This library helps with step 3.
+"""
 homepage: "https://github.com/mattjbray/ocaml-decoders"
 doc: "https://mattjbray.github.io/ocaml-decoders/decoders-cbor"
 bug-reports: "https://github.com/mattjbray/ocaml-decoders/issues"
