@@ -8,11 +8,11 @@ module Sexplib_decodeable : Decode.Decodeable with type value = Sexp.t = struct
     Format.fprintf fmt "@[%a@]"
       Sexp.pp_hum value
 
-  let of_string (input : string) : (value, string) CCResult.t =
+  let of_string (input : string) : (value, string) result =
     try Ok (Sexplib.Sexp.of_string input) with
     | Failure msg -> Error msg
 
-  let of_file (file : string) : (value, string) CCResult.t =
+  let of_file (file : string) : (value, string) result =
     try Ok (Sexplib.Sexp.load_sexp file) with
     | e -> Error (Printexc.to_string e)
 
@@ -32,11 +32,11 @@ module Sexplib_decodeable : Decode.Decodeable with type value = Sexp.t = struct
 
   let get_key_value_pairs = function
     | Sexp.List lst ->
-      lst |> CCList.map (function
+      lst |> Decoders_util.My_list.map (function
           | Sexp.List [key; value] -> Some (key, value)
           | Sexp.List (key :: values) -> Some (key, Sexp.List values)
           | _ -> None)
-      |> CCList.all_some
+      |> Decoders_util.My_list.all_some
     | _ -> None
 
   let to_list values = Sexp.List values

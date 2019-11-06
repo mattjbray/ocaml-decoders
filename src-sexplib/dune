@@ -3,6 +3,5 @@
  (public_name decoders-sexplib)
  (libraries
   decoders
-  containers
   sexplib
   sexplib0))

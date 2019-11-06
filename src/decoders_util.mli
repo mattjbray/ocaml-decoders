@@ -20,6 +20,7 @@ end
 
 module My_list : sig
   val take : int -> 'a list -> 'a list
+  val all_some : 'a option list -> 'a list option
   val map : ('a -> 'b) -> 'a list -> 'b list
   val mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
   val filter_map : ('a -> 'b option) -> 'a list -> 'b list

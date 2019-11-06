@@ -42,7 +42,7 @@ module My_list = struct
       | x::l' -> safe (n-1) (x::acc) l'
     in
     direct 500 n l
-
+      
   let map f l =
     let rec direct f i l = match l with
       | [] -> []
@@ -58,6 +58,10 @@ module My_list = struct
         y1 :: y2 :: y3 :: y4 :: direct f (i-1) l'
     in
     direct f 500 l
+
+  let all_some l =
+    try Some (map (function Some x -> x | None -> raise Exit) l)
+    with Exit -> None
 
   let mapi f l =
     let r = ref 0 in

@@ -3,4 +3,5 @@
  (package decoders-sexplib)
  (libraries
   decoders-sexplib
+  containers
   oUnit))
