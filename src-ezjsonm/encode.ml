@@ -18,7 +18,7 @@ module Ezjsonm_encodeable = struct
   let of_key_value_pairs xs =
     `O
       (xs
-       |> CCList.filter_map (fun (k, v) ->
+       |> Decoders.Decoders_util.My_list.filter_map (fun (k, v) ->
            match k with
            | `String k -> Some (k, v)
            | _ -> None))

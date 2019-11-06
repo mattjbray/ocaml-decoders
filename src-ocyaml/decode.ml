@@ -36,7 +36,7 @@ module Yaml_decodeable : Decode.Decodeable with type value = Ocyaml.yaml = struc
     fun t ->
       try
         get_string t
-        |> CCOpt.map int_of_string
+        |> Decoders_util.My_opt.map int_of_string
       with
       | Failure _ -> None
 
@@ -45,7 +45,7 @@ module Yaml_decodeable : Decode.Decodeable with type value = Ocyaml.yaml = struc
     fun t ->
       try
         get_string t
-        |> CCOpt.map float_of_string
+        |> Decoders_util.My_opt.map float_of_string
       with
       | Failure _ -> None
 
@@ -53,14 +53,14 @@ module Yaml_decodeable : Decode.Decodeable with type value = Ocyaml.yaml = struc
     fun t ->
       try
         get_string t
-        |> CCOpt.map bool_of_string
+        |> Decoders_util.My_opt.map bool_of_string
       with
       | Failure _ -> None
 
   let get_null : value -> unit option =
     fun t ->
       get_string t
-      |> CCOpt.flat_map (function
+      |> Decoders_util.My_opt.flat_map (function
           | "" -> Some ()
           | _ -> None
         )

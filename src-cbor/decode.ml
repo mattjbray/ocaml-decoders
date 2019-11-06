@@ -5,12 +5,13 @@ module Cbor_decodeable : Decode.Decodeable with type value = CBOR.Simple.t = str
 
   let pp fmt t = Format.fprintf fmt "@[%s@]" (CBOR.Simple.to_diagnostic t)
 
-  let of_string (input : string) : (value, string) CCResult.t =
+  let of_string (input : string) : (value, string) result =
     try Ok (CBOR.Simple.decode input) with
     | CBOR.Error msg -> Error msg
 
-  let of_file (file : string) : (value, string) CCResult.t =
-    try Ok (CCIO.with_in file (fun chan -> CCIO.read_all chan |> CBOR.Simple.decode)) with
+  let of_file (file : string) : (value, string) result =
+    try Ok (Decoders_util.with_file_in file
+              (fun chan -> Decoders_util.read_all chan |> CBOR.Simple.decode)) with
     | e -> Error (Printexc.to_string e)
 
   let get_string = function

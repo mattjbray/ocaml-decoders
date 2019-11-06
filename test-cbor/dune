@@ -2,5 +2,5 @@
  (name main)
  (package decoders-cbor)
  (libraries
-  decoders-cbor
+  decoders-cbor containers
   oUnit))

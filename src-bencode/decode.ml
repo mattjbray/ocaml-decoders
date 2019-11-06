@@ -5,13 +5,13 @@ module Bencode_decodeable : Decode.Decodeable with type value = Bencode.t = stru
 
   let pp fmt t = Format.fprintf fmt "@[%s@]" (Bencode.pretty_print t)
 
-  let of_string (input : string) : (value, string) CCResult.t =
+  let of_string (input : string) : (value, string) result =
     try Ok (Bencode.decode (`String input)) with
     | _ -> Error "invalid bencode"
 
-  let of_file (file : string) : (value, string) CCResult.t =
+  let of_file (file : string) : (value, string) result =
     try
-      let v = CCIO.with_in file (fun ic -> Bencode.decode (`Channel ic)) in
+      let v = Decoders_util.with_file_in file (fun ic -> Bencode.decode (`Channel ic)) in
       Ok v
     with
     | e -> Error (Printexc.to_string e)
