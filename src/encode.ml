@@ -11,7 +11,9 @@ module type S = sig
   val bool : bool encoder
   val null : value
 
+  val nullable : 'a encoder -> 'a option encoder
   val option : 'a encoder -> 'a option encoder
+  [@@ocaml.deprecated "Use nullable instead."]
 
   val list : 'a encoder -> 'a list encoder
   val obj : (string * value) list encoder
@@ -48,10 +50,11 @@ module Make(E : Encodeable) : S with type value = E.value = struct
   let bool x = E.of_bool x
   let null = E.null
 
-  let option encoder =
+  let nullable encoder =
     function
     | None -> E.null
     | Some x -> encoder x
+  let option = nullable
 
   let list encoder xs =
     xs

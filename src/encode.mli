@@ -9,7 +9,9 @@ module type S = sig
   val bool : bool encoder
   val null : value
 
+  val nullable : 'a encoder -> 'a option encoder
   val option : 'a encoder -> 'a option encoder
+  [@@ocaml.deprecated "Use nullable instead."]
 
   val list : 'a encoder -> 'a list encoder
   val obj : (string * value) list encoder
