@@ -42,6 +42,9 @@ module type S = sig
   (** Decode a [bool]. *)
   val bool : bool decoder
 
+  (** Decode a [null]. *)
+  val null : unit decoder
+
   (** Decode a literal [value]. *)
   val value : value decoder
 

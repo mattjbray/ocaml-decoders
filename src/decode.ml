@@ -45,6 +45,7 @@ module type S = sig
   val int : int decoder
   val float : float decoder
   val bool : bool decoder
+  val null : unit decoder
   val value : value decoder
   val list : 'a decoder -> 'a list decoder
   val list_filter : 'a option decoder -> 'a list decoder
@@ -270,10 +271,8 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
   let bool : bool decoder =
     primitive_decoder Decodeable.get_bool "Expected a bool"
 
-  let null : 'a -> 'a decoder =
-    fun default ->
+  let null : unit decoder =
     primitive_decoder Decodeable.get_null "Expected a null"
-    |> map (fun _ -> default)
 
   let list : 'a decoder -> 'a list decoder =
     fun decoder ->
@@ -516,7 +515,7 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
       let null_or decoder =
         one_of
           [ ( "non-null", decoder )
-          ; ( "null", null default )
+          ; ( "null", null |> map (fun () -> default) )
           ] in
       let handle_result : value -> 'a decoder =
         fun input ->
