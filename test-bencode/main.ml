@@ -32,7 +32,7 @@ let decoders_suite =
       match
         decode_string
           (field_opt "optional" string)
-          (encode_s (Bencode.Dict [("optional", Bencode.Integer 123)]))
+          (encode_s (Bencode.Dict [("optional", Bencode.Integer 123L)]))
       with
       | Ok _ ->
         assert_string

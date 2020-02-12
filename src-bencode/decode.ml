@@ -21,7 +21,7 @@ module Bencode_decodeable : Decode.Decodeable with type value = Bencode.t = stru
     | _ -> None
 
   let get_int = function
-    | Bencode.Integer int -> Some int
+    | Bencode.Integer int -> Some (Int64.to_int int)
     | Bencode.String s -> (try Some (int_of_string s) with _ -> None)
     | _ -> None
 
@@ -30,12 +30,12 @@ module Bencode_decodeable : Decode.Decodeable with type value = Bencode.t = stru
     | _ -> None
 
   let get_null = function
-    | Bencode.Integer 0 | Bencode.List [] -> Some ()
+    | Bencode.Integer 0L | Bencode.List [] -> Some ()
     | _ -> None
 
   let get_bool = function
-    | Bencode.Integer 1 | Bencode.String "true" -> Some true
-    | Bencode.Integer 0 | Bencode.String "false" -> Some false
+    | Bencode.Integer 1L | Bencode.String "true" -> Some true
+    | Bencode.Integer 0L | Bencode.String "false" -> Some false
     | _ -> None
 
   let get_list = function
@@ -51,3 +51,11 @@ module Bencode_decodeable : Decode.Decodeable with type value = Bencode.t = stru
 end
 
 include Decode.Make(Bencode_decodeable)
+
+let int64 : int64 decoder =
+  { run =
+      fun t ->
+        match t with
+        | Bencode.Integer value -> Ok value
+        | _ -> (fail "Expected an int64").run t
+  }

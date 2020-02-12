@@ -5,10 +5,10 @@ module Bencode_encodeable = struct
   let to_string value = Bencode.encode_to_string value
 
   let of_string x = Bencode.String x
-  let of_int x = Bencode.Integer x
+  let of_int x = Bencode.Integer (Int64.of_int x)
   let of_float x = Bencode.String (string_of_float x)
-  let of_bool x = Bencode.Integer (if x then 1 else 0)
-  let null = Bencode.Integer 0
+  let of_bool x = Bencode.Integer (if x then 1L else 0L)
+  let null = Bencode.Integer 0L
 
   let of_list xs = Bencode.List xs
   let of_key_value_pairs xs =
@@ -23,3 +23,5 @@ module Bencode_encodeable = struct
 end
 
 include Decoders.Encode.Make(Bencode_encodeable)
+
+let int64 i = Bencode.Integer i
