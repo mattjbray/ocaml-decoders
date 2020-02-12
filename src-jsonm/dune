@@ -1,0 +1,7 @@
+(library
+ (name decoders_jsonm)
+ (public_name decoders-jsonm)
+ (libraries
+   decoders
+   jsonm
+   seq))

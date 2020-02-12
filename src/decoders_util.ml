@@ -89,6 +89,39 @@ module My_list = struct
     in recurse [] l
 
   let fold_left = List.fold_left
+
+  let direct_depth_append_ = 10_000
+
+  let append l1 l2 =
+    let rec direct i l1 l2 = match l1 with
+      | [] -> l2
+      | _ when i=0 -> safe l1 l2
+      | x::l1' -> x :: direct (i-1) l1' l2
+    and safe l1 l2 =
+      List.rev_append (List.rev l1) l2
+    in
+    match l1 with
+    | [] -> l2
+    | [x] -> x::l2
+    | [x;y] -> x::y::l2
+    | _ -> direct direct_depth_append_ l1 l2
+
+  let (@) = append
+
+  let flat_map f l =
+    let rec aux f l kont = match l with
+      | [] -> kont []
+      | x::l' ->
+        let y = f x in
+        let kont' tail = match y with
+          | [] -> kont tail
+          | [x] -> kont (x :: tail)
+          | [x;y] -> kont (x::y::tail)
+          | l -> kont (append l tail)
+        in
+        aux f l' kont'
+    in
+    aux f l (fun l->l)
 end
 
 let with_file_in file f =
