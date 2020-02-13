@@ -1,0 +1,7 @@
+(test
+ (name main)
+ (package decoders-jsonm)
+ (libraries
+  decoders-jsonm
+  containers
+  oUnit))
