@@ -26,6 +26,9 @@ module My_list : sig
   val filter_map : ('a -> 'b option) -> 'a list -> 'b list
   val find_map : ('a -> 'b option) -> 'a list -> 'b option
   val fold_left : ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a
+  val append : 'a list -> 'a list -> 'a list
+  val (@) : 'a list -> 'a list -> 'a list
+  val flat_map : ('a -> 'b list) -> 'a list -> 'b list
 end
 
 val with_file_in : string -> (in_channel -> 'a) -> 'a

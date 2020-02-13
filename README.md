@@ -281,6 +281,6 @@ After updating CHANGES.md:
 ```
 npm version <newversion>
 git push --tags
-dune-release -p decoders,decoders-bencode,decoders-cbor,decoders-ezjsonm,decoders-sexplib,decoders-yojson
+dune-release -p decoders,decoders-bencode,decoders-cbor,decoders-ezjsonm,decoders-jsonm,decoders-sexplib,decoders-yojson
 npm publish
 ```

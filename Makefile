@@ -1,4 +1,4 @@
-ALL_TARGETS=decoders.install decoders-bencode.install decoders-cbor.install decoders-ezjsonm.install decoders-sexplib.install decoders-yojson.install
+ALL_TARGETS=decoders.install decoders-bencode.install decoders-cbor.install decoders-jsonm.install decoders-ezjsonm.install decoders-sexplib.install decoders-yojson.install
 
 .PHONY: build
 build:
