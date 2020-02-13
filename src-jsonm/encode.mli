@@ -9,7 +9,7 @@
         let dst = `Channel out_channel in
         let encoder = Jsonm.encoder ~minify:true dst in
         let env = E.make_env ~encoder () in
-        encode x env
+        E.encode_value encode x env
     ]}
 *)
 

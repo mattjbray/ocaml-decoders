@@ -64,6 +64,8 @@ end
 
 include Decoders.Encode.Make(Jsonm_encodeable)
 
+(* Override with more efficient implementations *)
+
 let list encode xs =
   array_start >>
   iter encode xs >>
@@ -73,3 +75,11 @@ let obj (xs : (string * value) list) : value =
   object_start >>
   iter (fun (k, v) -> name k >> v) xs >>
   object_end
+
+let encode_value encoder x = encoder x >> end_
+
+let encode_string encoder x =
+  let b = Buffer.create 16 in
+  let env = make_env ~encoder:(Jsonm.encoder ~minify:true (`Buffer b)) () in
+  let () = encode_value encoder x env in
+  Buffer.contents b
