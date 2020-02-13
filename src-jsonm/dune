@@ -3,5 +3,4 @@
  (public_name decoders-jsonm)
  (libraries
    decoders
-   jsonm
-   seq))
+   jsonm))
