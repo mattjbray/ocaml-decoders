@@ -1,3 +1,9 @@
+## 0.4.0 (2020-05-06)
+
+* Expose `null` decoder (#18, @mattjbray)
+* Rename `Encode.option` to `Encode.nullable` (#19, @mattjbray)
+* Add `Decoders_jsonm` (#20, @mattjbray)
+
 ## 0.3.0 (2019-06-24)
 
 * Add `uncons` primitive (#7, @mattjbray)
