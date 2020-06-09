@@ -224,6 +224,7 @@ module type S = sig
     val (>|=) : 'a decoder -> ('a -> 'b) -> 'b decoder
     val (>>=) : 'a decoder -> ('a -> 'b decoder) -> 'b decoder
     val (<*>) : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
+    val (<$>) : ('a -> 'b) -> 'a decoder -> 'b decoder
   end
 
   include module type of Infix
