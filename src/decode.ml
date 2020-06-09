@@ -78,6 +78,7 @@ module type S = sig
     val (>|=) : 'a decoder -> ('a -> 'b) -> 'b decoder
     val (>>=) : 'a decoder -> ('a -> 'b decoder) -> 'b decoder
     val (<*>) : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
+    val (<$>) : ('a -> 'b) -> 'a decoder -> 'b decoder
   end
 
   include module type of Infix
@@ -216,6 +217,7 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
     let (>|=) x f = map f x
     let (>>=) x f = and_then f x
     let (<*>) f x = apply f x
+    let (<$>) = map
   end
 
   let maybe (decoder : 'a decoder) : 'a option decoder =
