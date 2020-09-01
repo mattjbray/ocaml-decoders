@@ -119,7 +119,7 @@ type shape =
   | Triangle of int * int
 
 let square_decoder : shape decoder =
-  D.(field "side" int >>= fun s -> succeed (Square side))
+  D.(field "side" int >>= fun s -> succeed (Square s))
 
 let circle_decoder : shape decoder =
   D.(field "radius" int >>= fun r -> succeed (Circle r))
