@@ -156,7 +156,7 @@ error messages.
 let shape_decoder_2 : shape decoder =
   D.(
     one_of
-      [ ("a square", sqaure_decoder)
+      [ ("a square", square_decoder)
       ; ("a circle", circle_decoder)
       ; ("a triangle", triangle_decoder)
       ]
