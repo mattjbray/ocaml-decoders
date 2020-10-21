@@ -79,11 +79,11 @@ module type S = sig
     val (>>=) : 'a decoder -> ('a -> 'b decoder) -> 'b decoder
     val (<*>) : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
     val (<$>) : ('a -> 'b) -> 'a decoder -> 'b decoder
+
+    include Shims_let_ops_.S with type 'a t_let := 'a decoder
   end
 
   include module type of Infix
-
-  include Shims_let_ops_.S with type 'a t_let := 'a decoder
 
   val decode_value : 'a decoder -> value -> ('a, error) result
   val decode_string : 'a decoder -> string -> ('a, error) result
@@ -216,10 +216,17 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
     r
 
   module Infix = struct
-    let (>|=) x f = map f x
-    let (>>=) x f = and_then f x
-    let (<*>) f x = apply f x
+    let[@inline] (>|=) x f = map f x
+    let[@inline] (>>=) x f = and_then f x
+    let[@inline] (<*>) f x = apply f x
     let (<$>) = map
+
+    include Shims_let_ops_.Make(struct
+        type 'a t = 'a decoder
+        let (>>=) = (>>=)
+        let (>|=) = (>|=)
+        let[@inline] monoid_product a b = map (fun x y -> x,y) a <*> b
+        end)
   end
 
   let maybe (decoder : 'a decoder) : 'a option decoder =
@@ -544,10 +551,4 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
   end
 
   include Infix
-
-  include Shims_let_ops_.Make(struct
-      type 'a t = 'a decoder
-      include Infix
-      let[@inline] monoid_product a b = map (fun x y -> x,y) a <*> b
-      end)
 end
