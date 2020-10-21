@@ -229,6 +229,8 @@ module type S = sig
 
   include module type of Infix
 
+  include Shims_let_ops_.S with type 'a t_let := 'a decoder
+
   (** {2 Running decoders} *)
 
   (** Run a decoder on some input. *)

@@ -83,6 +83,8 @@ module type S = sig
 
   include module type of Infix
 
+  include Shims_let_ops_.S with type 'a t_let := 'a decoder
+
   val decode_value : 'a decoder -> value -> ('a, error) result
   val decode_string : 'a decoder -> string -> ('a, error) result
   val decode_file : 'a decoder -> string -> ('a, error) result
@@ -542,4 +544,10 @@ module Make(Decodeable : Decodeable) : S with type value = Decodeable.value
   end
 
   include Infix
+
+  include Shims_let_ops_.Make(struct
+      type 'a t = 'a decoder
+      include Infix
+      let[@inline] monoid_product a b = map (fun x y -> x,y) a <*> b
+      end)
 end
