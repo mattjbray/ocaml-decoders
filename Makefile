@@ -38,3 +38,16 @@ publish-doc: doc
 .PHONY: watch
 watch:
 	@dune build --watch $(ALL_TARGETS)
+
+
+install-bs-dependencies:
+	npm i
+
+build-bs:
+	npm run build
+
+test-bs:
+	npm test
+
+clean-bs:
+	npm run clean
