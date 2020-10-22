@@ -20,12 +20,10 @@ module Cbor_decodeable : Decode.Decodeable with type value = Msgpck.t = struct
     | M.String str | M.Bytes str -> Some str
     | _ -> None
 
+  (* note: the other int constructors are only used for values that do
+     not fit in [int]. *)
   let get_int = function
     | M.Int int -> Some int
-    | M.Uint32 i -> (try Some (Int32.to_int i) with _ -> None)
-    | M.Uint64 i -> (try Some (Int64.to_int i) with _ -> None)
-    | M.Int32 i -> (try Some (Int32.to_int i) with _ -> None)
-    | M.Int64 i -> (try Some (Int64.to_int i) with _ -> None)
     | _ -> None
 
   let get_float = function
