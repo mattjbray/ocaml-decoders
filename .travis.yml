@@ -1,6 +1,6 @@
 env:
   global:
-  - PINS="decoders:. decoders-ezjsonm:. decoders-sexplib:. decoders-yojson:."
+  - PINS="decoders:. decoders-cbor:. decoders-bencode:. decoders-ezjsonm:. decoders-jsonm:. decoders-sexplib:. decoders-yojson:."
   - DISTRO="ubuntu-16.04"
 language: c
 install: wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-docker.sh
@@ -9,31 +9,37 @@ services:
   - docker
 jobs:
   include:
-      # - PACKAGE="decoders-cbor" OCAML_VERSION="4.03"
-      # - PACKAGE="decoders-cbor" OCAML_VERSION="4.08"
-
-      # - PACKAGE="decoders-bencode" OCAML_VERSION="4.03"
-      # - PACKAGE="decoders-bencode" OCAML_VERSION="4.08"
-
-      # - PACKAGE="decoders-jsonm" OCAML_VERSION="4.03"
-      # - PACKAGE="decoders-jsonm" OCAML_VERSION="4.08"
-
-      # - PACKAGE="decoders-ezjsonm" OCAML_VERSION="4.03"
-      # - PACKAGE="decoders-ezjsonm" OCAML_VERSION="4.08"
-
-      # - PACKAGE="decoders-sexplib" OCAML_VERSION="4.03"
-      # - PACKAGE="decoders-sexplib" OCAML_VERSION="4.08"
-
-      # - PACKAGE="decoders-yojson" OCAML_VERSION="4.03"
-      # - PACKAGE="decoders-yojson" OCAML_VERSION="4.04"
-      # - PACKAGE="decoders-yojson" OCAML_VERSION="4.06"
-  - env:
-     - PACKAGE="decoders-yojson"
-     - OCAML_VERSION="4.08"
-  - language: node_js
-    node_js:
-      - lts/*
-    install: npm ci
-    script: npm test
-    env: []
-    services: []
+    - env:
+        - PACKAGE="decoders-cbor"
+        - OCAML_VERSION="4.08"
+    - env:
+        - PACKAGE="decoders-bencode"
+        - OCAML_VERSION="4.08"
+    - env:
+        - PACKAGE="decoders-ezjsonm"
+        - OCAML_VERSION="4.08"
+    - env:
+        - PACKAGE="decoders-jsonm"
+        - OCAML_VERSION="4.08"
+    - env:
+        - PACKAGE="decoders-sexplib"
+        - OCAML_VERSION="4.08"
+    - env:
+        - PACKAGE="decoders-yojson"
+        - OCAML_VERSION="4.03"
+    - env:
+        - PACKAGE="decoders-yojson"
+        - OCAML_VERSION="4.04"
+    - env:
+        - PACKAGE="decoders-yojson"
+        - OCAML_VERSION="4.06"
+    - env:
+        - PACKAGE="decoders-yojson"
+        - OCAML_VERSION="4.08"
+    - language: node_js
+      node_js:
+        - lts/*
+      install: npm ci
+      script: npm test
+      env: []
+      services: []
