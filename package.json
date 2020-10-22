@@ -7,7 +7,11 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "bsb -make-world",
+    "build-watch": "bsb -make-world -w",
+    "test": "bsb -make-world && jest",
+    "test-watch": "jest --watch",
+    "clean": "bsb -clean-world"
   },
   "repository": {
     "type": "git",
@@ -20,6 +24,7 @@
   },
   "homepage": "https://github.com/mattjbray/ocaml-decoders#readme",
   "devDependencies": {
-    "bs-platform": "^4.0.5"
+    "@glennsl/bs-jest": "^0.5.1",
+    "bs-platform": "^8.0.0"
   }
 }
