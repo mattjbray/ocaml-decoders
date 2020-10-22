@@ -1,15 +1,14 @@
+env:
+  global:
+  - PINS="decoders:. decoders-ezjsonm:. decoders-sexplib:. decoders-yojson:."
+  - DISTRO="ubuntu-16.04"
+language: c
+install: wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-docker.sh
+script: bash -ex .travis-docker.sh
+services:
+  - docker
 jobs:
   include:
-  - language: c
-    install: wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-docker.sh
-    script: bash -ex .travis-docker.sh
-    services:
-    - docker
-    env:
-      global:
-      - PINS="decoders:. decoders-ezjsonm:. decoders-sexplib:. decoders-yojson:."
-      - DISTRO="ubuntu-16.04"
-      matrix:
       # - PACKAGE="decoders-cbor" OCAML_VERSION="4.03"
       # - PACKAGE="decoders-cbor" OCAML_VERSION="4.08"
 
@@ -28,7 +27,13 @@ jobs:
       # - PACKAGE="decoders-yojson" OCAML_VERSION="4.03"
       # - PACKAGE="decoders-yojson" OCAML_VERSION="4.04"
       # - PACKAGE="decoders-yojson" OCAML_VERSION="4.06"
-      - PACKAGE="decoders-yojson" OCAML_VERSION="4.08"
+  - env:
+     - PACKAGE="decoders-yojson"
+     - OCAML_VERSION="4.08"
   - language: node_js
     node_js:
       - lts/*
+    install: npm ci
+    script: npm test
+    env: []
+    services: []
