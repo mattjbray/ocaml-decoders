@@ -225,6 +225,8 @@ module type S = sig
     val (>>=) : 'a decoder -> ('a -> 'b decoder) -> 'b decoder
     val (<*>) : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
     val (<$>) : ('a -> 'b) -> 'a decoder -> 'b decoder
+
+    include Shims_let_ops_.S with type 'a t_let := 'a decoder
   end
 
   include module type of Infix

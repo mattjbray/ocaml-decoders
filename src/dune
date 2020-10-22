@@ -1,3 +1,8 @@
 (library
  (name decoders)
-  (public_name decoders))
+ (flags :standard -warn-error -a+8)
+ (public_name decoders))
+
+(rule
+  (targets shims_let_ops_.ml)
+  (action (with-stdout-to %{targets} (run ./gen/mkshims.exe))))
