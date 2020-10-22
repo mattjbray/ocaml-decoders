@@ -1,0 +1,5 @@
+(library
+ (name decoders_msgpck)
+ (public_name decoders-msgpck)
+ (flags :standard -warn-error -a+8)
+ (libraries decoders msgpck))
