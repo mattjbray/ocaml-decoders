@@ -1,7 +1,7 @@
 env:
   global:
   - PINS="decoders:. decoders-cbor:. decoders-bencode:. decoders-ezjsonm:. decoders-jsonm:. decoders-sexplib:. decoders-yojson:."
-  - DISTRO="ubuntu-16.04"
+  - DISTRO="ubuntu-20.04"
 language: c
 install: wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-docker.sh
 script: bash -ex .travis-docker.sh
