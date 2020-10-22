@@ -11,19 +11,19 @@ jobs:
   include:
     - env:
         - PACKAGE="decoders-cbor"
-        - OCAML_VERSION="4.08"
+        - OCAML_VERSION="4.10"
     - env:
         - PACKAGE="decoders-bencode"
-        - OCAML_VERSION="4.08"
+        - OCAML_VERSION="4.10"
     - env:
         - PACKAGE="decoders-ezjsonm"
-        - OCAML_VERSION="4.08"
+        - OCAML_VERSION="4.10"
     - env:
         - PACKAGE="decoders-jsonm"
-        - OCAML_VERSION="4.08"
+        - OCAML_VERSION="4.10"
     - env:
         - PACKAGE="decoders-sexplib"
-        - OCAML_VERSION="4.08"
+        - OCAML_VERSION="4.10"
     - env:
         - PACKAGE="decoders-yojson"
         - OCAML_VERSION="4.03"
@@ -36,6 +36,12 @@ jobs:
     - env:
         - PACKAGE="decoders-yojson"
         - OCAML_VERSION="4.08"
+    - env:
+        - PACKAGE="decoders-yojson"
+        - OCAML_VERSION="4.09"
+    - env:
+        - PACKAGE="decoders-yojson"
+        - OCAML_VERSION="4.10"
     - language: node_js
       node_js:
         - lts/*
