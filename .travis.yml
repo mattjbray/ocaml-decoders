@@ -30,3 +30,5 @@ jobs:
       # - PACKAGE="decoders-yojson" OCAML_VERSION="4.06"
       - PACKAGE="decoders-yojson" OCAML_VERSION="4.08"
   - language: node_js
+    node_js:
+      - lts/*
