@@ -1,4 +1,5 @@
 
+(* Note: also copied to src-bs/shims_let_ops_.ml *)
 let shims_let_op_pre_408 =
   "
    module type S = sig type 'a t_let end
