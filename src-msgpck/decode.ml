@@ -1,7 +1,7 @@
 open Decoders
 module M = Msgpck
 
-module Cbor_decodeable : Decode.Decodeable with type value = Msgpck.t = struct
+module Msgpck_decodeable : Decode.Decodeable with type value = Msgpck.t = struct
   type value = Msgpck.t
 
   let pp fmt t = Format.fprintf fmt "@[%a@]" Msgpck.pp t
@@ -50,7 +50,7 @@ module Cbor_decodeable : Decode.Decodeable with type value = Msgpck.t = struct
   let to_list vs = M.List vs
 end
 
-include Decode.Make(Cbor_decodeable)
+include Decode.Make(Msgpck_decodeable)
 
 let bytes : string decoder =
   { run =
