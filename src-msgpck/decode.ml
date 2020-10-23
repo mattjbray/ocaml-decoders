@@ -52,6 +52,13 @@ end
 
 include Decode.Make(Msgpck_decodeable)
 
+let string_strict : string decoder =
+  { run =
+      function
+      | M.String b -> Ok b
+      | m -> (fail "Expected string (strict)").run m
+  }
+
 let bytes : string decoder =
   { run =
       function
