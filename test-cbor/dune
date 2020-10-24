@@ -1,6 +1,4 @@
 (test
  (name main)
  (package decoders-cbor)
- (libraries
-  decoders-cbor containers
-  oUnit))
+ (libraries decoders-cbor containers oUnit))

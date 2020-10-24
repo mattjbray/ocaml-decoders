@@ -7,7 +7,7 @@ A combinator library for "decoding" JSON-like values into your own Ocaml types, 
 An Ocaml program having a JSON (or YAML) data source usually goes something like this:
 
 1. Get your data from somewhere. Now you have a `string`.
-2. *Parse* the `string` as JSON (or YAML). Now you have a `Yojson.Basic.json`, or maybe an `Ezjsonm.value`, or perhaps a `Ocyaml.yaml`.
+2. *Parse* the `string` as JSON (or YAML). Now you have a `Yojson.Basic.json`, or maybe an `Ezjsonm.value`.
 3. *Decode* the JSON value to an Ocaml type that's actually useful for your program's domain.
 
 This library helps with step 3.
@@ -19,9 +19,13 @@ Install one of the supported decoder backends:
 ### For ocaml
 
 ```
-opam install decoders-ezjsonm      # For Ezjsonm
-opam install decoders-ocyaml       # For Ocyaml
-opam install decoders-yojson       # For Yojson
+opam install decoders-bencode      # For bencode
+opam install decoders-cbor         # For CBOR
+opam install decoders-ezjsonm      # For ezjsonm
+opam install decoders-jsonm        # For jsonm
+opam install decoders-msgpck       # For msgpck
+opam install decoders-sexplib      # For sexplib
+opam install decoders-yojson       # For yojson
 ```
 
 ### For bucklescript

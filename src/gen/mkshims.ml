@@ -1,15 +1,16 @@
-
 (* Note: also copied to src-bs/shims_let_ops_.ml *)
 let shims_let_op_pre_408 =
-  "
+  {|
    module type S = sig type 'a t_let end
    module Make(X:sig type 'a t end) = struct type 'a t_let = 'a X.t end
 
    module type S2 = sig type ('a,'b) t_let2 end
    module Make2(X:sig type ('a,'b) t end) = struct type ('a,'b) t_let2 = ('a,'b) X.t end
-"
+|}
+
+
 let shims_let_op_post_408 =
-  "
+  {|
     module type S = sig
       type 'a t_let
       val (let+) : 'a t_let -> ('a -> 'b) -> 'b t_let
@@ -50,15 +51,14 @@ let shims_let_op_post_408 =
       let (let*) = X.(>>=)
       let (and*) = X.monoid_product
   end[@@inline]
-"
+|}
+
 
 let () =
   let version = Sys.ocaml_version in
-  let major, minor =
-    Scanf.sscanf version "%u.%u" (fun maj min -> maj, min) in
-  print_endline (
-    if (major, minor) >= (4,8)
+  let major, minor = Scanf.sscanf version "%u.%u" (fun maj min -> (maj, min)) in
+  print_endline
+    ( if (major, minor) >= (4, 8)
     then shims_let_op_post_408
-    else shims_let_op_pre_408
-  );
+    else shims_let_op_pre_408 ) ;
   ()

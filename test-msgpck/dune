@@ -1,6 +1,4 @@
 (test
  (name main)
  (package decoders-msgpck)
- (libraries
-  decoders-msgpck containers
-  oUnit))
+ (libraries decoders-msgpck containers oUnit))

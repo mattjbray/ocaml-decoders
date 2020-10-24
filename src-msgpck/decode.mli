@@ -8,7 +8,11 @@ val bytes : string decoder
 (** Raw data only. *)
 
 val int32 : int32 decoder
+
 val int64 : int64 decoder
+
 val uint32 : int32 decoder
+
 val uint64 : int64 decoder
+
 val ext : (int * string) decoder

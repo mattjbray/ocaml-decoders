@@ -15,7 +15,8 @@
 
 type env
 
-val make_env : encoder:Jsonm.encoder -> ?on_partial:(unit -> unit) -> unit -> env
+val make_env :
+  encoder:Jsonm.encoder -> ?on_partial:(unit -> unit) -> unit -> env
 
 include Decoders.Encode.S with type value = env -> unit
 
@@ -55,12 +56,18 @@ include Decoders.Encode.S with type value = env -> unit
     ]}
 *)
 
-val (>>) : value -> value -> value
+val ( >> ) : value -> value -> value
+
 val iter : 'a encoder -> 'a list -> value
 
 val object_start : value
+
 val name : string -> value
+
 val object_end : value
+
 val array_start : value
+
 val array_end : value
+
 val end_ : value

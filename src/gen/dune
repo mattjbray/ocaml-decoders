@@ -1,4 +1,3 @@
-
 (executable
-  (name mkshims)
-  (modes native))
+ (name mkshims)
+ (modes native))
