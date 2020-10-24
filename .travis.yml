@@ -13,6 +13,9 @@ jobs:
         - PACKAGE="decoders-cbor"
         - OCAML_VERSION="4.10"
     - env:
+        - PACKAGE="decoders-msgpck"
+        - OCAML_VERSION="4.10"
+    - env:
         - PACKAGE="decoders-bencode"
         - OCAML_VERSION="4.10"
     - env:
