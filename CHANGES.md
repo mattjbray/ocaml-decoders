@@ -1,3 +1,9 @@
+## NEXT
+
+* Add `Decoders_msgpck` (#26, @c-cube)
+* Add `let` operators (#24, @c-cube)
+* Alias `Decode.map` as `<$>` (#21, @hamza0867)
+
 ## 0.4.0 (2020-05-06)
 
 * Expose `null` decoder (#18, @mattjbray)
