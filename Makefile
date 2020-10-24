@@ -24,6 +24,10 @@ install-dependencies: _opam
 doc:
 	dune build @doc
 
+.PHONY: format
+format:
+	dune build @fmt --auto-promote
+
 DOCS_WORKTREE_PATH=../ocaml-decoders-doc
 
 .PHONY: publish-doc

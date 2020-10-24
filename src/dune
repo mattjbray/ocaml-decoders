@@ -4,5 +4,8 @@
  (public_name decoders))
 
 (rule
-  (targets shims_let_ops_.ml)
-  (action (with-stdout-to %{targets} (run ./gen/mkshims.exe))))
+ (targets shims_let_ops_.ml)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ./gen/mkshims.exe))))

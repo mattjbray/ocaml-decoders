@@ -1,6 +1,4 @@
 (test
  (name main)
  (package decoders-yojson)
- (libraries
-  decoders-yojson
-  oUnit))
+ (libraries decoders-yojson oUnit))

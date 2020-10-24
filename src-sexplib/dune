@@ -1,7 +1,4 @@
 (library
  (name decoders_sexplib)
  (public_name decoders-sexplib)
- (libraries
-  decoders
-  sexplib
-  sexplib0))
+ (libraries decoders sexplib sexplib0))

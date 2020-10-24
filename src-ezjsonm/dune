@@ -1,6 +1,4 @@
 (library
  (name decoders_ezjsonm)
  (public_name decoders-ezjsonm)
- (libraries
-  decoders
-  ezjsonm))
+ (libraries decoders ezjsonm))
