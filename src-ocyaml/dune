@@ -1,4 +1,4 @@
-(library
- (name decoders_ocyaml)
- (public_name decoders-ocyaml)
- (libraries decoders containers ocyaml))
+; (library
+;  (name decoders_ocyaml)
+;  (public_name decoders-ocyaml)
+;  (libraries decoders containers ocyaml))
