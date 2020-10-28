@@ -285,6 +285,6 @@ After updating CHANGES.md:
 ```
 npm version <newversion>
 git push --tags
-dune-release
+dune-release --name decoders
 npm publish
 ```
