@@ -1,4 +1,4 @@
-## NEXT
+## 0.5.0 (2020-10-28)
 
 * Add `Decoders_msgpck` (#26, @c-cube)
 * Add `let` operators (#24, @c-cube)
