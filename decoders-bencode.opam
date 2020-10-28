@@ -7,7 +7,7 @@ maintainer: ["Matt Bray <mattjbray@gmail.com>"]
 authors: ["Simon Cruanes <simon@imandra.ai>"]
 license: "ISC"
 homepage: "https://github.com/mattjbray/ocaml-decoders"
-doc: "https://mattjbray.github.io/ocaml-decoders/decoders/decoders-bencode/"
+doc: "https://mattjbray.github.io/ocaml-decoders/"
 bug-reports: "https://github.com/mattjbray/ocaml-decoders/issues"
 depends: [
   "ocaml" {>= "4.03.0"}

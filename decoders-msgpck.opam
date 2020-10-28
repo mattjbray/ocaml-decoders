@@ -9,7 +9,7 @@ authors: [
 ]
 license: "ISC"
 homepage: "https://github.com/mattjbray/ocaml-decoders"
-doc: "https://mattjbray.github.io/ocaml-decoders/decoders/decoders-msgpck/"
+doc: "https://mattjbray.github.io/ocaml-decoders/"
 bug-reports: "https://github.com/mattjbray/ocaml-decoders/issues"
 depends: [
   "ocaml" {>= "4.03.0"}

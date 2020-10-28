@@ -5,7 +5,6 @@
 (authors "Matt Bray <mattjbray@gmail.com>")
 (maintainers "Matt Bray <mattjbray@gmail.com>")
 (source (github "mattjbray/ocaml-decoders"))
-(homepage "https://github.com/mattjbray/ocaml-decoders")
 (documentation "https://mattjbray.github.io/ocaml-decoders/")
 
 (package
