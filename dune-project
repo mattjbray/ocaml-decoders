@@ -6,14 +6,13 @@
 (maintainers "Matt Bray <mattjbray@gmail.com>")
 (source (github "mattjbray/ocaml-decoders"))
 (homepage "https://github.com/mattjbray/ocaml-decoders")
-(documentation "https://mattjbray.github.io/ocaml-decoders/decoders/")
+(documentation "https://mattjbray.github.io/ocaml-decoders/")
 
 (package
  (name decoders)
  (synopsis "Elm-inspired decoders for Ocaml")
  (description
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
- (documentation "https://mattjbray.github.io/ocaml-decoders/decoders/decoders/")
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 1.0))
@@ -26,7 +25,6 @@
  (synopsis "Bencode backend for decoders")
  (description
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
- (documentation "https://mattjbray.github.io/ocaml-decoders/decoders/decoders-bencode/")
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 1.0))
@@ -41,7 +39,6 @@
  (synopsis "CBOR backend for decoders")
  (description
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
- (documentation "https://mattjbray.github.io/ocaml-decoders/decoders/decoders-cbor/")
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 1.0))
@@ -56,7 +53,6 @@
  (synopsis "Ezjsonm backend for decoders")
  (description
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
- (documentation "https://mattjbray.github.io/ocaml-decoders/decoders/decoders-ezjsonm/")
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 1.0))
@@ -71,7 +67,6 @@
  (synopsis "Jsonm backend for decoders")
  (description
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
- (documentation "https://mattjbray.github.io/ocaml-decoders/decoders/decoders-jsonm/")
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 1.0))
@@ -87,7 +82,6 @@
  (synopsis "Msgpck backend for decoders")
  (description
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
- (documentation "https://mattjbray.github.io/ocaml-decoders/decoders/decoders-msgpck/")
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 1.0))
@@ -102,7 +96,6 @@
  (synopsis "Sexplib backend for decoders")
  (description
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
- (documentation "https://mattjbray.github.io/ocaml-decoders/decoders/decoders-sexplib/")
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 1.0))
@@ -118,7 +111,6 @@
  (synopsis "Yojson backend for decoders")
  (description
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
- (documentation "https://mattjbray.github.io/ocaml-decoders/decoders/decoders-yojson/")
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 1.0))
