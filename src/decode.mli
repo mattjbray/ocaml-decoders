@@ -227,6 +227,9 @@ module type S = sig
       [my_decoder] in terms of itself.
   *)
 
+  val of_of_string : msg:string -> (string -> 'a option) -> 'a decoder
+  (** Create a decoder from a function [of_string : string -> 'a option] *)
+
   module Infix : sig
     val ( >|= ) : 'a decoder -> ('a -> 'b) -> 'b decoder
 

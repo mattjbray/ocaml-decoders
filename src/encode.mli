@@ -26,6 +26,8 @@ module type S = sig
 
   val value : value encoder
 
+  val of_to_string : ('a -> string) -> 'a encoder
+
   val encode_value : 'a encoder -> 'a -> value
 
   val encode_string : 'a encoder -> 'a -> string

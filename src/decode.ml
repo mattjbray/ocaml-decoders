@@ -121,6 +121,8 @@ module type S = sig
 
   val fix : ('a decoder -> 'a decoder) -> 'a decoder
 
+  val of_of_string : msg:string -> (string -> 'a option) -> 'a decoder
+
   module Infix : sig
     val ( >|= ) : 'a decoder -> ('a -> 'b) -> 'b decoder
 
@@ -666,6 +668,13 @@ module Make (Decodeable : Decodeable) :
 
   let decode_value (decoder : 'a decoder) (input : value) : ('a, error) result =
     decoder.run input
+
+
+  let of_of_string ~msg of_string =
+    let open Infix in
+    string
+    >|= of_string
+    >>= function Some x -> succeed x | None -> fail ("Expected " ^ msg)
 
 
   let decode_string : 'a decoder -> string -> ('a, error) result =

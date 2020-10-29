@@ -28,6 +28,8 @@ module type S = sig
 
   val value : value encoder
 
+  val of_to_string : ('a -> string) -> 'a encoder
+
   val encode_value : 'a encoder -> 'a -> value
 
   val encode_string : 'a encoder -> 'a -> string
@@ -81,6 +83,8 @@ module Make (E : Encodeable) : S with type value = E.value = struct
 
 
   let value x = x
+
+  let of_to_string to_string x = string (to_string x)
 
   let encode_value encoder x = encoder x
 
