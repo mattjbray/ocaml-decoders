@@ -14,7 +14,7 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 1.0))
+  (dune (>= 2.0))
   (odoc :with-doc)
   (containers :with-test)))
 
@@ -26,7 +26,7 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 1.0))
+  (dune (>= 2.0))
   decoders
   bencode
   (odoc :with-doc)
@@ -40,7 +40,7 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 1.0))
+  (dune (>= 2.0))
   decoders
   cbor
   (odoc :with-doc)
@@ -54,7 +54,7 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 1.0))
+  (dune (>= 2.0))
   decoders
   (ezjsonm (>= 0.4.0))
   (odoc :with-doc)
@@ -68,7 +68,7 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 1.0))
+  (dune (>= 2.0))
   decoders
   jsonm
   (odoc :with-doc)
@@ -83,7 +83,7 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 1.0))
+  (dune (>= 2.0))
   decoders
   msgpck
   (odoc :with-doc)
@@ -97,7 +97,7 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 1.0))
+  (dune (>= 2.0))
   decoders
   sexplib0
   sexplib
@@ -112,7 +112,7 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 1.0))
+  (dune (>= 2.0))
   decoders
   yojson
   (odoc :with-doc)
