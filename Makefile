@@ -1,3 +1,7 @@
+.PHONY: all
+all: build test build-bs test-bs
+
+
 .PHONY: build
 build:
 	dune build
