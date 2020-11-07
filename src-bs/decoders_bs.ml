@@ -47,7 +47,59 @@ module Json_decodeable : Decode.Decodeable with type value = Js.Json.t = struct
   let to_list values = Js.Json.array (Array.of_list values)
 end
 
-module Decode = Decode.Make (Json_decodeable)
+module Decode = struct
+  module D = Decode.Make (Json_decodeable)
+  include D
+
+  let tag_error (msg : string) (error : error) : error = Decoder_tag (msg, error)
+
+  let combine_errors (results : ('a, error) result array) :
+      ('a array, error list) result =
+    if Js.Array.some Belt.Result.isError results
+    then
+      Error
+        ( results
+        |. Belt.Array.keepMap (function Ok _ -> None | Error e -> Some e)
+        |> Array.to_list )
+    else
+      Ok
+        ( results
+        |> Js.Array.map (function
+               | Ok x ->
+                   x
+               | Error _ ->
+                   failwith "Errors should be filtered out here") )
+
+
+  let tag_errors (msg : string) (errors : error list) : error =
+    Decoder_tag (msg, Decoder_errors errors)
+
+
+  let array : 'a decoder -> 'a array decoder =
+   fun decoder ->
+    { run =
+        (fun t ->
+          match Js.Json.decodeArray t with
+          | None ->
+              (fail "Expected an array").run t
+          | Some arr ->
+              let res =
+                arr
+                |> Js.Array.mapi (fun x i ->
+                       match decoder.run x with
+                       | Ok a ->
+                           Ok a
+                       | Error e ->
+                           Error (tag_error ("element " ^ Js.Int.toString i) e))
+                |> combine_errors
+              in
+              ( match res with
+              | Ok a ->
+                  Ok a
+              | Error e ->
+                  Error (tag_errors "while decoding an array" e) ))
+    }
+end
 
 module Json_encodeable = struct
   type value = Js.Json.t
@@ -74,4 +126,9 @@ module Json_encodeable = struct
       |. Js.Dict.fromList )
 end
 
-module Encode = Encode.Make (Json_encodeable)
+module Encode = struct
+  include Encode.Make (Json_encodeable)
+
+  let array encoder xs =
+    xs |> Js.Array.map (fun x -> encoder x) |> Js.Json.array
+end
