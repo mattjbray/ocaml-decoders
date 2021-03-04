@@ -476,20 +476,14 @@ module Make (Decodeable : Decodeable) :
     fun decoder ->
     { run =
         (fun t ->
-           match Decodeable.get_list t with
-           | None ->
-             (fail "Expected a list").run t
-           | Some values ->
-             values
-             |> My_list.mapi (fun i x ->
-                 decoder.run x
-                 |> My_result.map_err
-                   (tag_error (Printf.sprintf "element %i" i)))
-             |> combine_errors
-             |> My_result.map_err (tag_errors "while decoding a list")
-             |> My_result.map (Array.of_list)
-        )
-    }
+           let res = (list decoder).run t in
+           match res with
+           | Ok x -> Ok (Array.of_list x)
+           | Error (Decoder_tag ("while decoding a list", e)) ->
+             Error (Decoder_tag ("while decoding an array", e))
+           | Error e ->
+             Error e )}
+
 
   let field : string -> 'a decoder -> 'a decoder =
    fun key value_decoder ->
