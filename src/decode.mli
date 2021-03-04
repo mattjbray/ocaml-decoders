@@ -77,6 +77,9 @@ module type S = sig
       ]}
   *)
 
+  val array : 'a decoder -> 'a array decoder
+  (** Decode a collection into an OCaml array. *)
+
   val index : int -> 'a decoder -> 'a decoder
   (** Decode a collection, requiring a particular index. *)
 

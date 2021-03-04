@@ -20,6 +20,8 @@ module type S = sig
 
   val list : 'a encoder -> 'a list encoder
 
+  val array : 'a encoder -> 'a array encoder
+
   val obj : (string * value) list encoder
 
   val obj' : (value * value) list encoder

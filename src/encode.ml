@@ -22,6 +22,8 @@ module type S = sig
 
   val list : 'a encoder -> 'a list encoder
 
+  val array : 'a encoder -> 'a array encoder
+
   val obj : (string * value) list encoder
 
   val obj' : (value * value) list encoder
@@ -75,6 +77,8 @@ module Make (E : Encodeable) : S with type value = E.value = struct
   let option = nullable
 
   let list encoder xs = xs |> My_list.map (fun x -> encoder x) |> E.of_list
+
+  let array encoder xs = xs |> Array.to_list |> My_list.map (fun x -> encoder x) |> E.of_list
 
   let obj' xs = E.of_key_value_pairs xs
 
