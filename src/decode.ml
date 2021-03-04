@@ -75,6 +75,8 @@ module type S = sig
 
   val list_fold_left : ('a -> 'a decoder) -> 'a -> 'a decoder
 
+  val array : 'a decoder -> 'a array decoder
+
   val index : int -> 'a decoder -> 'a decoder
 
   val uncons : ('a -> 'b decoder) -> 'a decoder -> 'b decoder
@@ -469,6 +471,18 @@ module Make (Decodeable : Decodeable) :
               |> fst
               |> My_result.map_err (tag_error "while decoding a list"))
     }
+
+  let array : 'a decoder -> 'a array decoder =
+    fun decoder ->
+    { run =
+        (fun t ->
+           let res = (list decoder).run t in
+           match res with
+           | Ok x -> Ok (Array.of_list x)
+           | Error (Decoder_tag ("while decoding a list", e)) ->
+             Error (Decoder_tag ("while decoding an array", e))
+           | Error e ->
+             Error e )}
 
 
   let field : string -> 'a decoder -> 'a decoder =

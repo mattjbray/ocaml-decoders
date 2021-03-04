@@ -22,6 +22,14 @@ let yojson_basic_suite =
           ~expected:[ "Hello world" ]
   in
 
+  let array_string_test =
+    "array string"
+    >:: decoder_test
+      ~decoder:(array string)
+      ~input:"[\"Hello world\"]"
+      ~expected:[| "Hello world" |]
+  in
+
   let fix_one_of_test =
     "fix one_of"
     >:: fun _ ->
@@ -204,6 +212,7 @@ let yojson_basic_suite =
 
   "Yojson.Basic"
   >::: [ list_string_test
+       ; array_string_test
        ; fix_one_of_test
        ; mut_rec_test
        ; string_or_floatlit_test
