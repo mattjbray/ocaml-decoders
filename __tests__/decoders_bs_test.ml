@@ -29,6 +29,30 @@ let () =
               expect decoded |> toEqual (Belt.Result.Ok [| "a"; "b"; "c" |])))
 
 
+
+
+let () =
+  describe
+    "decoders-bs decode error"
+    Expect.(
+      fun () ->
+        test
+          "array"
+          Decode.(
+            fun () ->
+              let json_str = {|["a", 1, "c"]|} in
+              let decoded = decode_string (array string) json_str in
+              expect decoded |> toEqual
+                (Belt.Result.Error
+                   (Decoders.Decode.(
+                       Decoder_tag
+                         ("while decoding an array",
+                          (Decoder_errors
+                             [Decoder_tag
+                                ("element 1",
+                                 Decoder_error ("Expected a string", Some (Js.Json.number 1.)))])))) )))
+
+
 let () =
   describe
     "decoders-bs encode"
