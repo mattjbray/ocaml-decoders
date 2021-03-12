@@ -1,3 +1,8 @@
+## 0.6.0 (2021-03-12)
+
+* Add `Decode.of_of_string` and `Encode.of_to_string` (@mattjbray)
+* Add `Decode.array` with bs-specific impl (#28, #30, @actionshrimp)
+
 ## 0.5.0 (2020-10-28)
 
 * Add `Decoders_msgpck` (#26, @c-cube)
