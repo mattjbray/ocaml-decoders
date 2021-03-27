@@ -89,7 +89,8 @@ Error while decoding a list: element 2: Expected an int, but got true
 
 ## Complicated JSON structure
 
-To decode a JSON object with many fields, we can use the bind operator (`>>=`) from the `Infix` module.
+To decode a JSON object with many fields, we can use the let-binding operators
+(`let*`, etc.) from the `Infix` module.
 
 ```ocaml
 type my_user =
@@ -97,6 +98,18 @@ type my_user =
   ; age : int
   }
 
+let my_user_decoder : my_user decoder =
+  let open D in
+  let* name = field "name" string in
+  let* age = field "age" int in
+  succeed { name; age }
+```
+
+*Note for Bucklescript users*: let-binding operators are not currently available
+in Bucklescript, so if you need your decoders to be compatible with Bucklescript
+you can use the monadic bind operator (`>>=`):
+
+```ocaml
 let my_user_decoder : my_user decoder =
   let open D in
   field "name" string >>= fun name ->
@@ -123,21 +136,22 @@ type shape =
   | Triangle of int * int
 
 let square_decoder : shape decoder =
-  D.(field "side" int >>= fun s -> succeed (Square s))
+  D.(let+ s = field "side" int in Square s)
 
 let circle_decoder : shape decoder =
-  D.(field "radius" int >>= fun r -> succeed (Circle r))
+  D.(let+ r = field "radius" int in Circle r)
 
 let triangle_decoder : shape decoder =
   D.(
-    field "base" int >>= fun b ->
-    field "height" int >>= fun h ->
-    succeed (Triangle (b, h))
+    let* b = field "base" int in
+    let+ h = field "height" int in
+    Triangle (b, h)
   )
 
 let shape_decoder : shape decoder =
   let open D in
-  field "shape" string >>= function
+  let* shape = field "shape" string in
+  match shape with
   | "square" -> square_decoder
   | "circle" -> circle_decoder
   | "triangle" -> triangle_decoder
@@ -197,8 +211,8 @@ module My_decoders(D : Decoders.Decode.S) = struct
     | _ -> fail "Expected a role"
 
   let user : user decoder =
-    field "name" string >>= fun name ->
-    field "roles" (list role) >>= fun roles ->
+    let* name = field "name" string in
+    let* roles = field "roles" (list role) in
     succeed { name; roles }
 end
 
