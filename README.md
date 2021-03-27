@@ -1,14 +1,14 @@
-# ocaml-decoders: Elm-inspired decoders for Ocaml [![build status](https://travis-ci.org/mattjbray/ocaml-decoders.svg?branch=master)](https://travis-ci.org/mattjbray/ocaml-decoders)
+# ocaml-decoders: Elm-inspired decoders for OCaml [![build status](https://travis-ci.org/mattjbray/ocaml-decoders.svg?branch=master)](https://travis-ci.org/mattjbray/ocaml-decoders)
 
-A combinator library for "decoding" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.
+A combinator library for "decoding" JSON-like values into your own OCaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.
 
 > Eh?
 
-An Ocaml program having a JSON (or YAML) data source usually goes something like this:
+An OCaml program having a JSON (or YAML) data source usually goes something like this:
 
 1. Get your data from somewhere. Now you have a `string`.
 2. *Parse* the `string` as JSON (or YAML). Now you have a `Yojson.Basic.json`, or maybe an `Ezjsonm.value`.
-3. *Decode* the JSON value to an Ocaml type that's actually useful for your program's domain.
+3. *Decode* the JSON value to an OCaml type that's actually useful for your program's domain.
 
 This library helps with step 3.
 
@@ -117,7 +117,7 @@ let my_user_decoder : my_user decoder =
 >   succeed { name; age }
 > ```
 
-We can also use bind to decode objects with inconsistent structure. Say, for
+We can also use these operators to decode objects with inconsistent structure. Say, for
 example, our JSON is a list of shapes. Squares have a side length, circles have
 a radius, and triangles have a base and a height.
 
