@@ -290,7 +290,12 @@ utop # E.encode_string E.obj [("users", E.list user users)];;
 "{\"users\":[{\"name\":\"Alice\",\"roles\":[\"ADMIN\",\"USER\"]},{\"name\":\"Bob\",\"roles\":[\"USER\"]}]}"
 ```
 
-See also the [API docs](https://mattjbray.github.io/ocaml-decoders/decoders/decoders/Decoders/Encode/module-type-S/index.html).
+## API Documentation
+
+For more details, see the API documentation:
+
+* [`Decoders.Decode.S`](https://mattjbray.github.io/ocaml-decoders/decoders/Decoders/Decode/module-type-S/index.html) interface
+* [`Decoders.Encode.S`](https://mattjbray.github.io/ocaml-decoders/decoders/Decoders/Encode/module-type-S/index.html) interface
 
 # Release
 
