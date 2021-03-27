@@ -105,17 +105,17 @@ let my_user_decoder : my_user decoder =
   succeed { name; age }
 ```
 
-*Note for Bucklescript users*: let-binding operators are not currently available
-in Bucklescript, so if you need your decoders to be compatible with Bucklescript
-you can use the monadic bind operator (`>>=`):
-
-```ocaml
-let my_user_decoder : my_user decoder =
-  let open D in
-  field "name" string >>= fun name ->
-  field "age" int >>= fun age ->
-  succeed { name; age }
-```
+> *Note for Bucklescript users*: let-binding operators are not currently available
+> in Bucklescript, so if you need your decoders to be compatible with Bucklescript
+> you can use the monadic bind operator (`>>=`):
+> 
+> ```ocaml
+> let my_user_decoder : my_user decoder =
+>   let open D in
+>   field "name" string >>= fun name ->
+>   field "age" int >>= fun age ->
+>   succeed { name; age }
+> ```
 
 We can also use bind to decode objects with inconsistent structure. Say, for
 example, our JSON is a list of shapes. Squares have a side length, circles have
