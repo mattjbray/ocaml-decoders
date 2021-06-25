@@ -11,7 +11,7 @@ doc: "https://mattjbray.github.io/ocaml-decoders/"
 bug-reports: "https://github.com/mattjbray/ocaml-decoders/issues"
 depends: [
   "ocaml" {>= "4.03.0"}
-  "dune" {>= "2.0"}
+  "dune" {>= "2.8" & >= "2.0"}
   "decoders"
   "jsonm"
   "odoc" {with-doc}
@@ -19,7 +19,7 @@ depends: [
   "ounit" {with-test}
 ]
 build: [
-  ["dune" "subst"] {pinned}
+  ["dune" "subst"] {dev}
   [
     "dune"
     "build"
