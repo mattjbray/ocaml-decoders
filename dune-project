@@ -1,6 +1,5 @@
-(lang dune 2.8)
+(lang dune 2.0)
 (name decoders)
-(using action-plugin 0.1)
 (generate_opam_files true)
 (license ISC)
 (authors "Matt Bray <mattjbray@gmail.com>")
