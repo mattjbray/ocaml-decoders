@@ -28,7 +28,7 @@ clean:
 
 _opam:
 	opam switch create . --empty
-	opam install -y ocaml-base-compiler.4.06.1 merlin utop ocp-indent
+	opam install -y ocaml-base-compiler.4.12.0 merlin utop ocp-indent
 
 install-dependencies: _opam
 	opam install . --deps-only --with-test
