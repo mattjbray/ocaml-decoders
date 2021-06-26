@@ -114,7 +114,7 @@
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
   decoders
-  yojson
+  (yojson (>= 1.6.0))
   (odoc :with-doc)
   (containers :with-test)
   (ounit :with-test)))

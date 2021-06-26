@@ -1,7 +1,7 @@
 (** Turn JSON values into Ocaml values. *)
 
 module Decode : sig
-  include Decoders.Decode.S with type value = Yojson.Raw.json
+  include Decoders.Decode.S with type value = Yojson.Raw.t
 
   (** {2 Yojson.Raw-specific decoders}*)
 
@@ -13,7 +13,7 @@ module Decode : sig
 end
 
 module Encode : sig
-  include Decoders.Encode.S with type value = Yojson.Raw.json
+  include Decoders.Encode.S with type value = Yojson.Raw.t
 
   (** {2 Yojson.Raw-specific encoders}*)
 

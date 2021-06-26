@@ -2,9 +2,9 @@
 
 open Decoders
 
-module Json_decodeable : Decode.Decodeable with type value = Yojson.Safe.json =
+module Json_decodeable : Decode.Decodeable with type value = Yojson.Safe.t =
 struct
-  type value = Yojson.Safe.json
+  type value = Yojson.Safe.t
 
   let pp fmt json =
     Format.fprintf fmt "@[%s@]" (Yojson.Safe.pretty_to_string json)
@@ -58,7 +58,7 @@ end
 module Decode = Decode.Make (Json_decodeable)
 
 module Json_encodeable = struct
-  type value = Yojson.Safe.json
+  type value = Yojson.Safe.t
 
   let to_string json = Yojson.Safe.to_string json
 

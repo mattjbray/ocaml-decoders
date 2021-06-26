@@ -7,7 +7,7 @@ A combinator library for "decoding" JSON-like values into your own OCaml types, 
 An OCaml program having a JSON (or YAML) data source usually goes something like this:
 
 1. Get your data from somewhere. Now you have a `string`.
-2. *Parse* the `string` as JSON (or YAML). Now you have a `Yojson.Basic.json`, or maybe an `Ezjsonm.value`.
+2. *Parse* the `string` as JSON (or YAML). Now you have a `Yojson.Basic.t`, or maybe an `Ezjsonm.value`.
 3. *Decode* the JSON value to an OCaml type that's actually useful for your program's domain.
 
 This library helps with step 3.
@@ -54,7 +54,7 @@ utop # D.decode_value D.int (`Int 1);;
 ```
 
 Nice! We used `decode_value`, which takes a `decoder` and a `value` (in this
-case a `Yojson.Basic.json`) and... decodes the value.
+case a `Yojson.Basic.t`) and... decodes the value.
 
 ```ocaml
 utop # D.decode_value;;
@@ -108,7 +108,7 @@ let my_user_decoder : my_user decoder =
 > *Note for Bucklescript users*: let-binding operators are not currently available
 > in Bucklescript, so if you need your decoders to be compatible with Bucklescript
 > you can use the monadic bind operator (`>>=`):
-> 
+>
 > ```ocaml
 > let my_user_decoder : my_user decoder =
 >   let open D in
