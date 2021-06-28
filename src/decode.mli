@@ -7,8 +7,7 @@ type ('good, 'bad) result = ('good, 'bad) Decoders_util.My_result.t =
   | Ok of 'good
   | Error of 'bad
 
-type ('value, 'a) exposed_decoder =
-  { run : 'value -> ('a, 'value exposed_error) result }
+type ('value, 'a) exposed_decoder = ('value, 'a, 'value exposed_error) Decoder.t
 
 (** User-facing Decoder interface. *)
 module type S = sig
