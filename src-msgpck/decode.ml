@@ -48,37 +48,50 @@ end
 
 include Decode.Make (Msgpck_decodeable)
 
-let string_strict : string decoder =
-  { run =
-      (function
-      | M.String b -> Ok b | m -> (fail "Expected string (strict)").run m)
-  }
+let string_strict : string decoder = function
+  | M.String b ->
+      Ok b
+  | m ->
+      (fail "Expected string (strict)") m
 
 
-let bytes : string decoder =
-  { run = (function M.Bytes b -> Ok b | m -> (fail "Expected bytes").run m) }
+let bytes : string decoder = function
+  | M.Bytes b ->
+      Ok b
+  | m ->
+      (fail "Expected bytes") m
 
 
-let int32 : _ decoder =
-  { run = (function M.Int32 i -> Ok i | m -> (fail "Expected int32").run m) }
+let int32 : _ decoder = function
+  | M.Int32 i ->
+      Ok i
+  | m ->
+      (fail "Expected int32") m
 
 
-let int64 : _ decoder =
-  { run = (function M.Int64 i -> Ok i | m -> (fail "Expected int64").run m) }
+let int64 : _ decoder = function
+  | M.Int64 i ->
+      Ok i
+  | m ->
+      (fail "Expected int64") m
 
 
-let uint32 : _ decoder =
-  { run = (function M.Uint32 i -> Ok i | m -> (fail "Expected uint32").run m)
-  }
+let uint32 : _ decoder = function
+  | M.Uint32 i ->
+      Ok i
+  | m ->
+      (fail "Expected uint32") m
 
 
-let uint64 : _ decoder =
-  { run = (function M.Uint64 i -> Ok i | m -> (fail "Expected uint64").run m)
-  }
+let uint64 : _ decoder = function
+  | M.Uint64 i ->
+      Ok i
+  | m ->
+      (fail "Expected uint64") m
 
 
-let ext : (int * string) decoder =
-  { run =
-      (function
-      | M.Ext (i, s) -> Ok (i, s) | m -> (fail "Expected extension").run m)
-  }
+let ext : (int * string) decoder = function
+  | M.Ext (i, s) ->
+      Ok (i, s)
+  | m ->
+      (fail "Expected extension") m
