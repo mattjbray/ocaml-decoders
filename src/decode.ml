@@ -2,16 +2,9 @@
 
 open Decoders_util
 
-type 'value exposed_error =
-  | Decoder_error of string * 'value option
-  | Decoder_errors of 'value exposed_error list
-  | Decoder_tag of string * 'value exposed_error
-
 type ('good, 'bad) result = ('good, 'bad) My_result.t =
   | Ok of 'good
   | Error of 'bad
-
-type ('value, 'a) exposed_decoder = ('value, 'a, 'value exposed_error) Decoder.t
 
 (** Signature of things that can be decoded. *)
 module type Decodeable = sig
@@ -44,7 +37,7 @@ end
 module type S = sig
   type value
 
-  type error = value exposed_error
+  type error = value Error.t
 
   val pp_error : Format.formatter -> error -> unit
 
@@ -171,40 +164,17 @@ end
 module Make (Decodeable : Decodeable) :
   S
     with type value = Decodeable.value
-     and type 'a decoder = (Decodeable.value, 'a) exposed_decoder = struct
+     and type 'a decoder =
+          (Decodeable.value, 'a, Decodeable.value Error.t) Decoder.t = struct
   type value = Decodeable.value
 
   let pp = Decodeable.pp
 
-  type error = value exposed_error
+  type error = value Error.t
 
-  let rec pp_error fmt = function
-    | Decoder_error (msg, Some t) ->
-        Format.fprintf fmt "@[%s, but got@ @[%a@]@]" msg pp t
-    | Decoder_error (msg, None) ->
-        Format.fprintf fmt "@[%s@]" msg
-    | Decoder_errors errors ->
-        let errors_trunc = My_list.take 5 errors in
-        let not_shown = List.length errors - 5 in
-        Format.fprintf
-          fmt
-          "@[%a@ %s@]"
-          (Format.pp_print_list ~pp_sep:Format.pp_print_space pp_error)
-          errors_trunc
-          ( if not_shown > 0
-          then Printf.sprintf "(...%d errors not shown...)" not_shown
-          else "" )
-    | Decoder_tag (msg, error) ->
-        Format.fprintf fmt "@[<2>%s:@ @[%a@]@]" msg pp_error error
-
+  let pp_error = Error.pp ~pp_i:pp
 
   let string_of_error e : string = Format.asprintf "@[<2>%a@?@]" pp_error e
-
-  let tag_error (msg : string) (error : error) : error = Decoder_tag (msg, error)
-
-  let tag_errors (msg : string) (errors : error list) : error =
-    Decoder_tag (msg, Decoder_errors errors)
-
 
   let combine_errors (results : ('a, error) result list) :
       ('a list, error list) result =
@@ -236,31 +206,25 @@ module Make (Decodeable : Decodeable) :
    fun string ->
     Decodeable.of_string string
     |> My_result.map_err (fun msg ->
-           Decoder_tag ("Json parse error", Decoder_error (msg, None)))
+           Error.tag "Json parse error" (Error.make msg) )
 
 
   let of_file : string -> (value, error) result =
    fun file ->
     Decodeable.of_file file
     |> My_result.map_err (fun msg ->
-           Decoder_tag
-             (Printf.sprintf "While reading %s" file, Decoder_error (msg, None)))
+           Error.tag (Printf.sprintf "While reading %s" file) (Error.make msg) )
 
 
-  type 'a decoder = (value, 'a) exposed_decoder
+  type 'a decoder = (value, 'a, value Error.t) Decoder.t
 
   let succeed x = Decoder.pure x
 
-  let fail msg input = Error (Decoder_error (msg, Some input))
+  let fail msg input = Error (Error.make msg ~context:input)
 
   let fail_with error = Decoder.fail error
 
-  let from_result = function
-    | Ok ok ->
-        succeed ok
-    | Error error ->
-        fail_with error
-
+  let from_result = Decoder.of_result
 
   let value = Decoder.value
 
@@ -302,7 +266,7 @@ module Make (Decodeable : Decodeable) :
     | None ->
         decoder input
         |> My_result.map My_opt.return
-        |> My_result.map_err (tag_error "Expected null or")
+        |> My_result.map_err (Error.tag "Expected null or")
 
 
   let one_of (decoders : (string * 'a decoder) list) : 'a decoder =
@@ -311,12 +275,12 @@ module Make (Decodeable : Decodeable) :
       |> My_list.map (fun (name, d) ->
              d
              |> Decoder.map_err (fun e ->
-                    tag_errors (Printf.sprintf "%S decoder" name) [ e ] ) )
+                    Error.tag_group (Printf.sprintf "%S decoder" name) [ e ] ) )
     in
     Decoder.one_of
       decoders
       ~combine_errors:
-        (tag_errors "I tried the following decoders but they all failed")
+        (Error.tag_group "I tried the following decoders but they all failed")
 
   let pick : (string * 'a decoder decoder) list -> 'a decoder =
    fun decoders ->
@@ -382,9 +346,9 @@ module Make (Decodeable : Decodeable) :
         values
         |> My_list.mapi (fun i x ->
                decoder x
-               |> My_result.map_err (tag_error (Printf.sprintf "element %i" i)) )
+               |> My_result.map_err (Error.tag (Printf.sprintf "element %i" i)) )
         |> combine_errors
-        |> My_result.map_err (tag_errors "while decoding a list")
+        |> My_result.map_err (Error.tag_group "while decoding a list")
 
 
   let list_filter : 'a option decoder -> 'a list decoder =
@@ -395,7 +359,7 @@ module Make (Decodeable : Decodeable) :
       | v :: vs ->
           My_result.Infix.(
             decoder v
-            |> My_result.map_err (tag_error (Printf.sprintf "element %i" i))
+            |> My_result.map_err (Error.tag (Printf.sprintf "element %i" i))
             >>= (function
             | Some x ->
                 go (i + 1) vs >>= fun xs -> My_result.return (x :: xs)
@@ -407,7 +371,7 @@ module Make (Decodeable : Decodeable) :
       | None ->
           (fail "Expected a list") t
       | Some values ->
-          go 0 values |> My_result.map_err (tag_error "while decoding a list")
+          go 0 values |> My_result.map_err (Error.tag "while decoding a list")
 
 
   let list_fold_left : ('a -> 'a decoder) -> 'a -> 'a decoder =
@@ -424,11 +388,11 @@ module Make (Decodeable : Decodeable) :
                    >>= fun acc ->
                    (acc |> decoder_func) el
                    |> My_result.map_err
-                        (tag_error (Printf.sprintf "element %i" i)) )
+                        (Error.tag (Printf.sprintf "element %i" i)) )
                  , i + 1 ) )
                (Ok init, 0))
         |> fst
-        |> My_result.map_err (tag_error "while decoding a list")
+        |> My_result.map_err (Error.tag "while decoding a list")
 
 
   let array : 'a decoder -> 'a array decoder =
@@ -437,8 +401,8 @@ module Make (Decodeable : Decodeable) :
     match res with
     | Ok x ->
         Ok (Array.of_list x)
-    | Error (Decoder_tag ("while decoding a list", e)) ->
-        Error (Decoder_tag ("while decoding an array", e))
+    | Error (Tag ("while decoding a list", e)) ->
+        Error (Tag ("while decoding an array", e))
     | Error e ->
         Error e
 
@@ -458,7 +422,7 @@ module Make (Decodeable : Decodeable) :
     match value with
     | Some value ->
         value_decoder value
-        |> My_result.map_err (tag_error (Printf.sprintf "in field %S" key))
+        |> My_result.map_err (Error.tag (Printf.sprintf "in field %S" key))
     | None ->
         (fail (Printf.sprintf "Expected an object with an attribute %S" key)) t
 
@@ -479,7 +443,7 @@ module Make (Decodeable : Decodeable) :
     | Some value ->
         value_decoder value
         |> My_result.map (fun v -> Some v)
-        |> My_result.map_err (tag_error (Printf.sprintf "in field %S" key))
+        |> My_result.map_err (Error.tag (Printf.sprintf "in field %S" key))
     | None ->
         Ok None
 
@@ -500,7 +464,7 @@ module Make (Decodeable : Decodeable) :
       ( match Decodeable.get_string key with
       | Some key ->
           (value_decoder key) value
-          |> My_result.map_err (tag_error (Printf.sprintf "in field %S" key))
+          |> My_result.map_err (Error.tag (Printf.sprintf "in field %S" key))
       | None ->
           (fail "Expected an object with a string key") t )
     | _ ->
@@ -535,10 +499,10 @@ module Make (Decodeable : Decodeable) :
     | Some (x :: rest) ->
         My_result.Infix.(
           head x
-          |> My_result.map_err (tag_error "while consuming a list element")
+          |> My_result.map_err (Error.tag "while consuming a list element")
           >>= fun x ->
           (tail x) (Decodeable.to_list rest)
-          |> My_result.map_err (tag_error "after consuming a list element"))
+          |> My_result.map_err (Error.tag "after consuming a list element"))
     | Some [] ->
         (fail "Expected a non-empty list") value
     | None ->
@@ -564,7 +528,7 @@ module Make (Decodeable : Decodeable) :
         |> List.map (fun (key, _) -> key_decoder key)
         |> combine_errors
         |> My_result.map_err
-             (tag_errors "Failed while decoding the keys of an object")
+             (Error.tag_group "Failed while decoding the keys of an object")
     | None ->
         (fail "Expected an object") value
 
@@ -584,7 +548,7 @@ module Make (Decodeable : Decodeable) :
                  value_decoder value_val >|= fun value -> (key, value))
         |> combine_errors
         |> My_result.map_err
-             (tag_errors "Failed while decoding key-value pairs")
+             (Error.tag_group "Failed while decoding key-value pairs")
     | None ->
         (fail "Expected an object") value
 
@@ -604,7 +568,7 @@ module Make (Decodeable : Decodeable) :
                  >>= fun key -> (value_decoder key) value_val)
         |> combine_errors
         |> My_result.map_err
-             (tag_errors "Failed while decoding key-value pairs")
+             (Error.tag_group "Failed while decoding key-value pairs")
     | None ->
         (fail "Expected an object") value
 

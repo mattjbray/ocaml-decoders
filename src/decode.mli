@@ -1,20 +1,13 @@
-type 'value exposed_error =
-  | Decoder_error of string * 'value option
-  | Decoder_errors of 'value exposed_error list
-  | Decoder_tag of string * 'value exposed_error
-
 type ('good, 'bad) result = ('good, 'bad) Decoders_util.My_result.t =
   | Ok of 'good
   | Error of 'bad
-
-type ('value, 'a) exposed_decoder = ('value, 'a, 'value exposed_error) Decoder.t
 
 (** User-facing Decoder interface. *)
 module type S = sig
   (** The type of values to be decoded (e.g. JSON or Yaml). *)
   type value
 
-  type error = value exposed_error
+  type error = value Error.t
 
   val pp_error : Format.formatter -> error -> unit
 
@@ -345,4 +338,4 @@ end
 module Make (M : Decodeable) :
   S
     with type value = M.value
-     and type 'a decoder = (M.value, 'a) exposed_decoder
+     and type 'a decoder = (M.value, 'a, M.value Error.t) Decoder.t
