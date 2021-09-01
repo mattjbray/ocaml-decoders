@@ -24,7 +24,16 @@ module Json_decodeable : Decode.Decodeable with type value = Js.Json.t = struct
 
   let get_string = Js.Json.decodeString
 
-  let get_int json = Js.Json.decodeNumber json |. Belt.Option.map int_of_float
+  let is_integer json =
+    Js.Float.isFinite json && Js.Math.floor_float json == json
+
+  let get_int json =
+    Js.Json.decodeNumber json
+    |. Belt.Option.flatMap (fun n ->
+           if is_integer n then
+             Some (Obj.magic (n : float) : int)
+           else
+             None)
 
   let get_float = Js.Json.decodeNumber
 
