@@ -141,6 +141,10 @@ module type S = sig
       - when run on [["a", "list", "of", "strings"]], will fail
   *)
 
+  val field_opt_or : default:'a -> string -> 'a decoder -> 'a decoder
+  (** Similar to {!field_opt} but with a default value.
+      @since 0.7 *)
+
   val single_field : (string -> 'a decoder) -> 'a decoder
   (** Decode an object, requiring exactly one field. *)
 

@@ -85,6 +85,8 @@ module type S = sig
 
   val field_opt : string -> 'a decoder -> 'a option decoder
 
+  val field_opt_or : default:'a -> string -> 'a decoder -> 'a decoder
+
   val single_field : (string -> 'a decoder) -> 'a decoder
 
   val at : string list -> 'a decoder -> 'a decoder
@@ -536,6 +538,15 @@ module Make (Decodeable : Decodeable) :
               Ok None)
     }
 
+  let field_opt_or : default:'a -> string -> 'a decoder -> 'a decoder =
+   fun ~default key value_decoder ->
+    { run =
+        (fun t ->
+           match (field_opt key value_decoder).run t with
+           | Ok (Some x) -> Ok x
+           | Ok None -> Ok default
+           | Error _ as e -> e)
+    }
 
   let single_field : (string -> 'a decoder) -> 'a decoder =
    fun value_decoder ->
