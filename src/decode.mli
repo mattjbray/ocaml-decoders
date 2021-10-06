@@ -183,6 +183,19 @@ module type S = sig
   val one_of : (string * 'a decoder) list -> 'a decoder
   (** Try a sequence of different decoders. *)
 
+  val pick : (string * (unit -> 'a decoder) decoder) list -> 'a decoder
+  (** [pick choices] picks a single choice, like {!one_of}.
+      However, each element of [choices] can look at the value, decide if
+      it applies (e.g. based on the value of a single field, like a "kind"
+      or "type" field), and if it does, returns a decoder for the rest of
+      the value.
+
+      If a choice is made, even if the returned sub-decoder fails, the
+      error message will totally ignore the rest of the choices and only be
+      about the choice that was initially made.
+
+      @since 0.7 *)
+
   (** {2 Mapping} *)
 
   val map : ('a -> 'b) -> 'a decoder -> 'b decoder

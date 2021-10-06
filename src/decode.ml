@@ -97,6 +97,8 @@ module type S = sig
 
   val one_of : (string * 'a decoder) list -> 'a decoder
 
+  val pick : (string * (unit -> 'a decoder) decoder) list -> 'a decoder
+
   val map : ('a -> 'b) -> 'a decoder -> 'b decoder
 
   val apply : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
@@ -376,6 +378,35 @@ module Make (Decodeable : Decodeable) :
     in
     { run }
 
+  let pick : (string * (unit -> 'a decoder) decoder) list -> 'a decoder =
+   fun decoders ->
+    let run input =
+      let rec go errors = function
+        | (name, decoder) :: rest ->
+          ( match decoder.run input with
+          | Ok dec ->
+            (* use [dec] and drop errors *)
+            let dec = dec() in
+            (match dec.run input with
+             | Ok _ as x -> x
+             | Error e ->
+               (* wrap single error *)
+               Error (tag_errors (Printf.sprintf "%S decoder" name) [e])
+            )
+          | Error error ->
+              go
+                ( tag_errors (Printf.sprintf "%S decoder" name) [ error ]
+                :: errors )
+                rest )
+        | [] ->
+            Error
+              (tag_errors
+                 "I tried the following decoders but they all failed"
+                 errors)
+      in
+      go [] decoders
+    in
+    { run }
 
   let primitive_decoder (get_value : value -> 'a option) (message : string) :
       'a decoder =
