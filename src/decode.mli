@@ -183,7 +183,7 @@ module type S = sig
   val one_of : (string * 'a decoder) list -> 'a decoder
   (** Try a sequence of different decoders. *)
 
-  val pick : (string * (unit -> 'a decoder) decoder) list -> 'a decoder
+  val pick : (string * 'a decoder decoder) list -> 'a decoder
   (** [pick choices] picks a single choice, like {!one_of}.
       However, each element of [choices] can look at the value, decide if
       it applies (e.g. based on the value of a single field, like a "kind"

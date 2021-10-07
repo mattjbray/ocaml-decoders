@@ -97,7 +97,7 @@ module type S = sig
 
   val one_of : (string * 'a decoder) list -> 'a decoder
 
-  val pick : (string * (unit -> 'a decoder) decoder) list -> 'a decoder
+  val pick : (string * 'a decoder decoder) list -> 'a decoder
 
   val map : ('a -> 'b) -> 'a decoder -> 'b decoder
 
@@ -378,7 +378,7 @@ module Make (Decodeable : Decodeable) :
     in
     { run }
 
-  let pick : (string * (unit -> 'a decoder) decoder) list -> 'a decoder =
+  let pick : (string * 'a decoder decoder) list -> 'a decoder =
    fun decoders ->
     let run input =
       let rec go errors = function
@@ -386,7 +386,6 @@ module Make (Decodeable : Decodeable) :
           ( match decoder.run input with
           | Ok dec ->
             (* use [dec] and drop errors *)
-            let dec = dec() in
             (match dec.run input with
              | Ok _ as x -> x
              | Error e ->
