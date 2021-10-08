@@ -85,6 +85,8 @@ module type S = sig
 
   val field_opt : string -> 'a decoder -> 'a option decoder
 
+  val field_opt_or : default:'a -> string -> 'a decoder -> 'a decoder
+
   val single_field : (string -> 'a decoder) -> 'a decoder
 
   val at : string list -> 'a decoder -> 'a decoder
@@ -94,6 +96,8 @@ module type S = sig
   val nullable : 'a decoder -> 'a option decoder
 
   val one_of : (string * 'a decoder) list -> 'a decoder
+
+  val pick : (string * 'a decoder decoder) list -> 'a decoder
 
   val map : ('a -> 'b) -> 'a decoder -> 'b decoder
 
@@ -374,6 +378,34 @@ module Make (Decodeable : Decodeable) :
     in
     { run }
 
+  let pick : (string * 'a decoder decoder) list -> 'a decoder =
+   fun decoders ->
+    let run input =
+      let rec go errors = function
+        | (name, decoder) :: rest ->
+          ( match decoder.run input with
+          | Ok dec ->
+            (* use [dec] and drop errors *)
+            (match dec.run input with
+             | Ok _ as x -> x
+             | Error e ->
+               (* wrap single error *)
+               Error (tag_errors (Printf.sprintf "%S decoder" name) [e])
+            )
+          | Error error ->
+              go
+                ( tag_errors (Printf.sprintf "%S decoder" name) [ error ]
+                :: errors )
+                rest )
+        | [] ->
+            Error
+              (tag_errors
+                 "I tried the following decoders but they all failed"
+                 errors)
+      in
+      go [] decoders
+    in
+    { run }
 
   let primitive_decoder (get_value : value -> 'a option) (message : string) :
       'a decoder =
@@ -536,6 +568,15 @@ module Make (Decodeable : Decodeable) :
               Ok None)
     }
 
+  let field_opt_or : default:'a -> string -> 'a decoder -> 'a decoder =
+   fun ~default key value_decoder ->
+    { run =
+        (fun t ->
+           match (field_opt key value_decoder).run t with
+           | Ok (Some x) -> Ok x
+           | Ok None -> Ok default
+           | Error _ as e -> e)
+    }
 
   let single_field : (string -> 'a decoder) -> 'a decoder =
    fun value_decoder ->

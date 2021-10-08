@@ -141,6 +141,10 @@ module type S = sig
       - when run on [["a", "list", "of", "strings"]], will fail
   *)
 
+  val field_opt_or : default:'a -> string -> 'a decoder -> 'a decoder
+  (** Similar to {!field_opt} but with a default value.
+      @since 0.7 *)
+
   val single_field : (string -> 'a decoder) -> 'a decoder
   (** Decode an object, requiring exactly one field. *)
 
@@ -178,6 +182,19 @@ module type S = sig
 
   val one_of : (string * 'a decoder) list -> 'a decoder
   (** Try a sequence of different decoders. *)
+
+  val pick : (string * 'a decoder decoder) list -> 'a decoder
+  (** [pick choices] picks a single choice, like {!one_of}.
+      However, each element of [choices] can look at the value, decide if
+      it applies (e.g. based on the value of a single field, like a "kind"
+      or "type" field), and if it does, returns a decoder for the rest of
+      the value.
+
+      If a choice is made, even if the returned sub-decoder fails, the
+      error message will totally ignore the rest of the choices and only be
+      about the choice that was initially made.
+
+      @since 0.7 *)
 
   (** {2 Mapping} *)
 
