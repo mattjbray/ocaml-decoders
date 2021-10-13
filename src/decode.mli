@@ -196,6 +196,11 @@ module type S = sig
 
       @since 0.7 *)
 
+  val decode_sub : value -> 'a decoder -> 'a decoder
+  (** [decode_sub value sub_dec] uses [sub_dec] to decode [value].
+      This is useful when one has a value on hand.
+      @since 0.7 *)
+
   (** {2 Mapping} *)
 
   val map : ('a -> 'b) -> 'a decoder -> 'b decoder
