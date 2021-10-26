@@ -99,6 +99,8 @@ module type S = sig
 
   val pick : (string * 'a decoder decoder) list -> 'a decoder
 
+  val decode_sub : value -> 'a decoder -> 'a decoder
+
   val map : ('a -> 'b) -> 'a decoder -> 'b decoder
 
   val apply : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
@@ -406,6 +408,8 @@ module Make (Decodeable : Decodeable) :
       go [] decoders
     in
     { run }
+
+  let decode_sub v dec = from_result (dec.run v)
 
   let primitive_decoder (get_value : value -> 'a option) (message : string) :
       'a decoder =
