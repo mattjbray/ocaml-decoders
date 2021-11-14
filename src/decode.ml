@@ -282,36 +282,36 @@ module Make (Decodeable : Decodeable) :
       ~combine_errors:
         (Error.tag_group "I tried the following decoders but they all failed")
 
-  let pick : (string * 'a decoder decoder) list -> 'a decoder =
-   fun decoders ->
-    let run input =
-      let rec go errors = function
-        | (name, decoder) :: rest ->
-          ( match decoder.run input with
-          | Ok dec ->
-            (* use [dec] and drop errors *)
-            (match dec.run input with
-             | Ok _ as x -> x
-             | Error e ->
-               (* wrap single error *)
-               Error (tag_errors (Printf.sprintf "%S decoder" name) [e])
-            )
-          | Error error ->
-              go
-                ( tag_errors (Printf.sprintf "%S decoder" name) [ error ]
-                :: errors )
-                rest )
-        | [] ->
-            Error
-              (tag_errors
-                 "I tried the following decoders but they all failed"
-                 errors)
-      in
-      go [] decoders
-    in
-    { run }
 
-  let decode_sub v dec = from_result (dec.run v)
+  let pick : (string * 'a decoder decoder) list -> 'a decoder =
+   fun decoders input ->
+    let rec go errors = function
+      | (name, decoder) :: rest ->
+        ( match decoder input with
+        | Ok dec ->
+          (* use [dec] and drop errors *)
+          ( match dec input with
+          | Ok _ as x ->
+              x
+          | Error e ->
+              (* wrap single error *)
+              Error (Error.tag_group (Printf.sprintf "%S decoder" name) [ e ])
+          )
+        | Error error ->
+            go
+              ( Error.tag_group (Printf.sprintf "%S decoder" name) [ error ]
+              :: errors )
+              rest )
+      | [] ->
+          Error
+            (Error.tag_group
+               "I tried the following decoders but they all failed"
+               errors )
+    in
+    go [] decoders
+
+
+  let decode_sub v dec = from_result (dec v)
 
   let primitive_decoder (get_value : value -> 'a option) (message : string) :
       'a decoder =
@@ -447,15 +447,17 @@ module Make (Decodeable : Decodeable) :
     | None ->
         Ok None
 
+
   let field_opt_or : default:'a -> string -> 'a decoder -> 'a decoder =
-   fun ~default key value_decoder ->
-    { run =
-        (fun t ->
-           match (field_opt key value_decoder).run t with
-           | Ok (Some x) -> Ok x
-           | Ok None -> Ok default
-           | Error _ as e -> e)
-    }
+   fun ~default key value_decoder t ->
+    match field_opt key value_decoder t with
+    | Ok (Some x) ->
+        Ok x
+    | Ok None ->
+        Ok default
+    | Error _ as e ->
+        e
+
 
   let single_field : (string -> 'a decoder) -> 'a decoder =
    fun value_decoder t ->
