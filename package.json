@@ -26,5 +26,8 @@
   "devDependencies": {
     "@glennsl/bs-jest": "^0.7.0",
     "bs-platform": "^9.0.2"
+  },
+  "jest": {
+    "modulePathIgnorePatterns": ["_opam"]
   }
 }
