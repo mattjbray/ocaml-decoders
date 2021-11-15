@@ -35,3 +35,6 @@ let rec pp ~pp_i fmt =
         ( if not_shown > 0
         then Printf.sprintf "(...%d errors not shown...)" not_shown
         else "" )
+
+
+let map_tag f = function Tag (s, e) -> Tag (f s, e) | e -> e

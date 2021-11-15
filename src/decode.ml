@@ -367,10 +367,13 @@ module Make (Decodeable : Decodeable) :
     match res with
     | Ok x ->
         Ok (Array.of_list x)
-    | Error (Tag ("while decoding a list", e)) ->
-        Error (Tag ("while decoding an array", e))
     | Error e ->
-        Error e
+        Error
+          (Error.map_tag
+             (function
+               | "while decoding a list" -> "while decoding an array" | s -> s
+               )
+             e )
 
 
   let field : string -> 'a decoder -> 'a decoder =
