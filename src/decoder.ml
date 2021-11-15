@@ -34,9 +34,15 @@ module Infix = struct
 
   let[@inline] ( <*> ) f x = apply f x
 
-  let ( let* ) = ( >>= )
+  include Shims_let_ops_.Make (struct
+    type nonrec ('i, 'o, 'e) t = ('i, 'o, 'e) t
 
-  let ( let+ ) = ( >|= )
+    let ( >>= ) = ( >>= )
+
+    let ( >|= ) = ( >|= )
+
+    let[@inline] monoid_product a b = map (fun x y -> (x, y)) a <*> b
+  end)
 end
 
 let fix (f : ('i, 'a, 'e) t -> ('i, 'a, 'e) t) : ('i, 'a, 'e) t =

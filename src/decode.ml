@@ -124,15 +124,9 @@ module type S = sig
   val of_of_string : msg:string -> (string -> 'a option) -> 'a decoder
 
   module Infix : sig
-    val ( >|= ) : 'a decoder -> ('a -> 'b) -> 'b decoder
-
-    val ( >>= ) : 'a decoder -> ('a -> 'b decoder) -> 'b decoder
-
-    val ( <*> ) : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
+    include module type of Decoder.Infix
 
     val ( <$> ) : ('a -> 'b) -> 'a decoder -> 'b decoder
-
-    include Shims_let_ops_.S with type 'a t_let := 'a decoder
   end
 
   include module type of Infix
@@ -239,23 +233,9 @@ module Make (Decodeable : Decodeable) :
   let maybe = Decoder.maybe
 
   module Infix = struct
-    let[@inline] ( >|= ) x f = map f x
-
-    let[@inline] ( >>= ) x f = and_then f x
-
-    let[@inline] ( <*> ) f x = apply f x
+    include Decoder.Infix
 
     let ( <$> ) = map
-
-    include Shims_let_ops_.Make (struct
-      type 'a t = 'a decoder
-
-      let ( >>= ) = ( >>= )
-
-      let ( >|= ) = ( >|= )
-
-      let[@inline] monoid_product a b = map (fun x y -> (x, y)) a <*> b
-    end)
   end
 
   let nullable (decoder : 'a decoder) : 'a option decoder =

@@ -1,31 +1,20 @@
 (* Note: also copied to src-bs/shims_let_ops_.ml *)
-let shims_let_op_pre_408 =
-  {|
-   module type S = sig type 'a t_let end
-   module Make(X:sig type 'a t end) = struct type 'a t_let = 'a X.t end
+let shims_let_op_pre_408 = {|
+   module Make(X:sig  end) = struct  end
 |}
-
 
 let shims_let_op_post_408 =
   {|
-    module type S = sig
-      type 'a t_let
-      val (let+) : 'a t_let -> ('a -> 'b) -> 'b t_let
-      val (and+) : 'a t_let -> 'b t_let -> ('a * 'b) t_let
-      val (let*) : 'a t_let -> ('a -> 'b t_let) -> 'b t_let
-      val (and*) : 'a t_let -> 'b t_let -> ('a * 'b) t_let
-    end
-   module Make(X:sig
-    type 'a t
-    val (>|=) : 'a t -> ('a -> 'b) -> 'b t
-    val monoid_product : 'a t -> 'b t -> ('a * 'b) t
-    val (>>=) : 'a t -> ('a -> 'b t) -> 'b t
-    end) : S with type 'a t_let = 'a X.t = struct
-      type 'a t_let = 'a X.t
-      let (let+) = X.(>|=)
-      let (and+) = X.monoid_product
-      let (let*) = X.(>>=)
-      let (and*) = X.monoid_product
+  module Make(X:sig
+    type ('i, 'a, 'e) t
+    val (>|=) : ('i, 'a, 'e) t -> ('a -> 'b) -> ('i, 'b, 'e) t
+    val monoid_product : ('i, 'a, 'e) t -> ('i, 'b, 'e) t -> ('i, ('a * 'b), 'e) t
+    val (>>=) : ('i, 'a, 'e) t -> ('a -> ('i, 'b, 'e) t) -> ('i, 'b, 'e) t
+  end) = struct
+    let (let+) = X.(>|=)
+    let (and+) = X.monoid_product
+    let (let*) = X.(>>=)
+    let (and*) = X.monoid_product
   end[@@inline]
 |}
 

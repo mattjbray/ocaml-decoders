@@ -248,15 +248,9 @@ module type S = sig
   (** Create a decoder from a function [of_string : string -> 'a option] *)
 
   module Infix : sig
-    val ( >|= ) : 'a decoder -> ('a -> 'b) -> 'b decoder
-
-    val ( >>= ) : 'a decoder -> ('a -> 'b decoder) -> 'b decoder
-
-    val ( <*> ) : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
+    include module type of Decoder.Infix
 
     val ( <$> ) : ('a -> 'b) -> 'a decoder -> 'b decoder
-
-    include Shims_let_ops_.S with type 'a t_let := 'a decoder
   end
 
   include module type of Infix
