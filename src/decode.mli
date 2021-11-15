@@ -23,7 +23,7 @@ module type S = sig
 
       To run a decoder, pass it to {!val:decode_value}.
   *)
-  type 'a decoder
+  type 'a decoder = (value, 'a, error) Decoder.t
 
   (** {2 Primitives} *)
 

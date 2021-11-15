@@ -47,7 +47,7 @@ module type S = sig
 
   val of_file : string -> (value, error) result
 
-  type 'a decoder
+  type 'a decoder = (value, 'a, error) Decoder.t
 
   val string : string decoder
 
