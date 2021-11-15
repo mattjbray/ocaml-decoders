@@ -1,8 +1,16 @@
+(** An [('i, 'o, 'e) t] is a decoder that
+
+    - consumes a value of type ['i]
+    - producing a value of type ['o]
+    - or an error of type ['e]
+ *)
 type ('i, 'o, 'e) t = 'i -> ('o, 'e) result
 
 val pure : 'o -> ('i, 'o, 'e) t
+(** [pure x] always succeeds with [x] *)
 
 val fail : 'e -> ('i, 'o, 'e) t
+(** [fail e] always fails with [e] *)
 
 val of_result : ('o, 'e) Decoders_util.My_result.t -> ('i, 'o, 'e) t
 
