@@ -2,7 +2,7 @@
 
 open Decoders
 
-type ('good, 'bad) result = ('good, 'bad) Decode.result =
+type ('good, 'bad) result = ('good, 'bad) Decoders_util.My_result.t =
   | Ok of 'good
   | Error of 'bad
 
@@ -27,13 +27,12 @@ module Json_decodeable : Decode.Decodeable with type value = Js.Json.t = struct
   let is_integer json =
     Js.Float.isFinite json && Js.Math.floor_float json == json
 
+
   let get_int json =
     Js.Json.decodeNumber json
     |. Belt.Option.flatMap (fun n ->
-           if is_integer n then
-             Some (Obj.magic (n : float) : int)
-           else
-             None)
+           if is_integer n then Some (Obj.magic (n : float) : int) else None )
+
 
   let get_float = Js.Json.decodeNumber
 
@@ -50,7 +49,7 @@ module Json_decodeable : Decode.Decodeable with type value = Js.Json.t = struct
     |. Belt.Option.map (fun dict ->
            Js.Dict.entries dict
            |. Array.to_list
-           |> List.map (fun (key, value) -> (Js.Json.string key, value)))
+           |> List.map (fun (key, value) -> (Js.Json.string key, value)) )
 
 
   let to_list values = Js.Json.array (Array.of_list values)
@@ -60,35 +59,34 @@ module Decode = struct
   module D = Decode.Make (Json_decodeable)
   include D
 
-  let tag_error (msg : string) (error : error) : error = Decoder_tag (msg, error)
-
-  let tag_errors (msg : string) (errors : error list) : error =
-    Decoder_tag (msg, Decoder_errors errors)
-
   let array : 'a decoder -> 'a array decoder =
-   fun decoder ->
-    { run =
-        (fun t ->
-          match Js.Json.decodeArray t with
-          | None ->
-              (fail "Expected an array").run t
-          | Some arr ->
-              let (oks, errs) =
-                arr
-                |> Js.Array.reducei (fun (oks, errs) x i ->
-                       match decoder.run x with
-                       | Ok a ->
-                          let _ = Js.Array.push a oks in
-                          (oks, errs)
-                       | Error e ->
-                         let _ = Js.Array.push (tag_error ("element " ^ Js.Int.toString i) e) errs in
-                             (oks, errs)) ([||], [||])
-              in
-              if (Js.Array.length errs > 0) then
-                Error (tag_errors "while decoding an array" (errs |> Array.to_list))
-              else
-                Ok oks)
-    }
+   fun decoder t ->
+    match Js.Json.decodeArray t with
+    | None ->
+        (fail "Expected an array") t
+    | Some arr ->
+        let oks, errs =
+          arr
+          |> Js.Array.reducei
+               (fun (oks, errs) x i ->
+                 match decoder x with
+                 | Ok a ->
+                     let _ = Js.Array.push a oks in
+                     (oks, errs)
+                 | Error e ->
+                     let _ =
+                       Js.Array.push
+                         (Error.tag ("element " ^ Js.Int.toString i) e)
+                         errs
+                     in
+                     (oks, errs) )
+               ([||], [||])
+        in
+        if Js.Array.length errs > 0
+        then
+          Error
+            (Error.tag_group "while decoding an array" (errs |> Array.to_list))
+        else Ok oks
 end
 
 module Json_encodeable = struct
@@ -112,7 +110,7 @@ module Json_encodeable = struct
     Js.Json.object_
       ( xs
       |. Belt.List.keepMap (fun (k, v) ->
-             Js.Json.decodeString k |. Belt.Option.map (fun k -> (k, v)))
+             Js.Json.decodeString k |. Belt.Option.map (fun k -> (k, v)) )
       |. Js.Dict.fromList )
 end
 
