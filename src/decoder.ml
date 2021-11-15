@@ -68,5 +68,21 @@ let one_of ~combine_errors (xs : ('i, 'o, 'e) t list) : ('i, 'o, 'e) t =
   aux [] xs
 
 
+let pick ~combine_errors : ('i, ('i, 'o, 'e) t, 'e) t list -> ('i, 'o, 'e) t =
+ fun decoders input ->
+  let rec go errors = function
+    | decoder :: rest ->
+      ( match decoder input with
+      | Ok dec ->
+        (* use [dec] and drop errors *)
+        (match dec input with Ok _ as x -> x | Error e -> Error e)
+      | Error error ->
+          go (error :: errors) rest )
+    | [] ->
+        Error (combine_errors errors)
+  in
+  go [] decoders
+
+
 let of_to_opt (to_opt : 'i -> 'o option) fail : ('i, 'o, 'e) t =
  fun i -> match to_opt i with Some o -> Ok o | None -> fail i

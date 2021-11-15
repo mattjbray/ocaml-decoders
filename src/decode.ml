@@ -263,32 +263,18 @@ module Make (Decodeable : Decodeable) :
         (Error.tag_group "I tried the following decoders but they all failed")
 
 
-  let pick : (string * 'a decoder decoder) list -> 'a decoder =
-   fun decoders input ->
-    let rec go errors = function
-      | (name, decoder) :: rest ->
-        ( match decoder input with
-        | Ok dec ->
-          (* use [dec] and drop errors *)
-          ( match dec input with
-          | Ok _ as x ->
-              x
-          | Error e ->
-              (* wrap single error *)
-              Error (Error.tag_group (Printf.sprintf "%S decoder" name) [ e ])
-          )
-        | Error error ->
-            go
-              ( Error.tag_group (Printf.sprintf "%S decoder" name) [ error ]
-              :: errors )
-              rest )
-      | [] ->
-          Error
-            (Error.tag_group
-               "I tried the following decoders but they all failed"
-               errors )
+  let pick decoders =
+    let decoders =
+      decoders
+      |> My_list.map (fun (name, d) ->
+             d
+             |> Decoder.map_err (fun e ->
+                    Error.tag_group (Printf.sprintf "%S decoder" name) [ e ] ) )
     in
-    go [] decoders
+    Decoder.pick
+      decoders
+      ~combine_errors:
+        (Error.tag_group "I tried the following decoders but they all failed")
 
 
   let decode_sub v dec = from_result (dec v)
