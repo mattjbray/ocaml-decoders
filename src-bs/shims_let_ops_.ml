@@ -10,9 +10,9 @@ module type I = sig
 end
 
 module type S = sig
-  type ('i, 'a, 'e) t
+  type ('i, 'a, 'e) t_let
 end
 
 module Make (X : I) = struct
-  type ('i, 'a, 'e) t = ('i, 'a, 'e) X.t
+  type ('i, 'a, 'e) t_let = ('i, 'a, 'e) X.t
 end

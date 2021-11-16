@@ -13,10 +13,10 @@ let shims_all =
 
 let shims_let_op_pre_408 =
   {|
-  module type S = sig type ('i, 'o, 'e) t end
-  module Make(X : I) : S with type ('i, 'o, 'e) t = ('i, 'o, 'e) X.t =
+  module type S = sig type ('i, 'o, 'e) t_let end
+   module Make(X : I) : S with type ('i, 'o, 'e) t_let = ('i, 'o, 'e) X.t =
   struct
-    type ('i, 'o, 'e) t = ('i, 'o, 'e) X.t
+    type ('i, 'o, 'e) t_let = ('i, 'o, 'e) X.t
   end
 |}
 
@@ -24,16 +24,16 @@ let shims_let_op_pre_408 =
 let shims_let_op_post_408 =
   {|
   module type S = sig
-    type ('i, 'o, 'e) t
-    val ( let+ ) : ('i, 'a, 'e) t -> ('a -> 'b) -> ('i, 'b, 'e) t
-    val ( and+ ) : ('i, 'a, 'e) t -> ('i, 'b, 'e) t -> ('i, 'a * 'b, 'e) t
-    val ( let* ) : ('i, 'a, 'e) t -> ('a -> ('i, 'b, 'e) t) -> ('i, 'b, 'e) t
-    val ( and* ) : ('i, 'a, 'e) t -> ('i, 'b, 'e) t -> ('i, 'a * 'b, 'e) t
+    type ('i, 'o, 'e) t_let
+    val ( let+ ) : ('i, 'a, 'e) t_let -> ('a -> 'b) -> ('i, 'b, 'e) t_let
+    val ( and+ ) : ('i, 'a, 'e) t_let -> ('i, 'b, 'e) t_let -> ('i, 'a * 'b, 'e) t_let
+    val ( let* ) : ('i, 'a, 'e) t_let -> ('a -> ('i, 'b, 'e) t_let) -> ('i, 'b, 'e) t_let
+    val ( and* ) : ('i, 'a, 'e) t_let -> ('i, 'b, 'e) t_let -> ('i, 'a * 'b, 'e) t_let
   end
 
-  module Make(X : I) : S with type ('i, 'o, 'e) t = ('i, 'o, 'e) X.t =
+  module Make(X : I) : S with type ('i, 'o, 'e) t_let = ('i, 'o, 'e) X.t =
   struct
-    type ('i, 'o, 'e) t = ('i, 'o, 'e) X.t
+    type ('i, 'o, 'e) t_let = ('i, 'o, 'e) X.t
     let (let+) = X.(>|=)
     let (and+) = X.monoid_product
     let (let*) = X.(>>=)
