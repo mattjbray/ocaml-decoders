@@ -119,6 +119,36 @@ module type S = sig
 
   (** {1 Object primitives} *)
 
+  module Obj : sig
+    type 'a obj
+
+    val run : 'a obj -> 'a decoder
+
+    val succeed : 'a -> 'a obj
+
+    val bind : ('a -> 'b obj) -> 'a obj -> 'b obj
+
+    val map : ('a -> 'b) -> 'a obj -> 'b obj
+
+    val field : string -> 'a decoder -> 'a obj
+
+    val field_opt : string -> 'a decoder -> 'a option obj
+
+    val empty : unit obj
+
+    module Infix : sig
+      val ( >>= ) : 'a obj -> ('a -> 'b obj) -> 'b obj
+
+      val ( >|= ) : 'a obj -> ('a -> 'b) -> 'b obj
+
+      val ( <*> ) : 'a obj -> ('a -> 'b) obj -> 'b obj
+
+      val ( let* ) : 'a obj -> ('a -> 'b obj) -> 'b obj
+
+      val ( let+ ) : 'a obj -> ('a -> 'b) -> 'b obj
+    end
+  end
+
   val field : string -> 'a decoder -> 'a decoder
   (** Decode an object, requiring a particular field. *)
 

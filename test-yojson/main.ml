@@ -172,6 +172,57 @@ let yojson_basic_suite =
             Format.asprintf "@,@[%a@]" pp_error e)
   in
 
+  let obj_test =
+    "objects"
+    >:: fun _test_ctxt ->
+    let obj =
+      Obj.(
+        let open Infix in
+        let* name = field "name" string in
+        let* age = field "age" int in
+        let* () = empty in
+        succeed (name, age))
+    in
+    let decoder = Obj.run obj in
+    let input = {| {"name": "Jim", "age": 42} |} in
+    match decode_string decoder input with
+    | Ok value ->
+        assert_equal value ("Jim", 42)
+    | Error error ->
+        assert_string (Format.asprintf "%a" pp_error error)
+  in
+
+  let obj_test_2 =
+    "objects with remaining fields"
+    >:: fun _test_ctxt ->
+    let obj =
+      Obj.(
+        let open Infix in
+        let* name = field "name" string in
+        let* age = field "age" int in
+        let* () = empty in
+        succeed (name, age))
+    in
+    let decoder = Obj.run obj in
+    let input = {| {"name": "Jim", "age": 42, "another": "thing"} |} in
+    match decode_string decoder input with
+    | Ok _ ->
+        assert_string "Expected an error"
+    | Error error ->
+        let open Decoders in
+        assert_equal
+          error
+          (Error.make
+             {|Expected an empty object, but have unconsumed field "another"|}
+             ~context:
+               (`Assoc
+                 [ ("name", `String "Jim")
+                 ; ("age", `Int 42)
+                 ; ("another", `String "thing")
+                 ] ) )
+          ~printer:(fun e -> Format.asprintf "@,@[%a@]" pp_error e)
+  in
+
   "Yojson.Basic"
   >::: [ list_string_test
        ; array_string_test
@@ -179,6 +230,8 @@ let yojson_basic_suite =
        ; mut_rec_test
        ; string_or_floatlit_test
        ; grouping_errors_test
+       ; obj_test
+       ; obj_test_2
        ]
 
 

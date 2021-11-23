@@ -163,6 +163,18 @@ module My_list = struct
     aux f l (fun l -> l)
 end
 
+module String_map = struct
+  include Map.Make (String)
+
+  let add_list m l = List.fold_left (fun m (k, v) -> add k v m) m l
+
+  let of_list l = add_list empty l
+
+  let get = find_opt
+
+  let choose_opt m = try Some (choose m) with Not_found -> None
+end
+
 let with_file_in file f =
   let ic = open_in file in
   try

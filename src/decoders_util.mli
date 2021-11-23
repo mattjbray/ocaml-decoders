@@ -47,6 +47,18 @@ module My_list : sig
   val flat_map : ('a -> 'b list) -> 'a list -> 'b list
 end
 
+module String_map : sig
+  type 'a t
+
+  val of_list : (string * 'a) list -> 'a t
+
+  val get : string -> 'a t -> 'a option
+
+  val remove : string -> 'a t -> 'a t
+
+  val choose_opt : 'a t -> (string * 'a) option
+end
+
 val with_file_in : string -> (in_channel -> 'a) -> 'a
 
 val read_all : in_channel -> string

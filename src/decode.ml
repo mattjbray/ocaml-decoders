@@ -286,6 +286,100 @@ module Make (Decodeable : Decodeable) :
     key_value_pairs_seq' string value_decoder
 
 
+  module Obj = struct
+    type t =
+      { context : value
+      ; map : value U.String_map.t
+      }
+
+    type 'a obj = (t, 'a * t, value Error.t) Decoder.t
+
+    let succeed x t = Ok (x, t)
+
+    let bind : ('a -> 'b obj) -> 'a obj -> 'b obj =
+     fun f dec t -> match dec t with Ok (x, t) -> f x t | Error e -> Error e
+
+
+    let map f dec t =
+      match dec t with Ok (x, t) -> Ok (f x, t) | Error e -> Error e
+
+
+    let apply f dec t =
+      match f t with
+      | Ok (f, t) ->
+        (match dec t with Ok (x, t) -> Ok (f x, t) | Error e -> Error e)
+      | Error e ->
+          Error e
+
+
+    module Infix = struct
+      let ( >>= ) x f = bind f x
+
+      let ( >|= ) x f = map f x
+
+      let ( <*> ) x f = apply f x
+
+      (* let monoid_product a b = map (fun x y -> (x, y)) a <*> b *)
+
+      let ( let+ ) = ( >|= )
+
+      (* let ( and+ ) = monoid_product *)
+
+      let ( let* ) = ( >>= )
+
+      (* let ( and* ) = monoid_product *)
+    end
+
+    let field_opt key v_dec : 'a option obj =
+     fun t ->
+      match U.String_map.get key t.map with
+      | None ->
+          Ok (None, t)
+      | Some value ->
+          let m = U.String_map.remove key t.map in
+          let t = { t with map = m } in
+          (match v_dec value with Ok x -> Ok (Some x, t) | Error e -> Error e)
+
+
+    let field key v_dec : 'a obj =
+     fun t ->
+      match field_opt key v_dec t with
+      | Ok (Some x, t) ->
+          Ok (x, t)
+      | Ok (None, _t) ->
+          Error
+            (Error.make
+               (Printf.sprintf "Expected an object with an attribute %S" key)
+               ~context:t.context )
+      | Error e ->
+          Error e
+
+
+    let empty : unit obj =
+     fun t ->
+      match U.String_map.choose_opt t.map with
+      | None ->
+          Ok ((), t)
+      | Some (k, _) ->
+          Error
+            (Error.make
+               (Printf.sprintf
+                  "Expected an empty object, but have unconsumed field %S"
+                  k )
+               ~context:t.context )
+
+
+    let run : 'a obj -> 'a decoder =
+     fun dec context ->
+      match key_value_pairs value context with
+      | Ok l ->
+          let map = U.String_map.of_list l in
+          let t = { context; map } in
+          dec t |> U.My_result.map (fun (x, _) -> x)
+      | Error e ->
+          Error e
+  end
+
   let field : string -> 'a decoder -> 'a decoder =
    fun key value_decoder t ->
     let value =
