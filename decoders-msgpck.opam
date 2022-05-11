@@ -14,10 +14,11 @@ bug-reports: "https://github.com/mattjbray/ocaml-decoders/issues"
 depends: [
   "ocaml" {>= "4.03.0"}
   "dune" {>= "2.0"}
-  "decoders"
+  "decoders" {version}
   "msgpck"
+  "ocplib-endian" {>= "0.6"}
   "odoc" {with-doc}
-  "containers" {with-test}
+  "containers" {with-test & >= "0.16"}
   "ounit" {with-test}
 ]
 build: [

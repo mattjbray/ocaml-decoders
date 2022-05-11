@@ -16,10 +16,10 @@
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
-  decoders
+  (decoders :version)
   bencode
   (odoc :with-doc)
-  (containers :with-test)
+  (containers (and :with-test (>= 0.16)))
   (ounit :with-test)))
 
 (package
@@ -30,10 +30,10 @@
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
-  decoders
+  (decoders :version)
   cbor
   (odoc :with-doc)
-  (containers :with-test)
+  (containers (and :with-test (>= 0.16)))
   (ounit :with-test)))
 
 (package
@@ -44,10 +44,10 @@
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
-  decoders
+  (decoders :version)
   (ezjsonm (>= 0.4.0))
   (odoc :with-doc)
-  (containers :with-test)
+  (containers (and :with-test (>= 0.16)))
   (ounit :with-test)))
 
 (package
@@ -58,10 +58,10 @@
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
-  decoders
+  (decoders :version)
   jsonm
   (odoc :with-doc)
-  (containers :with-test)
+  (containers (and :with-test (>= 0.16)))
   (ounit :with-test)))
 
 (package
@@ -73,10 +73,11 @@
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
-  decoders
+  (decoders :version)
   msgpck
+  (ocplib-endian (>= 0.6)) ; lower bound missing from msgpck
   (odoc :with-doc)
-  (containers :with-test)
+  (containers (and :with-test (>= 0.16)))
   (ounit :with-test)))
 
 (package
@@ -87,11 +88,11 @@
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
-  decoders
+  (decoders :version)
   sexplib0
   sexplib
   (odoc :with-doc)
-  (containers :with-test)
+  (containers (and :with-test (>= 0.16)))
   (ounit :with-test)))
 
 (package
@@ -102,10 +103,10 @@
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
-  decoders
+  (decoders :version)
   (yojson (>= 1.6.0))
   (odoc :with-doc)
-  (containers :with-test)
+  (containers (and :with-test (>= 0.16)))
   (ounit :with-test)))
 
 (package
@@ -117,4 +118,4 @@
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
   (odoc :with-doc)
-  (containers :with-test)))
+  (containers (and :with-test (>= 0.16)))))
