@@ -1,3 +1,17 @@
+## 0.7.0 (2022-05-11)
+
+* Add `Decode.field_opt_or` (#43, @c-cube)
+* Add `Decode.pick` (#43, @c-cube)
+* Add `Decode.decode_sub` (#45, @c-cube)
+
+### `bs-decoders`
+
+* Improve `int` decoder (@actionshrimp)
+
+### `decoders-yojson`
+
+* Move away from deprecated `Yojson.json` to `Yojson.t` (#37, @idkjs)
+
 ## 0.6.0 (2021-03-12)
 
 * Add `Decode.of_of_string` and `Encode.of_to_string` (@mattjbray)
