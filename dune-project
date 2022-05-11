@@ -8,17 +8,6 @@
 (documentation "https://mattjbray.github.io/ocaml-decoders/")
 
 (package
- (name decoders)
- (synopsis "Elm-inspired decoders for Ocaml")
- (description
-   "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
- (depends
-  (ocaml (>= 4.03.0))
-  (dune (>= 2.0))
-  (odoc :with-doc)
-  (containers :with-test)))
-
-(package
  (name decoders-bencode)
  (authors "Simon Cruanes <simon@imandra.ai>")
  (synopsis "Bencode backend for decoders")
@@ -118,3 +107,14 @@
   (odoc :with-doc)
   (containers :with-test)
   (ounit :with-test)))
+
+(package
+ (name decoders)
+ (synopsis "Elm-inspired decoders for Ocaml")
+ (description
+   "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
+ (depends
+  (ocaml (>= 4.03.0))
+  (dune (>= 2.0))
+  (odoc :with-doc)
+  (containers :with-test)))
