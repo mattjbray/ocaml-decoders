@@ -302,8 +302,8 @@ For more details, see the API documentation:
 After updating CHANGES.md:
 
 ```
-npm version <newversion>
+npm version <newversion> # e.g. npm version 0.7.0
 git push --tags
-dune-release --name decoders
+dune-release
 npm publish
 ```
