@@ -16,7 +16,7 @@
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
-  (decoders :version)
+  (decoders (= :version))
   bencode
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
@@ -30,7 +30,7 @@
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
-  (decoders :version)
+  (decoders (= :version))
   cbor
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
@@ -44,7 +44,7 @@
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
-  (decoders :version)
+  (decoders (= :version))
   (ezjsonm (>= 0.4.0))
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
@@ -58,7 +58,7 @@
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
-  (decoders :version)
+  (decoders (= :version))
   jsonm
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
@@ -73,7 +73,7 @@
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
-  (decoders :version)
+  (decoders (= :version))
   msgpck
   (ocplib-endian (>= 0.6)) ; lower bound missing from msgpck
   (odoc :with-doc)
@@ -88,7 +88,7 @@
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
-  (decoders :version)
+  (decoders (= :version))
   sexplib0
   sexplib
   (odoc :with-doc)
@@ -103,7 +103,7 @@
  (depends
   (ocaml (>= 4.03.0))
   (dune (>= 2.0))
-  (decoders :version)
+  (decoders (= :version))
   (yojson (>= 1.6.0))
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
