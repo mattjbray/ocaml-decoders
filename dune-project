@@ -1,4 +1,4 @@
-(lang dune 2.0)
+(lang dune 2.7)
 (name decoders)
 (generate_opam_files true)
 (license ISC)
@@ -15,7 +15,6 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 2.0))
   (decoders (= :version))
   bencode
   (odoc :with-doc)
@@ -29,7 +28,6 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 2.0))
   (decoders (= :version))
   cbor
   (odoc :with-doc)
@@ -43,7 +41,6 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 2.0))
   (decoders (= :version))
   (ezjsonm (>= 0.4.0))
   (odoc :with-doc)
@@ -57,7 +54,6 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 2.0))
   (decoders (= :version))
   jsonm
   (odoc :with-doc)
@@ -72,7 +68,6 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 2.0))
   (decoders (= :version))
   msgpck
   (ocplib-endian (>= 0.6)) ; lower bound missing from msgpck
@@ -87,7 +82,6 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 2.0))
   (decoders (= :version))
   sexplib0
   sexplib
@@ -102,7 +96,6 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 2.0))
   (decoders (= :version))
   (yojson (>= 1.6.0))
   (odoc :with-doc)
@@ -116,6 +109,5 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
-  (dune (>= 2.0))
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))))

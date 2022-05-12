@@ -12,8 +12,8 @@ homepage: "https://github.com/mattjbray/ocaml-decoders"
 doc: "https://mattjbray.github.io/ocaml-decoders/"
 bug-reports: "https://github.com/mattjbray/ocaml-decoders/issues"
 depends: [
+  "dune" {>= "2.7"}
   "ocaml" {>= "4.03.0"}
-  "dune" {>= "2.0"}
   "decoders" {= version}
   "msgpck"
   "ocplib-endian" {>= "0.6"}
@@ -22,7 +22,7 @@ depends: [
   "ounit" {with-test}
 ]
 build: [
-  ["dune" "subst"] {pinned}
+  ["dune" "subst"] {dev}
   [
     "dune"
     "build"
