@@ -16,7 +16,7 @@
  (depends
   (ocaml (>= 4.03.0))
   (decoders (= :version))
-  (bencode (>= 0.2))
+  (bencode (>= 2.0))
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
   (ounit :with-test)))
