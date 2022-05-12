@@ -16,7 +16,7 @@
  (depends
   (ocaml (>= 4.03.0))
   (decoders (= :version))
-  bencode
+  (bencode (>= 0.2))
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
   (ounit :with-test)))
@@ -69,7 +69,7 @@
  (depends
   (ocaml (>= 4.03.0))
   (decoders (= :version))
-  msgpck
+  (msgpck (>= 1.3))
   (ocplib-endian (>= 0.6)) ; lower bound missing from msgpck
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
