@@ -1,0 +1,40 @@
+name: build
+
+on:
+  pull_request:
+  push:
+    branch:
+      - master
+
+jobs:
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+        ocaml-compiler:
+          - 4.08.x
+          - 4.13.x
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Use OCaml ${{ matrix.ocaml-compiler }}
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          opam-depext-flags: --with-test
+
+      - run: opam install . --deps-only --with-test
+
+      - run: opam exec -- make build
+
+      - run: opam exec -- make test
