@@ -1,4 +1,4 @@
-# ocaml-decoders: Elm-inspired decoders for OCaml [![build status](https://travis-ci.org/mattjbray/ocaml-decoders.svg?branch=master)](https://travis-ci.org/mattjbray/ocaml-decoders)
+# ocaml-decoders: Elm-inspired decoders for OCaml
 
 A combinator library for "decoding" JSON-like values into your own OCaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.
 
