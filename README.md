@@ -130,31 +130,36 @@ a radius, and triangles have a base and a height.
 We could represent these types in OCaml and decode them like this:
 
 ```ocaml
+type square = { side : int }
+
+type circle = { radius : int }
+
+type triangle = { base : int; height : int }
+
 type shape =
-  | Square of int
-  | Circle of int
-  | Triangle of int * int
+  | Square of square
+  | Circle of circle
+  | Triangle of triangle
 
-let square_decoder : shape decoder =
-  D.(let+ s = field "side" int in Square s)
+let square_decoder : square decoder =
+  D.(let+ s = field "side" int in { side = s })
 
-let circle_decoder : shape decoder =
-  D.(let+ r = field "radius" int in Circle r)
+let circle_decoder : circle decoder =
+  D.(let+ r = field "radius" int in { radius = r })
 
-let triangle_decoder : shape decoder =
+let triangle_decoder : triangle decoder =
   D.(
     let* b = field "base" int in
     let+ h = field "height" int in
-    Triangle (b, h)
-  )
+    { base = b; height = h })
 
 let shape_decoder : shape decoder =
   let open D in
   let* shape = field "shape" string in
   match shape with
-  | "square" -> square_decoder
-  | "circle" -> circle_decoder
-  | "triangle" -> triangle_decoder
+  | "square" -> let+ s = square_decoder in Square s
+  | "circle" -> let+ c = circle_decoder in Circle c
+  | "triangle" -> let+ t = triangle_decoder in Triangle t
   | _ -> fail "Expected a shape"
 
 
@@ -174,9 +179,9 @@ error messages.
 let shape_decoder_2 : shape decoder =
   D.(
     one_of
-      [ ("a square", square_decoder)
-      ; ("a circle", circle_decoder)
-      ; ("a triangle", triangle_decoder)
+      [ ("a square", let+ s = square_decoder in Square s)
+      ; ("a circle", let+ c = circle_decoder in Circle c)
+      ; ("a triangle", let+ t = triangle_decoder in Triangle t)
       ]
   )
 ```
