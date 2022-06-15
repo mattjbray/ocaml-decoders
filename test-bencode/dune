@@ -1,4 +1,4 @@
 (test
  (name main)
  (package decoders-bencode)
- (libraries decoders-bencode containers oUnit))
+ (libraries decoders-bencode containers ounit2))

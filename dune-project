@@ -19,7 +19,7 @@
   (bencode (>= 2.0))
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
-  (ounit :with-test)))
+  (ounit2 :with-test)))
 
 (package
  (name decoders-cbor)
@@ -32,7 +32,7 @@
   cbor
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
-  (ounit :with-test)))
+  (ounit2 :with-test)))
 
 (package
  (name decoders-ezjsonm)
@@ -45,7 +45,7 @@
   (ezjsonm (>= 0.4.0))
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
-  (ounit :with-test)))
+  (ounit2 :with-test)))
 
 (package
  (name decoders-jsonm)
@@ -58,7 +58,7 @@
   jsonm
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
-  (ounit :with-test)))
+  (ounit2 :with-test)))
 
 (package
  (name decoders-msgpck)
@@ -73,7 +73,7 @@
   (ocplib-endian (>= 0.6)) ; lower bound missing from msgpck
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
-  (ounit :with-test)))
+  (ounit2 :with-test)))
 
 (package
  (name decoders-sexplib)
@@ -87,7 +87,7 @@
   sexplib
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
-  (ounit :with-test)))
+  (ounit2 :with-test)))
 
 (package
  (name decoders-ezxmlm)
@@ -111,7 +111,7 @@
   (yojson (>= 1.6.0))
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
-  (ounit :with-test)))
+  (ounit2 :with-test)))
 
 (package
  (name decoders)
