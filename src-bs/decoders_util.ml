@@ -24,6 +24,8 @@ end
 module My_opt = struct
   let return x = Some x
 
+  let map f x = Belt.Option.map x f
+
   let flat_map f x = Belt.Option.flatMap x f
 end
 
@@ -37,7 +39,7 @@ module My_list = struct
   let find_map f xs =
     xs
     |. Belt.List.getBy (fun x ->
-           match f x with Some _ -> true | None -> false)
+           match f x with Some _ -> true | None -> false )
     |. Belt.Option.flatMap f
 
 

@@ -19,6 +19,8 @@ end
 module My_opt : sig
   val return : 'a -> 'a option
 
+  val map : ('a -> 'b) -> 'a option -> 'b option
+
   val flat_map : ('a -> 'b option) -> 'a option -> 'b option
 end
 
