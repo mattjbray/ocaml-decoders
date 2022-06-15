@@ -90,13 +90,14 @@
   (ounit :with-test)))
 
 (package
- (name decoders-xml)
- (synopsis "Xml backend for decoders")
+ (name decoders-ezxmlm)
+ (synopsis "Ezxmlm backend for decoders")
  (description
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
   (decoders (= :version))
+   ezxmlm
   (odoc :with-doc)))
 
 (package

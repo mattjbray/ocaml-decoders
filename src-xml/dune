@@ -1,4 +1,0 @@
-(library
- (name decoders_xml)
- (public_name decoders-xml)
- (libraries decoders ezxmlm))
