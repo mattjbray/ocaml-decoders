@@ -21,7 +21,7 @@ module Make (Decodeable : Decodeable) :
 
   type error = value Error.t
 
-  let pp_error = Error.pp ~pp_i:pp
+  let pp_error = Error.pp pp
 
   let string_of_error e : string = Format.asprintf "@[<2>%a@?@]" pp_error e
 
