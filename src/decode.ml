@@ -1,6 +1,7 @@
 (** Functors for creating Decoders. *)
 
-open Decoders_util
+module U = Decoders_util
+open U
 
 type ('good, 'bad) result = ('good, 'bad) My_result.t =
   | Ok of 'good
@@ -228,6 +229,163 @@ module Make (Decodeable : Decodeable) :
              e )
 
 
+  let keys' : 'k decoder -> 'k list decoder =
+   fun key_decoder value ->
+    match Decodeable.get_key_value_pairs value with
+    | Some assoc ->
+        assoc
+        |> List.map (fun (key, _) -> key_decoder key)
+        |> combine_errors
+        |> My_result.map_err
+             (Error.tag_group "Failed while decoding the keys of an object")
+    | None ->
+        (fail "Expected an object") value
+
+
+  let keys = keys' string
+
+  let key_value_pairs' : 'k decoder -> 'v decoder -> ('k * 'v) list decoder =
+   fun key_decoder value_decoder value ->
+    match Decodeable.get_key_value_pairs value with
+    | Some assoc ->
+        assoc
+        |> List.map
+             My_result.Infix.(
+               fun (key_val, value_val) ->
+                 key_decoder key_val
+                 >>= fun key ->
+                 value_decoder value_val >|= fun value -> (key, value))
+        |> combine_errors
+        |> My_result.map_err
+             (Error.tag_group "Failed while decoding key-value pairs")
+    | None ->
+        (fail "Expected an object") value
+
+
+  let key_value_pairs value_decoder = key_value_pairs' string value_decoder
+
+  let key_value_pairs_seq' : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder
+      =
+   fun key_decoder value_decoder value ->
+    match Decodeable.get_key_value_pairs value with
+    | Some assoc ->
+        assoc
+        |> List.map
+             My_result.Infix.(
+               fun (key_val, value_val) ->
+                 key_decoder key_val
+                 >>= fun key -> (value_decoder key) value_val)
+        |> combine_errors
+        |> My_result.map_err
+             (Error.tag_group "Failed while decoding key-value pairs")
+    | None ->
+        (fail "Expected an object") value
+
+
+  let key_value_pairs_seq value_decoder =
+    key_value_pairs_seq' string value_decoder
+
+
+  module Obj = struct
+    type t =
+      { context : value
+      ; map : value U.String_map.t
+      }
+
+    type 'a obj = (t, 'a * t) Decoder.t
+
+    let succeed x t = Ok (x, t)
+
+    let bind : ('a -> 'b obj) -> 'a obj -> 'b obj =
+     fun f dec t -> match dec t with Ok (x, t) -> f x t | Error e -> Error e
+
+
+    let map f dec t =
+      match dec t with Ok (x, t) -> Ok (f x, t) | Error e -> Error e
+
+
+    let apply f dec t =
+      match f t with
+      | Ok (f, t) ->
+        (match dec t with Ok (x, t) -> Ok (f x, t) | Error e -> Error e)
+      | Error e ->
+          Error e
+
+
+    module Infix = struct
+      let ( >>= ) x f = bind f x
+
+      let ( >|= ) x f = map f x
+
+      let ( <*> ) x f = apply f x
+
+      (* let monoid_product a b = map (fun x y -> (x, y)) a <*> b *)
+
+      let ( let+ ) = ( >|= )
+
+      (* let ( and+ ) = monoid_product *)
+
+      let ( let* ) = ( >>= )
+
+      (* let ( and* ) = monoid_product *)
+    end
+
+    let field_opt key v_dec : 'a option obj =
+     fun t ->
+      match U.String_map.get key t.map with
+      | None ->
+          Ok (None, t)
+      | Some value ->
+          let m = U.String_map.remove key t.map in
+          let t = { t with map = m } in
+          ( match v_dec value with
+          | Ok x ->
+              Ok (Some x, t)
+          | Error e ->
+              Error (Error.map_context (fun context -> { t with context }) e) )
+
+
+    let field key v_dec : 'a obj =
+     fun t ->
+      match field_opt key v_dec t with
+      | Ok (Some x, t) ->
+          Ok (x, t)
+      | Ok (None, _t) ->
+          Error
+            (Error.make
+               (Printf.sprintf "Expected an object with an attribute %S" key)
+               ~context:t )
+      | Error e ->
+          Error e
+
+
+    let empty : unit obj =
+     fun t ->
+      match U.String_map.choose_opt t.map with
+      | None ->
+          Ok ((), t)
+      | Some (k, _) ->
+          Error
+            (Error.make
+               (Printf.sprintf
+                  "Expected an empty object, but have unconsumed field %S"
+                  k )
+               ~context:t )
+
+
+    let run : 'a obj -> 'a decoder =
+     fun dec context ->
+      match key_value_pairs value context with
+      | Ok l ->
+          let map = U.String_map.of_list l in
+          let t = { context; map } in
+          dec t
+          |> U.My_result.map (fun (x, _) -> x)
+          |> U.My_result.map_err (Error.map_context (fun t -> t.context))
+      | Error e ->
+          Error e
+  end
+
   let field : string -> 'a decoder -> 'a decoder =
    fun key value_decoder t ->
     let value =
@@ -341,63 +499,6 @@ module Make (Decodeable : Decodeable) :
         field key (at rest decoder)
     | [] ->
         fail "Must provide at least one key to 'at'"
-
-
-  let keys' : 'k decoder -> 'k list decoder =
-   fun key_decoder value ->
-    match Decodeable.get_key_value_pairs value with
-    | Some assoc ->
-        assoc
-        |> List.map (fun (key, _) -> key_decoder key)
-        |> combine_errors
-        |> My_result.map_err
-             (Error.tag_group "Failed while decoding the keys of an object")
-    | None ->
-        (fail "Expected an object") value
-
-
-  let keys = keys' string
-
-  let key_value_pairs' : 'k decoder -> 'v decoder -> ('k * 'v) list decoder =
-   fun key_decoder value_decoder value ->
-    match Decodeable.get_key_value_pairs value with
-    | Some assoc ->
-        assoc
-        |> List.map
-             My_result.Infix.(
-               fun (key_val, value_val) ->
-                 key_decoder key_val
-                 >>= fun key ->
-                 value_decoder value_val >|= fun value -> (key, value))
-        |> combine_errors
-        |> My_result.map_err
-             (Error.tag_group "Failed while decoding key-value pairs")
-    | None ->
-        (fail "Expected an object") value
-
-
-  let key_value_pairs value_decoder = key_value_pairs' string value_decoder
-
-  let key_value_pairs_seq' : 'k decoder -> ('k -> 'v decoder) -> 'v list decoder
-      =
-   fun key_decoder value_decoder value ->
-    match Decodeable.get_key_value_pairs value with
-    | Some assoc ->
-        assoc
-        |> List.map
-             My_result.Infix.(
-               fun (key_val, value_val) ->
-                 key_decoder key_val
-                 >>= fun key -> (value_decoder key) value_val)
-        |> combine_errors
-        |> My_result.map_err
-             (Error.tag_group "Failed while decoding key-value pairs")
-    | None ->
-        (fail "Expected an object") value
-
-
-  let key_value_pairs_seq value_decoder =
-    key_value_pairs_seq' string value_decoder
 
 
   let decode_value (decoder : 'a decoder) (input : value) : ('a, error) result =
