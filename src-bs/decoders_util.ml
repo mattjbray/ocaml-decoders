@@ -13,6 +13,31 @@ module My_result = struct
    fun f -> function Ok x -> Ok x | Error e -> Error (f e)
 
 
+  let combine_l (results : ('a, 'e) result list) : ('a list, 'e list) result =
+    let rec aux combined = function
+      | [] ->
+        ( match combined with
+        | Ok xs ->
+            Ok (List.rev xs)
+        | Error es ->
+            Error (List.rev es) )
+      | result :: rest ->
+          let combined =
+            match (result, combined) with
+            | Ok x, Ok xs ->
+                Ok (x :: xs)
+            | Error e, Error es ->
+                Error (e :: es)
+            | Error e, Ok _ ->
+                Error [ e ]
+            | Ok _, Error es ->
+                Error es
+          in
+          aux combined rest
+    in
+    aux (Ok []) results
+
+
   module Infix = struct
     let ( >|= ) : ('a, 'err) t -> ('a -> 'b) -> ('b, 'err) t = Belt.Result.map
 
@@ -37,7 +62,7 @@ module My_list = struct
   let find_map f xs =
     xs
     |. Belt.List.getBy (fun x ->
-           match f x with Some _ -> true | None -> false)
+           match f x with Some _ -> true | None -> false )
     |. Belt.Option.flatMap f
 
 

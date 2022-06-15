@@ -9,6 +9,8 @@ module My_result : sig
 
   val map_err : ('err1 -> 'err2) -> ('a, 'err1) t -> ('a, 'err2) t
 
+  val combine_l : ('a, 'e) result list -> ('a list, 'e list) result
+
   module Infix : sig
     val ( >|= ) : ('a, 'err) t -> ('a -> 'b) -> ('b, 'err) t
 

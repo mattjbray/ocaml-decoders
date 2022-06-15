@@ -22,32 +22,6 @@ module Make (Decodeable : Decodeable) :
 
   let pp_error = Error.pp pp
 
-
-  let combine_errors (results : ('a, error) result list) :
-      ('a list, error list) result =
-    let rec aux combined = function
-      | [] ->
-        ( match combined with
-        | Ok xs ->
-            Ok (List.rev xs)
-        | Error es ->
-            Error (List.rev es) )
-      | result :: rest ->
-          let combined =
-            match (result, combined) with
-            | Ok x, Ok xs ->
-                Ok (x :: xs)
-            | Error e, Error es ->
-                Error (e :: es)
-            | Error e, Ok _ ->
-                Error [ e ]
-            | Ok _, Error es ->
-                Error es
-          in
-          aux combined rest
-    in
-    aux (Ok []) results
-
   let string_of_error = Error.to_string pp
 
   let of_string : string -> (value, error) result =
@@ -165,7 +139,7 @@ module Make (Decodeable : Decodeable) :
         |> My_list.mapi (fun i x ->
                decoder x
                |> My_result.map_err (Error.tag (Printf.sprintf "element %i" i)) )
-        |> combine_errors
+        |> My_result.combine_l
         |> My_result.map_err (Error.tag_group "while decoding a list")
 
 
@@ -349,7 +323,7 @@ module Make (Decodeable : Decodeable) :
     | Some assoc ->
         assoc
         |> List.map (fun (key, _) -> key_decoder key)
-        |> combine_errors
+        |> My_result.combine_l
         |> My_result.map_err
              (Error.tag_group "Failed while decoding the keys of an object")
     | None ->
@@ -369,7 +343,7 @@ module Make (Decodeable : Decodeable) :
                  key_decoder key_val
                  >>= fun key ->
                  value_decoder value_val >|= fun value -> (key, value))
-        |> combine_errors
+        |> My_result.combine_l
         |> My_result.map_err
              (Error.tag_group "Failed while decoding key-value pairs")
     | None ->
@@ -389,7 +363,7 @@ module Make (Decodeable : Decodeable) :
                fun (key_val, value_val) ->
                  key_decoder key_val
                  >>= fun key -> (value_decoder key) value_val)
-        |> combine_errors
+        |> My_result.combine_l
         |> My_result.map_err
              (Error.tag_group "Failed while decoding key-value pairs")
     | None ->

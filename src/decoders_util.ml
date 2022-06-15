@@ -12,6 +12,31 @@ module My_result = struct
 
   let flat_map f e = match e with Ok x -> f x | Error s -> Error s
 
+  let combine_l (results : ('a, 'e) result list) : ('a list, 'e list) result =
+    let rec aux combined = function
+      | [] ->
+        ( match combined with
+        | Ok xs ->
+            Ok (List.rev xs)
+        | Error es ->
+            Error (List.rev es) )
+      | result :: rest ->
+          let combined =
+            match (result, combined) with
+            | Ok x, Ok xs ->
+                Ok (x :: xs)
+            | Error e, Error es ->
+                Error (e :: es)
+            | Error e, Ok _ ->
+                Error [ e ]
+            | Ok _, Error es ->
+                Error es
+          in
+          aux combined rest
+    in
+    aux (Ok []) results
+
+
   module Infix = struct
     let ( >|= ) e f = map f e
 
@@ -87,7 +112,7 @@ module My_list = struct
       (fun x ->
         let y = f !r x in
         incr r ;
-        y)
+        y )
       l
 
 
