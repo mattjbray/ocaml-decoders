@@ -13,8 +13,7 @@ module type Decodeable = Sig.Decodeable
 module Make (Decodeable : Decodeable) :
   Sig.S
     with type value = Decodeable.value
-     and type 'a decoder =
-          (Decodeable.value, 'a, Decodeable.value Error.t) Decoder.t = struct
+     and type 'a decoder = (Decodeable.value, 'a) Decoder.t = struct
   type value = Decodeable.value
 
   let pp = Decodeable.pp
@@ -65,7 +64,7 @@ module Make (Decodeable : Decodeable) :
            Error.tag (Printf.sprintf "While reading %s" file) (Error.make msg) )
 
 
-  type 'a decoder = (value, 'a, value Error.t) Decoder.t
+  type 'a decoder = (value, 'a) Decoder.t
 
   let succeed x = Decoder.pure x
 
@@ -112,10 +111,9 @@ module Make (Decodeable : Decodeable) :
              |> Decoder.map_err (fun e ->
                     Error.tag_group (Printf.sprintf "%S decoder" name) [ e ] ) )
     in
-    Decoder.one_of
-      decoders
-      ~combine_errors:
-        (Error.tag_group "I tried the following decoders but they all failed")
+    Decoder.one_of decoders
+    |> Decoder.map_err
+         (Error.tag "I tried the following decoders but they all failed")
 
 
   let pick decoders =
@@ -126,10 +124,9 @@ module Make (Decodeable : Decodeable) :
              |> Decoder.map_err (fun e ->
                     Error.tag_group (Printf.sprintf "%S decoder" name) [ e ] ) )
     in
-    Decoder.pick
-      decoders
-      ~combine_errors:
-        (Error.tag_group "I tried the following decoders but they all failed")
+    Decoder.pick decoders
+    |> Decoder.map_err
+         (Error.tag "I tried the following decoders but they all failed")
 
 
   let decode_sub v dec = from_result (dec v)

@@ -1,24 +1,24 @@
-type ('i, 'o, 'e) t = 'i -> ('o, 'e) result
+type ('i, 'o) t = 'i -> ('o, 'i Error.t) result
 
-let pure x : ('i, 'o, 'e) t = fun _i -> Ok x
+let pure x : ('i, 'o) t = fun _i -> Ok x
 
-let fail e : ('i, 'o, 'e) t = fun _i -> Error e
+let fail e : ('i, 'o) t = fun _i -> Error e
 
 let of_result = function Ok o -> pure o | Error e -> fail e
 
-let bind (f : 'a -> ('i, 'b, 'e) t) (x : ('i, 'a, 'e) t) : ('i, 'b, 'e) t =
+let bind (f : 'a -> ('i, 'b) t) (x : ('i, 'a) t) : ('i, 'b) t =
  fun i -> match x i with Ok y -> f y i | Error e -> Error e
 
 
-let map (f : 'a -> 'b) (x : ('i, 'a, 'e) t) : ('i, 'b, 'e) t =
+let map (f : 'a -> 'b) (x : ('i, 'a) t) : ('i, 'b) t =
  fun i -> match x i with Ok y -> Ok (f y) | Error e -> Error e
 
 
-let map_err (f : 'e1 -> 'e2) (x : ('i, 'o, 'e1) t) : ('i, 'o, 'e2) t =
+let map_err (f : 'i Error.t -> 'i Error.t) (x : ('i, 'o) t) : ('i, 'o) t =
  fun i -> match x i with Ok y -> Ok y | Error e -> Error (f e)
 
 
-let apply (f : ('i, 'a -> 'b, 'e) t) (x : ('i, 'a, 'e) t) : ('i, 'b, 'e) t =
+let apply (f : ('i, 'a -> 'b) t) (x : ('i, 'a) t) : ('i, 'b) t =
  fun i ->
   match f i with
   | Ok f ->
@@ -35,7 +35,7 @@ module Infix = struct
   let[@inline] ( <*> ) f x = apply f x
 
   include Shims_let_ops_.Make (struct
-    type nonrec ('i, 'o, 'e) t = ('i, 'o, 'e) t
+    type nonrec ('i, 'o) t = ('i, 'o) t
 
     let ( >>= ) = ( >>= )
 
@@ -45,30 +45,30 @@ module Infix = struct
   end)
 end
 
-let fix (f : ('i, 'a, 'e) t -> ('i, 'a, 'e) t) : ('i, 'a, 'e) t =
+let fix (f : ('i, 'a) t -> ('i, 'a) t) : ('i, 'a) t =
   let rec p = lazy (f r)
   and r value = (Lazy.force p) value in
   r
 
 
-let value : ('i, 'i, 'e) t = fun i -> Ok i
+let value : ('i, 'i) t = fun i -> Ok i
 
-let maybe (x : ('i, 'a, 'e) t) : ('i, 'a option, 'e) t =
+let maybe (x : ('i, 'a) t) : ('i, 'a option) t =
  fun i -> match x i with Ok x -> Ok (Some x) | Error _ -> Ok None
 
 
-let one_of ~combine_errors (xs : ('i, 'o, 'e) t list) : ('i, 'o, 'e) t =
+let one_of (xs : ('i, 'o) t list) : ('i, 'o) t =
  fun i ->
   let rec aux es = function
     | x :: xs ->
       (match x i with Ok o -> Ok o | Error e -> aux (e :: es) xs)
     | [] ->
-        Error (combine_errors (List.rev es))
+        Error (Error.group (List.rev es))
   in
   aux [] xs
 
 
-let pick ~combine_errors : ('i, ('i, 'o, 'e) t, 'e) t list -> ('i, 'o, 'e) t =
+let pick : ('i, ('i, 'o) t) t list -> ('i, 'o) t =
  fun decoders input ->
   let rec go errors = function
     | decoder :: rest ->
@@ -79,10 +79,10 @@ let pick ~combine_errors : ('i, ('i, 'o, 'e) t, 'e) t list -> ('i, 'o, 'e) t =
       | Error error ->
           go (error :: errors) rest )
     | [] ->
-        Error (combine_errors errors)
+        Error (Error.group errors)
   in
   go [] decoders
 
 
-let of_to_opt (to_opt : 'i -> 'o option) fail : ('i, 'o, 'e) t =
+let of_to_opt (to_opt : 'i -> 'o option) fail : ('i, 'o) t =
  fun i -> match to_opt i with Some o -> Ok o | None -> fail i

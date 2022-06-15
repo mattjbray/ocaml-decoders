@@ -3,20 +3,20 @@
 let shims_all =
   {|
   module type I = sig
-    type ('i, 'a, 'e) t
-    val (>|=) : ('i, 'a, 'e) t -> ('a -> 'b) -> ('i, 'b, 'e) t
-    val monoid_product : ('i, 'a, 'e) t -> ('i, 'b, 'e) t -> ('i, ('a * 'b), 'e) t
-    val (>>=) : ('i, 'a, 'e) t -> ('a -> ('i, 'b, 'e) t) -> ('i, 'b, 'e) t
+    type ('i, 'a) t
+    val (>|=) : ('i, 'a) t -> ('a -> 'b) -> ('i, 'b) t
+    val monoid_product : ('i, 'a) t -> ('i, 'b) t -> ('i, ('a * 'b)) t
+    val (>>=) : ('i, 'a) t -> ('a -> ('i, 'b) t) -> ('i, 'b) t
   end
 |}
 
 
 let shims_let_op_pre_408 =
   {|
-  module type S = sig type ('i, 'o, 'e) t_let end
-   module Make(X : I) : S with type ('i, 'o, 'e) t_let = ('i, 'o, 'e) X.t =
+  module type S = sig type ('i, 'o) t_let end
+   module Make(X : I) : S with type ('i, 'o) t_let = ('i, 'o) X.t =
   struct
-    type ('i, 'o, 'e) t_let = ('i, 'o, 'e) X.t
+    type ('i, 'o) t_let = ('i, 'o) X.t
   end
 |}
 
@@ -24,16 +24,16 @@ let shims_let_op_pre_408 =
 let shims_let_op_post_408 =
   {|
   module type S = sig
-    type ('i, 'o, 'e) t_let
-    val ( let+ ) : ('i, 'a, 'e) t_let -> ('a -> 'b) -> ('i, 'b, 'e) t_let
-    val ( and+ ) : ('i, 'a, 'e) t_let -> ('i, 'b, 'e) t_let -> ('i, 'a * 'b, 'e) t_let
-    val ( let* ) : ('i, 'a, 'e) t_let -> ('a -> ('i, 'b, 'e) t_let) -> ('i, 'b, 'e) t_let
-    val ( and* ) : ('i, 'a, 'e) t_let -> ('i, 'b, 'e) t_let -> ('i, 'a * 'b, 'e) t_let
+    type ('i, 'o) t_let
+    val ( let+ ) : ('i, 'a) t_let -> ('a -> 'b) -> ('i, 'b) t_let
+    val ( and+ ) : ('i, 'a) t_let -> ('i, 'b) t_let -> ('i, 'a * 'b) t_let
+    val ( let* ) : ('i, 'a) t_let -> ('a -> ('i, 'b) t_let) -> ('i, 'b) t_let
+    val ( and* ) : ('i, 'a) t_let -> ('i, 'b) t_let -> ('i, 'a * 'b) t_let
   end
 
-  module Make(X : I) : S with type ('i, 'o, 'e) t_let = ('i, 'o, 'e) X.t =
+  module Make(X : I) : S with type ('i, 'o) t_let = ('i, 'o) X.t =
   struct
-    type ('i, 'o, 'e) t_let = ('i, 'o, 'e) X.t
+    type ('i, 'o) t_let = ('i, 'o) X.t
     let (let+) = X.(>|=)
     let (and+) = X.monoid_product
     let (let*) = X.(>>=)
