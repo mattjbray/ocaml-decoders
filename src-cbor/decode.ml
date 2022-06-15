@@ -14,7 +14,7 @@ struct
     try
       Ok
         (Decoders_util.with_file_in file (fun chan ->
-             Decoders_util.read_all chan |> CBOR.Simple.decode))
+             Decoders_util.read_all chan |> CBOR.Simple.decode ) )
     with
     | e ->
         Error (Printexc.to_string e)

@@ -48,7 +48,7 @@ let sexplib_suite =
                    (one_of
                       [ ("list", list string)
                       ; ("string", string >|= fun s -> [ s ])
-                      ])
+                      ] )
                  >>= fun libs -> succeed (name, libs)
              | _ ->
                  fail "Expected 'library'" )

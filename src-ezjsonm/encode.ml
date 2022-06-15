@@ -30,7 +30,7 @@ module Ezjsonm_encodeable = struct
     `O
       ( xs
       |> Decoders.Decoders_util.My_list.filter_map (fun (k, v) ->
-             match k with `String k -> Some (k, v) | _ -> None) )
+             match k with `String k -> Some (k, v) | _ -> None ) )
 end
 
 include Decoders.Encode.Make (Ezjsonm_encodeable)

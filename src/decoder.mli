@@ -37,11 +37,9 @@ val value : ('i, 'i) t
 
 val maybe : ('i, 'a) t -> ('i, 'a option) t
 
-val one_of :
-  ('i, 'o) t list -> ('i, 'o) t
+val one_of : ('i, 'o) t list -> ('i, 'o) t
 
-val pick :
-  ('i, ('i, 'o) t) t list
-  -> ('i, 'o) t
+val pick : ('i, ('i, 'o) t) t list -> ('i, 'o) t
 
-val of_to_opt : ('i -> 'o option) -> ('i -> ('o, 'i Error.t) result) -> ('i, 'o) t
+val of_to_opt :
+  ('i -> 'o option) -> ('i -> ('o, 'i Error.t) result) -> ('i, 'o) t

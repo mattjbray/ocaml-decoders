@@ -67,24 +67,46 @@ let decoders_suite =
              assert_string (Printf.sprintf "expected decode error, got %d" v)
          | Error _e ->
              () )
-       ; ("pick1" >::
-          decoder_test
-            ~decoder:(pick
-                        ["case_x", (let* _x = field "x" null in
-                                    succeed (let+ v= field "val" int in `Int v))
-                        ; "case_y", (let* _y = field "y" null in
-                                     succeed (let+ v = field "val" float in `Float v))])
-            ~input:(m_to_str (M.Map [M.String "x", M.Nil; M.String "val", M.Int 42]))
-            ~expected:(`Int 42))
-       ; ("pick2" >::
-          decoder_test
-            ~decoder:(pick
-                        ["case_x", (let* _x = field "x" null in
-                                    succeed (let+ v= field "val" int in `Int v))
-                        ; "case_y", (let* _y = field "y" null in
-                                     succeed (let+ v = field "val" float in `Float v))])
-            ~input:(m_to_str (M.Map [M.String "y", M.Nil; M.String "val", M.Float 1.1]))
-            ~expected:(`Float 1.1))
+       ; "pick1"
+         >:: decoder_test
+               ~decoder:
+                 (pick
+                    [ ( "case_x"
+                      , let* _x = field "x" null in
+                        succeed
+                          (let+ v = field "val" int in
+                           `Int v ) )
+                    ; ( "case_y"
+                      , let* _y = field "y" null in
+                        succeed
+                          (let+ v = field "val" float in
+                           `Float v ) )
+                    ] )
+               ~input:
+                 (m_to_str
+                    (M.Map [ (M.String "x", M.Nil); (M.String "val", M.Int 42) ]) )
+               ~expected:(`Int 42)
+       ; "pick2"
+         >:: decoder_test
+               ~decoder:
+                 (pick
+                    [ ( "case_x"
+                      , let* _x = field "x" null in
+                        succeed
+                          (let+ v = field "val" int in
+                           `Int v ) )
+                    ; ( "case_y"
+                      , let* _y = field "y" null in
+                        succeed
+                          (let+ v = field "val" float in
+                           `Float v ) )
+                    ] )
+               ~input:
+                 (m_to_str
+                    (M.Map
+                       [ (M.String "y", M.Nil); (M.String "val", M.Float 1.1) ]
+                    ) )
+               ~expected:(`Float 1.1)
        ]
 
 

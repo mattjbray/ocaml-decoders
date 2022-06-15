@@ -61,7 +61,7 @@ struct
         Some
           (List.map
              (fun (key, value) -> (`Stringlit (Printf.sprintf "%S" key), value))
-             assoc)
+             assoc )
     | _ ->
         None
 
@@ -119,7 +119,7 @@ module Json_encodeable = struct
       ( xs
       |> Decoders_util.My_list.filter_map (fun (k, v) ->
              Json_decodeable.get_string k
-             |> Decoders_util.My_opt.map (fun k -> (k, v))) )
+             |> Decoders_util.My_opt.map (fun k -> (k, v)) ) )
 end
 
 module Encode = struct

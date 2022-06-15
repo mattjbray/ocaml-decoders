@@ -41,7 +41,7 @@ module Sexplib_decodeable : Decode.Decodeable with type value = Sexp.t = struct
                | Sexp.List (key :: values) ->
                    Some (key, Sexp.List values)
                | _ ->
-                   None)
+                   None )
         |> Decoders_util.My_list.all_some
     | _ ->
         None

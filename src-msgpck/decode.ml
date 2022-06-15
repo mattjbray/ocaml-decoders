@@ -14,7 +14,7 @@ module Msgpck_decodeable : Decode.Decodeable with type value = Msgpck.t = struct
     try
       Ok
         (Decoders_util.with_file_in file (fun chan ->
-             Decoders_util.read_all chan |> M.StringBuf.read |> snd))
+             Decoders_util.read_all chan |> M.StringBuf.read |> snd ) )
     with
     | e ->
         Error (Printexc.to_string e)

@@ -19,21 +19,21 @@ let decoders_suite =
                ~input:
                  (encode_s
                     (Bencode.List
-                       [ Bencode.String "hello"; Bencode.String "world" ]))
+                       [ Bencode.String "hello"; Bencode.String "world" ] ) )
                ~expected:[ "hello"; "world" ]
        ; "field_opt present"
          >:: decoder_test
                ~decoder:(field_opt "optional" string)
                ~input:
                  (encode_s
-                    (Bencode.Dict [ ("optional", Bencode.String "hello") ]))
+                    (Bencode.Dict [ ("optional", Bencode.String "hello") ]) )
                ~expected:(Some "hello")
        ; "field_opt missing"
          >:: decoder_test
                ~decoder:(field_opt "optional" string)
                ~input:
                  (encode_s
-                    (Bencode.Dict [ ("missing", Bencode.String "hello") ]))
+                    (Bencode.Dict [ ("missing", Bencode.String "hello") ]) )
                ~expected:None
        ; ( "field_opt decode error"
          >:: fun _ ->
@@ -60,7 +60,7 @@ let encoders_suite =
          assert_equal
            ~printer:CCFun.id
            (encode_s
-              (Bencode.List [ Bencode.String "hello"; Bencode.String "world" ]))
+              (Bencode.List [ Bencode.String "hello"; Bencode.String "world" ]) )
            (encode_string (list string) [ "hello"; "world" ]) )
        ; ( "string"
          >:: fun _ctxt ->

@@ -22,14 +22,14 @@ let decoders_suite =
                ~decoder:(field_opt "optional" string)
                ~input:
                  (CBOR.Simple.encode
-                    (`Map [ (`Text "optional", `Text "hello") ]))
+                    (`Map [ (`Text "optional", `Text "hello") ]) )
                ~expected:(Some "hello")
        ; "field_opt missing"
          >:: decoder_test
                ~decoder:(field_opt "optional" string)
                ~input:
                  (CBOR.Simple.encode
-                    (`Map [ (`Text "missing", `Text "hello") ]))
+                    (`Map [ (`Text "missing", `Text "hello") ]) )
                ~expected:None
        ; ( "field_opt decode error"
          >:: fun _ ->

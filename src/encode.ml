@@ -78,7 +78,9 @@ module Make (E : Encodeable) : S with type value = E.value = struct
 
   let list encoder xs = xs |> My_list.map (fun x -> encoder x) |> E.of_list
 
-  let array encoder xs = xs |> Array.to_list |> My_list.map (fun x -> encoder x) |> E.of_list
+  let array encoder xs =
+    xs |> Array.to_list |> My_list.map (fun x -> encoder x) |> E.of_list
+
 
   let obj' xs = E.of_key_value_pairs xs
 

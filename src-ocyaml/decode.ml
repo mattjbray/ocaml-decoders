@@ -16,14 +16,14 @@ struct
           fmt
           "@[%a@]"
           (Format.pp_print_list (fun fmt yaml ->
-               Format.fprintf fmt "- @[%a@]" pp yaml))
+               Format.fprintf fmt "- @[%a@]" pp yaml ) )
           xs
     | Structure xs ->
         Format.fprintf
           fmt
           "@[%a@]"
           (Format.pp_print_list (fun fmt (key, value) ->
-               Format.fprintf fmt "@[%a@]:@ @[%a@]" pp key pp value))
+               Format.fprintf fmt "@[%a@]:@ @[%a@]" pp key pp value ) )
           xs
 
 

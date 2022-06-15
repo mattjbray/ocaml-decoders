@@ -25,9 +25,9 @@ let yojson_basic_suite =
   let array_string_test =
     "array string"
     >:: decoder_test
-      ~decoder:(array string)
-      ~input:"[\"Hello world\"]"
-      ~expected:[| "Hello world" |]
+          ~decoder:(array string)
+          ~input:"[\"Hello world\"]"
+          ~expected:[| "Hello world" |]
   in
 
   let fix_one_of_test =
@@ -42,7 +42,7 @@ let yojson_basic_suite =
               |> required "left" tree_decoder
               |> required "right" tree_decoder)
           in
-          one_of [ ("leaf", leaf_decoder); ("node", node_decoder) ])
+          one_of [ ("leaf", leaf_decoder); ("node", node_decoder) ] )
     in
     decoder_test
       ~decoder:tree_decoder
@@ -87,7 +87,7 @@ let yojson_basic_suite =
             nullable (field "t2" t2)
             |> map (function None -> T1_end | Some t2 -> T1_more t2)
           in
-          t1)
+          t1 )
     in
     decoder_test
       ()
@@ -108,7 +108,7 @@ let yojson_basic_suite =
              | "" ->
                  succeed ()
              | _ ->
-                 fail "Expected an empty string")
+                 fail "Expected an empty string" )
     in
     decoder_test
       ~decoder:(one_of [ ("empty", empty_string |> map (fun () -> None)) ])
@@ -129,7 +129,7 @@ let yojson_basic_suite =
                 ( decode (fun x y z -> (x, y, z))
                 |> required "x" (list string)
                 |> required "y" int
-                |> required "z" bool ))
+                |> required "z" bool ) )
         |> required "hello" int
         |> required "another" int)
     in
@@ -169,7 +169,7 @@ let yojson_basic_suite =
         assert_string "Expected an error"
     | Error error ->
         assert_equal expected_error error ~printer:(fun e ->
-            Format.asprintf "@,@[%a@]" pp_error e)
+            Format.asprintf "@,@[%a@]" pp_error e )
   in
 
   "Yojson.Basic"
@@ -209,7 +209,7 @@ let yojson_raw_suite =
                    |> required "left" tree_decoder
                    |> required "right" tree_decoder)
                in
-               one_of [ ("leaf", leaf_decoder); ("node", node_decoder) ])
+               one_of [ ("leaf", leaf_decoder); ("node", node_decoder) ] )
          in
          decoder_test
            ~decoder:tree_decoder
@@ -224,7 +224,7 @@ let yojson_raw_suite =
                   | "" ->
                       succeed None
                   | _ ->
-                      fail "Expected an empty string")
+                      fail "Expected an empty string" )
          in
          decoder_test
            ~decoder:
@@ -232,7 +232,7 @@ let yojson_raw_suite =
                 (one_of
                    [ ("empty", empty_string)
                    ; ("floatlit", floatlit |> map (fun x -> Some x))
-                   ]))
+                   ] ) )
            ~input:{|["", 123, 123.45]|}
            ~expected:[ None; Some "123"; Some "123.45" ] )
        ]

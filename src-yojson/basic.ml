@@ -80,7 +80,7 @@ module Json_encodeable = struct
     `Assoc
       ( xs
       |> Decoders_util.My_list.filter_map (fun (k, v) ->
-             match k with `String k -> Some (k, v) | _ -> None) )
+             match k with `String k -> Some (k, v) | _ -> None ) )
 end
 
 module Encode = Encode.Make (Json_encodeable)
