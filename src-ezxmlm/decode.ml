@@ -1,6 +1,9 @@
 open Decoders
+module U = Decoders_util
 
 type value = Ezxmlm.node
+
+type tag = Xmlm.tag * value list
 
 let pp fmt v = Ezxmlm.pp fmt [ v ]
 
@@ -40,3 +43,19 @@ let of_file (file : string) =
 
 
 type 'a decoder = (value, 'a) Decoder.t
+
+type 'a tag_decoder = (tag, 'a) Decoder.t
+
+let tag name (tag_decoder : 'a tag_decoder) : 'a decoder =
+ fun (v : value) ->
+  match v with
+  | `El ((((_ns, name'), _), _) as el) when name = name' ->
+      tag_decoder el
+      |> U.My_result.map_err (Error.map_context (fun el -> `El el))
+  | `El _ ->
+      Error
+        (Error.make
+           (Format.asprintf "Expected a tag with name %S" name)
+           ~context:v )
+  | `Data _ ->
+      Error (Error.make "Expected a tag" ~context:v)
