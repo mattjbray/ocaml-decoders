@@ -292,7 +292,7 @@ module Make (Decodeable : Decodeable) :
       ; map : value U.String_map.t
       }
 
-    type 'a obj = (t, 'a * t, value Error.t) Decoder.t
+    type 'a obj = (t, 'a * t) Decoder.t
 
     let succeed x t = Ok (x, t)
 
@@ -338,7 +338,11 @@ module Make (Decodeable : Decodeable) :
       | Some value ->
           let m = U.String_map.remove key t.map in
           let t = { t with map = m } in
-          (match v_dec value with Ok x -> Ok (Some x, t) | Error e -> Error e)
+          ( match v_dec value with
+          | Ok x ->
+              Ok (Some x, t)
+          | Error e ->
+              Error (Error.map_context (fun context -> { t with context }) e) )
 
 
     let field key v_dec : 'a obj =
@@ -350,7 +354,7 @@ module Make (Decodeable : Decodeable) :
           Error
             (Error.make
                (Printf.sprintf "Expected an object with an attribute %S" key)
-               ~context:t.context )
+               ~context:t )
       | Error e ->
           Error e
 
@@ -366,7 +370,7 @@ module Make (Decodeable : Decodeable) :
                (Printf.sprintf
                   "Expected an empty object, but have unconsumed field %S"
                   k )
-               ~context:t.context )
+               ~context:t )
 
 
     let run : 'a obj -> 'a decoder =
@@ -375,7 +379,9 @@ module Make (Decodeable : Decodeable) :
       | Ok l ->
           let map = U.String_map.of_list l in
           let t = { context; map } in
-          dec t |> U.My_result.map (fun (x, _) -> x)
+          dec t
+          |> U.My_result.map (fun (x, _) -> x)
+          |> U.My_result.map_err (Error.map_context (fun t -> t.context))
       | Error e ->
           Error e
   end

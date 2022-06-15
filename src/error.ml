@@ -1,3 +1,5 @@
+module U = Decoders_util
+
 type 'a t =
   | E of
       { msg : string
@@ -25,7 +27,7 @@ let rec pp pp_context fmt =
       fprintf fmt "@[<2>%s:@ %a@]" msg (pp pp_context) e
   | Group es ->
       let max_errors = 5 in
-      let es_trunc = Decoders_util.My_list.take max_errors es in
+      let es_trunc = U.My_list.take max_errors es in
       let not_shown = List.length es - max_errors in
       fprintf
         fmt
@@ -38,3 +40,11 @@ let rec pp pp_context fmt =
 
 
 let map_tag f = function Tag (s, e) -> Tag (f s, e) | e -> e
+
+let rec map_context f = function
+  | E { msg; context } ->
+      E { msg; context = U.My_opt.map f context }
+  | Tag (s, e) ->
+      Tag (s, map_context f e)
+  | Group es ->
+      Group (U.My_list.map (map_context f) es)
