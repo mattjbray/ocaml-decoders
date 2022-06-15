@@ -139,68 +139,30 @@ let yojson_basic_suite =
       |}
     in
     let expected_error =
-      let open Decoders.Decode in
-      Decoder_errors
-        [ Decoder_tag
-            ( {|in field "records"|}
-            , Decoder_tag
-                ( "while decoding a list"
-                , Decoder_errors
-                    [ Decoder_tag
-                        ( "element 0"
-                        , Decoder_errors
-                            [ Decoder_error
-                                ( {|Expected an object with an attribute "x"|}
-                                , Some (`Bool true) )
-                            ; Decoder_error
-                                ( {|Expected an object with an attribute "y"|}
-                                , Some (`Bool true) )
-                            ; Decoder_error
-                                ( {|Expected an object with an attribute "z"|}
-                                , Some (`Bool true) )
-                            ] )
-                    ; Decoder_tag
-                        ( "element 1"
-                        , Decoder_errors
-                            [ Decoder_tag
-                                ( {|in field "x"|}
-                                , Decoder_tag
-                                    ( "while decoding a list"
-                                    , Decoder_errors
-                                        [ Decoder_tag
-                                            ( "element 0"
-                                            , Decoder_error
-                                                ( "Expected a string"
-                                                , Some (`Int 1) ) )
-                                        ; Decoder_tag
-                                            ( "element 2"
-                                            , Decoder_error
-                                                ( "Expected a string"
-                                                , Some (`Int 3) ) )
-                                        ] ) )
-                            ; Decoder_tag
-                                ( {|in field "y"|}
-                                , Decoder_error
-                                    ("Expected an int", Some (`String "hello"))
-                                )
-                            ; Decoder_error
-                                ( {|Expected an object with an attribute "z"|}
-                                , Some
-                                    (`Assoc
-                                      [ ( "x"
-                                        , `List [ `Int 1; `String "c"; `Int 3 ]
-                                        )
-                                      ; ("y", `String "hello")
-                                      ]) )
-                            ] )
-                    ] ) )
-        ; Decoder_tag
-            ( {|in field "hello"|}
-            , Decoder_error ("Expected an int", Some (`String "world")) )
-        ; Decoder_tag
-            ( {|in field "another"|}
-            , Decoder_error ("Expected an int", Some (`String "error")) )
-        ]
+      let open Decoders in
+      Error.tag
+        {|in field "records"|}
+        (Error.tag_group
+           "while decoding a list"
+           [ Error.tag
+               "element 0"
+               (Error.make
+                  {|Expected an object with an attribute "x"|}
+                  ~context:(`Bool true) )
+           ; Error.tag
+               "element 1"
+               (Error.tag
+                  {|in field "x"|}
+                  (Error.tag_group
+                     "while decoding a list"
+                     [ Error.tag
+                         "element 0"
+                         (Error.make "Expected a string" ~context:(`Int 1))
+                     ; Error.tag
+                         "element 2"
+                         (Error.make "Expected a string" ~context:(`Int 3))
+                     ] ) )
+           ] )
     in
     match decode_string decoder input with
     | Ok _ ->

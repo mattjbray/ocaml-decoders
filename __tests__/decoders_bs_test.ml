@@ -1,7 +1,7 @@
 open Jest
 open Decoders_bs
 
-external parse_int: string -> int = "parseInt" [@@bs.scope "window"] [@@bs.val]
+external parse_int : string -> int = "parseInt" [@@bs.scope "window"] [@@bs.val]
 
 let () =
   describe
@@ -16,18 +16,20 @@ let () =
               let decoded = decode_string string json_str in
               expect decoded |> toEqual (Belt.Result.Ok "Hello world")))
 
+
 let () =
   describe
     "decoders-bs decode int"
     Expect.(
-    fun () ->
-    test
-      "int"
-      Decode.(
       fun () ->
-      let json_str = {|5078476151|} in
-      let decoded = decode_string int json_str in
-      expect decoded |> toEqual (Belt.Result.Ok (parse_int "5078476151" ))))
+        test
+          "int"
+          Decode.(
+            fun () ->
+              let json_str = {|5078476151|} in
+              let decoded = decode_string int json_str in
+              expect decoded |> toEqual (Belt.Result.Ok (parse_int "5078476151"))))
+
 
 let () =
   describe
@@ -43,8 +45,6 @@ let () =
               expect decoded |> toEqual (Belt.Result.Ok [| "a"; "b"; "c" |])))
 
 
-
-
 let () =
   describe
     "decoders-bs decode error"
@@ -56,15 +56,18 @@ let () =
             fun () ->
               let json_str = {|["a", 1, "c"]|} in
               let decoded = decode_string (array string) json_str in
-              expect decoded |> toEqual
-                (Belt.Result.Error
-                   (Decoders.Decode.(
-                       Decoder_tag
-                         ("while decoding an array",
-                          (Decoder_errors
-                             [Decoder_tag
-                                ("element 1",
-                                 Decoder_error ("Expected a string", Some (Js.Json.number 1.)))])))) )))
+              expect decoded
+              |> toEqual
+                   (Belt.Result.Error
+                      Decoders.Error.(
+                        tag_group
+                          "while decoding an array"
+                          [ tag
+                              "element 1"
+                              (make
+                                 "Expected a string"
+                                 ~context:(Js.Json.number 1.) )
+                          ]) )))
 
 
 let () =

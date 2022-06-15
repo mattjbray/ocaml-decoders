@@ -1,3 +1,7 @@
+## 1.0.0 (UNRELEASED)
+
+* Extract and expose `Decoder.t`, useful for "decoding" things outside of the JSON family.
+
 ## 0.7.0 (2022-05-11)
 
 * Add `Decode.field_opt_or` (#43, @c-cube)

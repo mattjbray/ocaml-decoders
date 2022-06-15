@@ -1,31 +1,43 @@
 (* Note: also copied to src-bs/shims_let_ops_.ml *)
+
+let shims_all =
+  {|
+  module type I = sig
+    type ('i, 'a) t
+    val (>|=) : ('i, 'a) t -> ('a -> 'b) -> ('i, 'b) t
+    val monoid_product : ('i, 'a) t -> ('i, 'b) t -> ('i, ('a * 'b)) t
+    val (>>=) : ('i, 'a) t -> ('a -> ('i, 'b) t) -> ('i, 'b) t
+  end
+|}
+
+
 let shims_let_op_pre_408 =
   {|
-   module type S = sig type 'a t_let end
-   module Make(X:sig type 'a t end) = struct type 'a t_let = 'a X.t end
+  module type S = sig type ('i, 'o) t_let end
+   module Make(X : I) : S with type ('i, 'o) t_let = ('i, 'o) X.t =
+  struct
+    type ('i, 'o) t_let = ('i, 'o) X.t
+  end
 |}
 
 
 let shims_let_op_post_408 =
   {|
-    module type S = sig
-      type 'a t_let
-      val (let+) : 'a t_let -> ('a -> 'b) -> 'b t_let
-      val (and+) : 'a t_let -> 'b t_let -> ('a * 'b) t_let
-      val (let*) : 'a t_let -> ('a -> 'b t_let) -> 'b t_let
-      val (and*) : 'a t_let -> 'b t_let -> ('a * 'b) t_let
-    end
-   module Make(X:sig
-    type 'a t
-    val (>|=) : 'a t -> ('a -> 'b) -> 'b t
-    val monoid_product : 'a t -> 'b t -> ('a * 'b) t
-    val (>>=) : 'a t -> ('a -> 'b t) -> 'b t
-    end) : S with type 'a t_let = 'a X.t = struct
-      type 'a t_let = 'a X.t
-      let (let+) = X.(>|=)
-      let (and+) = X.monoid_product
-      let (let*) = X.(>>=)
-      let (and*) = X.monoid_product
+  module type S = sig
+    type ('i, 'o) t_let
+    val ( let+ ) : ('i, 'a) t_let -> ('a -> 'b) -> ('i, 'b) t_let
+    val ( and+ ) : ('i, 'a) t_let -> ('i, 'b) t_let -> ('i, 'a * 'b) t_let
+    val ( let* ) : ('i, 'a) t_let -> ('a -> ('i, 'b) t_let) -> ('i, 'b) t_let
+    val ( and* ) : ('i, 'a) t_let -> ('i, 'b) t_let -> ('i, 'a * 'b) t_let
+  end
+
+  module Make(X : I) : S with type ('i, 'o) t_let = ('i, 'o) X.t =
+  struct
+    type ('i, 'o) t_let = ('i, 'o) X.t
+    let (let+) = X.(>|=)
+    let (and+) = X.monoid_product
+    let (let*) = X.(>>=)
+    let (and*) = X.monoid_product
   end[@@inline]
 |}
 
@@ -33,6 +45,7 @@ let shims_let_op_post_408 =
 let () =
   let version = Sys.ocaml_version in
   let major, minor = Scanf.sscanf version "%u.%u" (fun maj min -> (maj, min)) in
+  print_endline shims_all ;
   print_endline
     ( if (major, minor) >= (4, 8)
     then shims_let_op_post_408

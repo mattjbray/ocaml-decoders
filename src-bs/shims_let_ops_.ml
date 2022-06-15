@@ -1,22 +1,18 @@
 (* Note: copied from src/gen/mkshims.ml *)
+module type I = sig
+  type ('i, 'a) t
+
+  val ( >|= ) : ('i, 'a) t -> ('a -> 'b) -> ('i, 'b) t
+
+  val monoid_product : ('i, 'a) t -> ('i, 'b) t -> ('i, 'a * 'b) t
+
+  val ( >>= ) : ('i, 'a) t -> ('a -> ('i, 'b) t) -> ('i, 'b) t
+end
+
 module type S = sig
-  type 'a t_let
+  type ('i, 'a) t_let
 end
 
-module Make (X : sig
-  type 'a t
-end) =
-struct
-  type 'a t_let = 'a X.t
-end
-
-module type S2 = sig
-  type ('a, 'b) t_let2
-end
-
-module Make2 (X : sig
-  type ('a, 'b) t
-end) =
-struct
-  type ('a, 'b) t_let2 = ('a, 'b) X.t
+module Make (X : I) = struct
+  type ('i, 'a) t_let = ('i, 'a) X.t
 end

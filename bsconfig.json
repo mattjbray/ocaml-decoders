@@ -4,11 +4,16 @@
   "sources": [{
     "dir" : "src",
     "files" : [
-      "encode.mli",
       "decode.ml",
       "decode.mli",
+      "decoder.ml",
+      "decoder.mli",
       "decoders.ml",
-      "encode.ml"
+      "encode.ml",
+      "encode.mli",
+      "error.ml",
+      "error.mli",
+      "sig.ml"
     ]
   }, {
     "dir" : "src-bs"

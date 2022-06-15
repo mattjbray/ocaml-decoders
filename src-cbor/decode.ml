@@ -41,20 +41,22 @@ include Decode.Make (Cbor_decodeable)
 
 (* CBOR-specific decoders *)
 
-let undefined : unit decoder =
-  { run =
-      (function
-      | `Undefined -> Ok () | json -> (fail "Expected Undefined").run json)
-  }
+let undefined : unit decoder = function
+  | `Undefined ->
+      Ok ()
+  | json ->
+      (fail "Expected Undefined") json
 
 
-let simple : int decoder =
-  { run =
-      (function `Simple i -> Ok i | json -> (fail "Expected Simple").run json)
-  }
+let simple : int decoder = function
+  | `Simple i ->
+      Ok i
+  | json ->
+      (fail "Expected Simple") json
 
 
-let bytes : string decoder =
-  { run =
-      (function `Bytes b -> Ok b | json -> (fail "Expected bytes").run json)
-  }
+let bytes : string decoder = function
+  | `Bytes b ->
+      Ok b
+  | json ->
+      (fail "Expected bytes") json

@@ -1,6 +1,8 @@
 .PHONY: all
 all: build test build-bs test-bs
 
+.PHONY: clean-all
+clean-all: clean clean-bs
 
 .PHONY: build
 build:
