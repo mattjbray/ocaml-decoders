@@ -22,7 +22,6 @@ module Make (Decodeable : Decodeable) :
 
   let pp_error = Error.pp pp
 
-  let string_of_error e : string = Format.asprintf "@[<2>%a@?@]" pp_error e
 
   let combine_errors (results : ('a, error) result list) :
       ('a list, error list) result =
@@ -49,6 +48,7 @@ module Make (Decodeable : Decodeable) :
     in
     aux (Ok []) results
 
+  let string_of_error = Error.to_string pp
 
   let of_string : string -> (value, error) result =
    fun string ->

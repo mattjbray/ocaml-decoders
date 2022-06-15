@@ -37,4 +37,6 @@ let rec pp pp_context fmt =
         else "" )
 
 
+let to_string pp_context t = Format.asprintf "@[<2>%a@?@]" (pp pp_context) t
+
 let map_tag f = function Tag (s, e) -> Tag (f s, e) | e -> e

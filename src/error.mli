@@ -11,4 +11,6 @@ val tag_group : string -> 'a t list -> 'a t
 
 val pp : (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
 
+val to_string : (Format.formatter -> 'a -> unit) -> 'a t -> string
+
 val map_tag : (string -> string) -> 'a t -> 'a t
