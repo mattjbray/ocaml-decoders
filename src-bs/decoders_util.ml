@@ -49,6 +49,8 @@ end
 module My_opt = struct
   let return x = Some x
 
+  let map f x = Belt.Option.map x f
+
   let flat_map f x = Belt.Option.flatMap x f
 end
 
@@ -58,6 +60,20 @@ module My_list = struct
   let map f xs = Belt.List.map xs f
 
   let mapi f xs = Belt.List.mapWithIndex xs f
+
+  let filter_mapi f l =
+    let rec recurse (acc, i) l =
+      match l with
+      | [] ->
+          List.rev acc
+      | x :: l' ->
+          let acc' = match f i x with None -> acc | Some y -> y :: acc in
+          recurse (acc', i + 1) l'
+    in
+    recurse ([], 0) l
+
+
+  let filter_map f xs = filter_mapi (fun _i x -> f x) xs
 
   let find_map f xs =
     xs

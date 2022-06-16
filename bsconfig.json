@@ -13,7 +13,8 @@
       "encode.mli",
       "error.ml",
       "error.mli",
-      "sig.ml"
+      "sig.ml",
+      "sig_xml.ml"
     ]
   }, {
     "dir" : "src-bs"

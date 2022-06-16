@@ -1,4 +1,4 @@
-include Decoders.Xml.S with type value = Ezxmlm.node
+include Decoders.Xml.Decode with type value = Ezxmlm.node
 
 val tag_ns : Xmlm.name -> unit decoder
 

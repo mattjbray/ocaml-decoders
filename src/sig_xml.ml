@@ -1,5 +1,5 @@
 (** Interface for decoding XML *)
-module type S = sig
+module type Decode = sig
   (** The type of XML values. *)
   type value
 
@@ -114,11 +114,7 @@ module type S = sig
       [my_decoder] in terms of itself.
   *)
 
-  module Infix : sig
-    include module type of Decoder.Infix
-
-    val ( <$> ) : ('a -> 'b) -> ('i, 'a) Decoder.t -> ('i, 'b) Decoder.t
-  end
+  module Infix :  module type of Decoder.Infix
 
   include module type of Infix
 
@@ -132,4 +128,17 @@ module type S = sig
 
   val decode_file : 'a decoder -> string -> ('a, error) result
   (** Run a decoder on a file. *)
+end
+
+module type Encode = sig
+  type value
+  type 'a encoder = 'a -> value
+
+  val tag : string -> ?attrs:((string * string) list) -> value list -> value
+
+  val data : string encoder
+
+  val value : value encoder
+
+  val encode_string : 'a encoder -> 'a -> string
 end
