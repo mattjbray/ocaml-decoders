@@ -1,1 +1,6 @@
-Hello
+(:main "MainTree"
+ :trees ((:MainTree (:sequence ((:action "SayA") (:subtree "GraspObject"))))
+         (:GraspObject (:sequence
+                        ((:action "Open") (:action "Approach")
+                         (:action "Close") (:subtree "DestroyObject"))))
+         (:DestroyObject (:sequence ((:action "Booom"))))))

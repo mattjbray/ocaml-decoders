@@ -3,8 +3,6 @@ open Decoders_util
 
 type value = Ezxmlm.node
 
-type tag = Ezxmlm.node
-
 let pp fmt v = Ezxmlm.pp fmt [ v ]
 
 type error = value Error.t
@@ -46,8 +44,6 @@ let of_file (file : string) =
 
 type 'a decoder = (value, 'a) Decoder.t
 
-type 'a tag_decoder = (tag, 'a) Decoder.t
-
 include Decoder
 
 let succeed = pure
@@ -64,11 +60,11 @@ end
 
 include Infix
 
-let tag_ns (name : Xmlm.name) (tag_decoder : 'a tag_decoder) : 'a decoder =
+let tag_ns (name : Xmlm.name) : unit decoder =
  fun (v : value) ->
   match v with
   | `El ((name', _), _) when name = name' ->
-      tag_decoder v
+      Ok ()
   | `El _ ->
       Error
         (Error.make
@@ -78,11 +74,11 @@ let tag_ns (name : Xmlm.name) (tag_decoder : 'a tag_decoder) : 'a decoder =
       Error (Error.make "Expected a tag" ~context:v)
 
 
-let tag (name : string) (tag_decoder : 'a tag_decoder) : 'a decoder =
+let tag (name : string) : unit decoder =
  fun (v : value) ->
   match v with
   | `El (((_ns, name'), _), _) when name = name' ->
-      tag_decoder v
+      Ok ()
   | `El _ ->
       Error
         (Error.make
@@ -92,17 +88,22 @@ let tag (name : string) (tag_decoder : 'a tag_decoder) : 'a decoder =
       Error (Error.make "Expected a tag" ~context:v)
 
 
-let any_tag_ns (tag_decoder : Xmlm.name -> 'a tag_decoder) : 'a decoder =
+let any_tag_ns : Xmlm.name decoder =
  fun (v : value) ->
   match v with
   | `El ((name, _), _) ->
-      tag_decoder name v
+      Ok name
   | `Data _ ->
       Error (Error.make "Expected a Tag" ~context:v)
 
 
-let any_tag (tag_decoder : string -> 'a tag_decoder) : 'a decoder =
-  any_tag_ns (fun (_ns, name) -> tag_decoder name)
+let any_tag : string decoder =
+ fun (v : value) ->
+  match v with
+  | `El (((_ns, name), _), _) ->
+      Ok name
+  | `Data _ ->
+      Error (Error.make "Expected a Tag" ~context:v)
 
 
 let data : string decoder =
@@ -114,20 +115,20 @@ let data : string decoder =
       Error (Error.make "Expected Data" ~context:v)
 
 
-let attrs_ns : Xmlm.attribute list tag_decoder = function
+let attrs_ns : Xmlm.attribute list decoder = function
   | `El ((_tag, attrs), _children) ->
       Ok attrs
   | `Data _ ->
       assert false
 
 
-let attr_opt_ns (name : Xmlm.name) : string option tag_decoder =
+let attr_opt_ns (name : Xmlm.name) : string option decoder =
   attrs_ns
   >|= My_list.find_map (fun (name', value) ->
           if name = name' then Some value else None )
 
 
-let attr_ns (name : Xmlm.name) : string tag_decoder =
+let attr_ns (name : Xmlm.name) : string decoder =
   attr_opt_ns name
   >>= function
   | Some value ->
@@ -136,17 +137,17 @@ let attr_ns (name : Xmlm.name) : string tag_decoder =
       fail (Format.asprintf "Expected an attribute named %a" pp_name name)
 
 
-let attrs : (string * string) list tag_decoder =
+let attrs : (string * string) list decoder =
   attrs_ns >|= My_list.map (fun ((_ns, name), value) -> (name, value))
 
 
-let attr_opt (name : string) : string option tag_decoder =
+let attr_opt (name : string) : string option decoder =
   attrs
   >|= My_list.find_map (fun (name', value) ->
           if name = name' then Some value else None )
 
 
-let attr (name : string) : string tag_decoder =
+let attr (name : string) : string decoder =
   attr_opt name
   >>= function
   | Some value ->
@@ -155,18 +156,27 @@ let attr (name : string) : string tag_decoder =
       fail (Format.asprintf "Expected an attribute named %s" name)
 
 
-let children (child : 'a decoder) : 'a list tag_decoder = function
-  | `El (_name, els) ->
+let pick_children (child : 'a decoder decoder) : 'a list decoder = function
+  | `El ((name, _attrs), els) ->
       els
-      |> My_list.mapi (fun i el ->
-             child el
-             |> My_result.map_err
-                  (Error.tag (Format.asprintf "While decoding child %i" i)) )
+      |> My_list.filter_mapi (fun i el ->
+             match child el with
+             | Error _ ->
+                 None
+             | Ok dec ->
+                 Some
+                   ( dec el
+                   |> My_result.map_err
+                        (Error.tag
+                           (Format.asprintf "While decoding child %i" i) ) ) )
       |> My_result.combine_l
-      |> My_result.map_err (Error.tag_group "While decoding children")
+      |> My_result.map_err
+           (Error.tag_group (Format.asprintf "In tag %a" pp_name name))
   | `Data _ ->
       assert false
 
+
+let children (child : 'a decoder) : 'a list decoder = pick_children (pure child)
 
 let decode_value decoder v = decoder v
 

@@ -61,11 +61,11 @@ let maybe (x : ('i, 'a) t) : ('i, 'a option) t =
 
 let one_of (xs : ('i, 'o) t list) : ('i, 'o) t =
  fun i ->
-  let rec aux es = function
+  let rec aux errors = function
     | x :: xs ->
-      (match x i with Ok o -> Ok o | Error e -> aux (e :: es) xs)
+      (match x i with Ok o -> Ok o | Error e -> aux (e :: errors) xs)
     | [] ->
-        Error (Error.group (List.rev es))
+        Error (Error.group (List.rev errors))
   in
   aux [] xs
 

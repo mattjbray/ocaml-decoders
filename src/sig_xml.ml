@@ -3,8 +3,6 @@ module type S = sig
   (** The type of XML values. *)
   type value
 
-  type tag
-
   type error = value Error.t
 
   val pp_error : Format.formatter -> error -> unit
@@ -23,49 +21,46 @@ module type S = sig
    *)
   type 'a decoder = (value, 'a) Decoder.t
 
-  type 'a tag_decoder = (tag, 'a) Decoder.t
-
   (** {2 Decoding values} *)
-
-  val tag : string -> 'a tag_decoder -> 'a decoder
-
-  val any_tag : (string -> 'a tag_decoder) -> 'a decoder
 
   val data : string decoder
   (** Decode a [string]. *)
 
-  val value : value decoder
-  (** Decode a literal [value]. *)
+  val tag : string -> unit decoder
+  (** Assert the name of the current tag *)
 
-  (** {2 Decoding the contents of a tag} *)
+  val any_tag : string decoder
 
-  (** {3 Attributes} *)
-
-  val attr : string -> string tag_decoder
+  val attr : string -> string decoder
   (** [attr name] decodes the attribute named [name]. *)
 
-  val attr_opt : string -> string option tag_decoder
+  val attr_opt : string -> string option decoder
   (** [attr_opt name] decodes the attribute named [name], if present. *)
 
-  val attrs : (string * string) list tag_decoder
+  val attrs : (string * string) list decoder
   (** [attrs] decodes the attributes as an assoc list. *)
 
   (** {3 Children} *)
 
-  val children : 'a decoder -> 'a list tag_decoder
+  val children : 'a decoder -> 'a list decoder
+
+  val pick_children : 'a decoder decoder -> 'a list decoder
 
   (** {2 Inconsistent structure} *)
 
-  val maybe : 'a decoder -> 'a option decoder
+  val value : ('i, 'i) Decoder.t
+  (** Decode a literal [value]. *)
+
+  val maybe : ('i, 'a) Decoder.t -> ('i, 'a option) Decoder.t
   (** [maybe d] is a decoder that always succeeds. If [d] succeeds with [x],
       then [maybe d] succeeds with [Some x], otherwise if [d] fails, then [maybe d]
       succeeds with [None].
   *)
 
-  (* TODO val one_of : (string * 'a decoder) list -> 'a decoder *)
+  val one_of : ('i, 'a) Decoder.t list -> ('i, 'a) Decoder.t
   (** Try a sequence of different decoders. *)
 
-  (* TODO val pick : (string * 'a decoder decoder) list -> 'a decoder *)
+  val pick : ('i, ('i, 'o) Decoder.t) Decoder.t list -> ('i, 'o) Decoder.t
   (** [pick choices] picks a single choice, like {!one_of}.
       However, each element of [choices] can look at the value, decide if
       it applies (e.g. based on the value of a single field, like a "kind"
@@ -77,40 +72,42 @@ module type S = sig
       about the choice that was initially made.
    *)
 
-  val decode_sub : value -> 'a decoder -> 'a decoder
+  val decode_sub : 'i -> ('i, 'o) Decoder.t -> ('i, 'o) Decoder.t
   (** [decode_sub value sub_dec] uses [sub_dec] to decode [value].
       This is useful when one has a value on hand.
    *)
 
   (** {2 Mapping} *)
 
-  val map : ('a -> 'b) -> 'a decoder -> 'b decoder
+  val map : ('a -> 'b) -> ('i, 'a) Decoder.t -> ('i, 'b) Decoder.t
   (** Map over the result of a decoder. *)
 
-  val apply : ('a -> 'b) decoder -> 'a decoder -> 'b decoder
+  val apply :
+    ('i, 'a -> 'b) Decoder.t -> ('i, 'a) Decoder.t -> ('i, 'b) Decoder.t
   (** Try two decoders and then combine the result. We can use this to decode
       objects with many fields (but it's preferable to use [Infix.(>>=)] - see the README).
   *)
 
   (** {2 Fancy decoding} *)
 
-  val pure : 'a -> 'a decoder
+  val pure : 'a -> ('i, 'a) Decoder.t
   (** A decoder that always succeeds with the argument, ignoring the input. *)
 
-  val succeed : 'a -> 'a decoder
+  val succeed : 'a -> ('i, 'a) Decoder.t
   (** Alias for [pure]. *)
 
-  val fail : string -> 'a decoder
+  val fail : string -> ('i, 'o) Decoder.t
   (** A decoder that always fails with the given message, ignoring the input. *)
 
-  val fail_with : error -> 'a decoder
+  val fail_with : 'i Error.t -> ('i, 'o) Decoder.t
 
-  val from_result : ('a, error) result -> 'a decoder
+  val from_result : ('a, 'i Error.t) result -> ('i, 'a) Decoder.t
 
-  val and_then : ('a -> 'b decoder) -> 'a decoder -> 'b decoder
+  val and_then :
+    ('a -> ('i, 'b) Decoder.t) -> ('i, 'a) Decoder.t -> ('i, 'b) Decoder.t
   (** Create decoders that depend on previous results. *)
 
-  val fix : ('a decoder -> 'a decoder) -> 'a decoder
+  val fix : (('i, 'o) Decoder.t -> ('i, 'o) Decoder.t) -> ('i, 'o) Decoder.t
   (** Recursive decoders.
 
       [let my_decoder = fix (fun my_decoder -> ...)] allows you to define
@@ -120,7 +117,7 @@ module type S = sig
   module Infix : sig
     include module type of Decoder.Infix
 
-    val ( <$> ) : ('a -> 'b) -> 'a decoder -> 'b decoder
+    val ( <$> ) : ('a -> 'b) -> ('i, 'a) Decoder.t -> ('i, 'b) Decoder.t
   end
 
   include module type of Infix

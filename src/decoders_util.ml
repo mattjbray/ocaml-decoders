@@ -126,17 +126,19 @@ module My_list = struct
     aux f l
 
 
-  let filter_map f l =
-    let rec recurse acc l =
+  let filter_mapi f l =
+    let rec recurse (acc, i) l =
       match l with
       | [] ->
           List.rev acc
       | x :: l' ->
-          let acc' = match f x with None -> acc | Some y -> y :: acc in
-          recurse acc' l'
+          let acc' = match f i x with None -> acc | Some y -> y :: acc in
+          recurse (acc', i + 1) l'
     in
-    recurse [] l
+    recurse ([], 0) l
 
+
+  let filter_map f l = filter_mapi (fun _i x -> f x) l
 
   let fold_left = List.fold_left
 

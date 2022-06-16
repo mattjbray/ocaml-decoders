@@ -38,6 +38,8 @@ module My_list : sig
 
   val filter_map : ('a -> 'b option) -> 'a list -> 'b list
 
+  val filter_mapi : (int -> 'a -> 'b option) -> 'a list -> 'b list
+
   val find_map : ('a -> 'b option) -> 'a list -> 'b option
 
   val fold_left : ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a
