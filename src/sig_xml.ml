@@ -25,7 +25,7 @@ module type S = sig
 
   type 'a tag_decoder = (tag, 'a) Decoder.t
 
-  (** {2 Primitives} *)
+  (** {2 Decoding values} *)
 
   val tag : string -> 'a tag_decoder -> 'a decoder
 
@@ -37,7 +37,9 @@ module type S = sig
   val value : value decoder
   (** Decode a literal [value]. *)
 
-  (** {2 Decoding the contents of a tag}*)
+  (** {2 Decoding the contents of a tag} *)
+
+  (** {3 Attributes} *)
 
   val attr : string -> string tag_decoder
   (** [attr name] decodes the attribute named [name]. *)
@@ -48,11 +50,9 @@ module type S = sig
   val attrs : (string * string) list tag_decoder
   (** [attrs] decodes the attributes as an assoc list. *)
 
+  (** {3 Children} *)
+
   val children : 'a decoder -> 'a list tag_decoder
-
-  val single_child : 'a decoder -> 'a tag_decoder
-
-  val first_child : 'a decoder -> 'a tag_decoder
 
   (** {2 Inconsistent structure} *)
 
@@ -62,10 +62,10 @@ module type S = sig
       succeeds with [None].
   *)
 
-  val one_of : (string * 'a decoder) list -> 'a decoder
+  (* TODO val one_of : (string * 'a decoder) list -> 'a decoder *)
   (** Try a sequence of different decoders. *)
 
-  val pick : (string * 'a decoder decoder) list -> 'a decoder
+  (* TODO val pick : (string * 'a decoder decoder) list -> 'a decoder *)
   (** [pick choices] picks a single choice, like {!one_of}.
       However, each element of [choices] can look at the value, decide if
       it applies (e.g. based on the value of a single field, like a "kind"
@@ -94,8 +94,11 @@ module type S = sig
 
   (** {2 Fancy decoding} *)
 
-  val succeed : 'a -> 'a decoder
+  val pure : 'a -> 'a decoder
   (** A decoder that always succeeds with the argument, ignoring the input. *)
+
+  val succeed : 'a -> 'a decoder
+  (** Alias for [pure]. *)
 
   val fail : string -> 'a decoder
   (** A decoder that always fails with the given message, ignoring the input. *)
@@ -113,9 +116,6 @@ module type S = sig
       [let my_decoder = fix (fun my_decoder -> ...)] allows you to define
       [my_decoder] in terms of itself.
   *)
-
-  val of_of_string : msg:string -> (string -> 'a option) -> 'a decoder
-  (** Create a decoder from a function [of_string : string -> 'a option] *)
 
   module Infix : sig
     include module type of Decoder.Infix
