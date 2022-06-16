@@ -2,9 +2,11 @@ type ('i, 'o) t = 'i -> ('o, 'i Error.t) result
 
 let pure x : ('i, 'o) t = fun _i -> Ok x
 
-let fail e : ('i, 'o) t = fun _i -> Error e
+let fail msg : ('i, 'o) t = fun i -> Error (Error.make ~context:i msg)
 
-let of_result = function Ok o -> pure o | Error e -> fail e
+let fail_with e : ('i, 'o) t = fun _i -> Error e
+
+let of_result = function Ok o -> pure o | Error e -> fail_with e
 
 let bind (f : 'a -> ('i, 'b) t) (x : ('i, 'a) t) : ('i, 'b) t =
  fun i -> match x i with Ok y -> f y i | Error e -> Error e
@@ -86,3 +88,6 @@ let pick : ('i, ('i, 'o) t) t list -> ('i, 'o) t =
 
 let of_to_opt (to_opt : 'i -> 'o option) fail : ('i, 'o) t =
  fun i -> match to_opt i with Some o -> Ok o | None -> fail i
+
+
+let decode_sub v dec = of_result (dec v)

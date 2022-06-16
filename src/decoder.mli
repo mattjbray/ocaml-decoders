@@ -8,8 +8,11 @@ type ('i, 'o) t = 'i -> ('o, 'i Error.t) result
 val pure : 'o -> ('i, 'o) t
 (** [pure x] always succeeds with [x] *)
 
-val fail : 'i Error.t -> ('i, 'o) t
-(** [fail e] always fails with [e] *)
+val fail : string -> ('i, 'o) t
+(** [fail msg] always fails with [msg], capturing the error context from 'i *)
+
+val fail_with : 'i Error.t -> ('i, 'o) t
+(** [fail_with e] always fails with [e] *)
 
 val of_result : ('o, 'i Error.t) Decoders_util.My_result.t -> ('i, 'o) t
 
@@ -43,3 +46,5 @@ val pick : ('i, ('i, 'o) t) t list -> ('i, 'o) t
 
 val of_to_opt :
   ('i -> 'o option) -> ('i -> ('o, 'i Error.t) result) -> ('i, 'o) t
+
+val decode_sub : 'a -> ('a, 'b) t -> ('a, 'b) t
