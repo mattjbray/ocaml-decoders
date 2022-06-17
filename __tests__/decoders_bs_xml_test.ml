@@ -1,5 +1,5 @@
 open Jest
-open Decoders_bs_xml
+open Xml_dom
 
 let () =
   describe
