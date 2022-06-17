@@ -45,20 +45,13 @@ let of_file (file : string) =
 type 'a decoder = (value, 'a) Decoder.t
 
 include Decoder
+include Decoder.Infix
 
 let succeed = pure
 
 let and_then = bind
 
 let from_result = of_result
-
-module Infix = struct
-  include Decoder.Infix
-
-  let ( <$> ) = map
-end
-
-include Infix
 
 let tag_ns (name : Xmlm.name) : unit decoder =
  fun (v : value) ->
