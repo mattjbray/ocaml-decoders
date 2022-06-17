@@ -304,7 +304,7 @@ For more details, see the API documentation:
 
 # Decoding XML
 
-A similar decoders interface exists for decoding XML. See the interface file [`src/sig_xml.ml`](src/sig_xml.ml) for documentation.
+A similar decoders interface exists for decoding XML. See the interface file [`src/xml.ml`](src/xml.ml) for documentation.
 
 ### XML implementations
 
