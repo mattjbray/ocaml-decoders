@@ -244,7 +244,7 @@ let () =
             let expected =
               Js.String.splitByRe [%re "/\\n/"] xml_str
               |> Array.to_list
-              |> Decoders_util.My_list.filter_map (function
+              |> Decoders.Util.My_list.filter_map (function
                      | None ->
                          None
                      | Some line ->

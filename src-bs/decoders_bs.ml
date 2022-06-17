@@ -2,7 +2,7 @@
 
 open Decoders
 
-type ('good, 'bad) result = ('good, 'bad) Decoders_util.My_result.t =
+type ('good, 'bad) result = ('good, 'bad) Util.My_result.t =
   | Ok of 'good
   | Error of 'bad
 

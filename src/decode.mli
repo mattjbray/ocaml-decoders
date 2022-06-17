@@ -10,4 +10,6 @@ module type Decodeable = Sig.Decodeable
 
 (** Derive decoders for a [Decodeable.value]. *)
 module Make (M : Decodeable) :
-  Sig.S with type value = M.value and type 'a decoder = (M.value, 'a) Decoder.t
+  Sig.S
+    with type value = M.value
+     and type 'a decoder = (M.value, 'a) Decoder.t

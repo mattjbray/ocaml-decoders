@@ -14,13 +14,15 @@ val fail : string -> ('i, 'o) t
 val fail_with : 'i Error.t -> ('i, 'o) t
 (** [fail_with e] always fails with [e] *)
 
-val of_result : ('o, 'i Error.t) Decoders_util.My_result.t -> ('i, 'o) t
+val of_result :
+  ('o, 'i Error.t) Util.My_result.t -> ('i, 'o) t
 
 val bind : ('a -> ('i, 'b) t) -> ('i, 'a) t -> ('i, 'b) t
 
 val map : ('a -> 'b) -> ('i, 'a) t -> ('i, 'b) t
 
-val map_err : ('i Error.t -> 'i Error.t) -> ('i, 'o) t -> ('i, 'o) t
+val map_err :
+  ('i Error.t -> 'i Error.t) -> ('i, 'o) t -> ('i, 'o) t
 
 val apply : ('i, 'a -> 'b) t -> ('i, 'a) t -> ('i, 'b) t
 

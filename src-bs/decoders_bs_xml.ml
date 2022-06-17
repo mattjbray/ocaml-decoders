@@ -138,7 +138,7 @@ end
 module Decode = struct
   module E = Encode
   open Decoders
-  open Decoders_util
+  open Util
 
   type nonrec value = value
 

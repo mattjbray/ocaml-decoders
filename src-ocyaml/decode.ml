@@ -47,29 +47,22 @@ struct
 
   let get_int : value -> int option =
    fun t ->
-    try get_string t |> Decoders_util.My_opt.map int_of_string with
-    | Failure _ ->
-        None
+    try get_string t |> Util.My_opt.map int_of_string with Failure _ -> None
 
 
   let get_float : value -> float option =
    fun t ->
-    try get_string t |> Decoders_util.My_opt.map float_of_string with
-    | Failure _ ->
-        None
+    try get_string t |> Util.My_opt.map float_of_string with Failure _ -> None
 
 
   let get_bool : value -> bool option =
    fun t ->
-    try get_string t |> Decoders_util.My_opt.map bool_of_string with
-    | Failure _ ->
-        None
+    try get_string t |> Util.My_opt.map bool_of_string with Failure _ -> None
 
 
   let get_null : value -> unit option =
    fun t ->
-    get_string t
-    |> Decoders_util.My_opt.flat_map (function "" -> Some () | _ -> None)
+    get_string t |> Util.My_opt.flat_map (function "" -> Some () | _ -> None)
 
 
   let get_list = function Collection l -> Some l | _ -> None

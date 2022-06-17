@@ -1,6 +1,6 @@
 (** Functors for creating Decoders. *)
 
-open Decoders_util
+open Util
 
 type ('good, 'bad) result = ('good, 'bad) My_result.t =
   | Ok of 'good

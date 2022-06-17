@@ -117,9 +117,9 @@ module Json_encodeable = struct
   let of_key_value_pairs xs =
     `Assoc
       ( xs
-      |> Decoders_util.My_list.filter_map (fun (k, v) ->
-             Json_decodeable.get_string k
-             |> Decoders_util.My_opt.map (fun k -> (k, v)) ) )
+      |> Util.My_list.filter_map (fun (k, v) ->
+             Json_decodeable.get_string k |> Util.My_opt.map (fun k -> (k, v)) )
+      )
 end
 
 module Encode = struct

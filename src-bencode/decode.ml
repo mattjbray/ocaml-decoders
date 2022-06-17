@@ -12,9 +12,7 @@ struct
 
   let of_file (file : string) : (value, string) result =
     try
-      let v =
-        Decoders_util.with_file_in file (fun ic -> Bencode.decode (`Channel ic))
-      in
+      let v = Util.with_file_in file (fun ic -> Bencode.decode (`Channel ic)) in
       Ok v
     with
     | e ->

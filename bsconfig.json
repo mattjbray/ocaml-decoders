@@ -14,7 +14,7 @@
       "error.ml",
       "error.mli",
       "sig.ml",
-      "sig_xml.ml"
+      "xml.ml"
     ]
   }, {
     "dir" : "src-bs"

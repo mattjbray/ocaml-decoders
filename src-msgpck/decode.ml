@@ -13,8 +13,8 @@ module Msgpck_decodeable : Decode.Decodeable with type value = Msgpck.t = struct
   let of_file (file : string) : (value, string) result =
     try
       Ok
-        (Decoders_util.with_file_in file (fun chan ->
-             Decoders_util.read_all chan |> M.StringBuf.read |> snd ) )
+        (Util.with_file_in file (fun chan ->
+             Util.read_all chan |> M.StringBuf.read |> snd ) )
     with
     | e ->
         Error (Printexc.to_string e)

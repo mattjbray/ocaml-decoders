@@ -1,5 +1,5 @@
 open Decoders
-open Decoders_util
+open Util
 
 type value = Ezxmlm.node
 
@@ -36,7 +36,7 @@ let of_string (s : string) = try_parse_with Ezxmlm.from_string s
 let of_channel (ic : in_channel) = try_parse_with Ezxmlm.from_channel ic
 
 let of_file (file : string) =
-  try Decoders_util.with_file_in file of_channel with
+  try Util.with_file_in file of_channel with
   | e ->
       Error
         (Error.tag "could not open file" (Error.make (Printexc.to_string e)))
