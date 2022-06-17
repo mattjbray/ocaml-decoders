@@ -239,20 +239,17 @@ let () =
     "decoders-bs-xml encode"
     Expect.(
       fun () ->
-        test
-          "tree"
-          Decode.(
-            fun () ->
-              let encoded = encode_string root xml_tree in
-              let expected =
-                Js.String.splitByRe [%re "/\\n/"] xml_str
-                |> Array.to_list
-                |> Decoders_util.My_list.filter_map (function
-                       | None ->
-                           None
-                       | Some line ->
-                           Some (Js.String.trim line) )
-                |> String.concat ""
-              in
+        test "tree" (fun () ->
+            let encoded = encode_string root xml_tree in
+            let expected =
+              Js.String.splitByRe [%re "/\\n/"] xml_str
+              |> Array.to_list
+              |> Decoders_util.My_list.filter_map (function
+                     | None ->
+                         None
+                     | Some line ->
+                         Some (Js.String.trim line) )
+              |> String.concat ""
+            in
 
-              expect encoded |> toEqual expected))
+            expect encoded |> toEqual expected ))

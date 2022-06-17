@@ -86,14 +86,7 @@ module Element = struct
   external setAttribute : Dom.element -> string -> string -> unit
     = "setAttribute"
     [@@bs.send]
-
-  external setAttributeNS : Dom.element -> string -> string -> string -> unit
-    = "setAttributeNS"
-    [@@bs.send]
 end
-
-(* Remove xmlns="http://www.w3.org/1999/xhtml" and "NS1:" prefix *)
-let xmlns = ""
 
 module XMLSerializer = struct
   type t
@@ -105,10 +98,6 @@ module XMLSerializer = struct
 end
 
 module Document = struct
-  external createElement : string -> Dom.element = "createElement"
-    [@@val] [@@scope "window", "document"]
-
-  (* var e = document.createElementNS('http://www.w3.org/1999/xhtml', 'BehaviorTree'); *)
   external createElementNS : string -> string -> Dom.element = "createElementNS"
     [@@val] [@@scope "window", "document"]
 
@@ -129,6 +118,8 @@ module Encode = struct
 
 
   let tag name ?(attrs = []) children =
+    (* Remove xmlns="http://www.w3.org/1999/xhtml" and "NS1:" prefix *)
+    let xmlns = "" in
     let el = Document.createElementNS xmlns name in
     Element.append el (List.map to_node children |> Array.of_list) ;
     List.iter (fun (name, value) -> Element.setAttribute el name value) attrs ;
@@ -210,13 +201,12 @@ module Decode = struct
 
 
   let attr name : string decoder =
-    Decoder.Infix.(
-      attr_opt name
-      >>= function
-      | Some value ->
-          succeed value
-      | None ->
-          fail (Format.asprintf "Expected an attribute named %S" name))
+    attr_opt name
+    >>= function
+    | Some value ->
+        succeed value
+    | None ->
+        fail (Format.asprintf "Expected an attribute named %S" name)
 
 
   let attrs : (string * string) list decoder =
