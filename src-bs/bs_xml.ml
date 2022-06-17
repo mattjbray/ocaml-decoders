@@ -248,8 +248,8 @@ module Decode = struct
         |> My_result.map_err
              (Error.tag_group
                 (Format.asprintf "In tag %s" (Element.tagName el)) )
-    | `Data _ ->
-        assert false
+    | `Data _ as v ->
+        fail "Expected a Tag" v
 
 
   let children (child : 'a decoder) : 'a list decoder =

@@ -111,8 +111,8 @@ let data : string decoder =
 let attrs_ns : Xmlm.attribute list decoder = function
   | `El ((_tag, attrs), _children) ->
       Ok attrs
-  | `Data _ ->
-      assert false
+  | `Data _ as v ->
+      fail "Expected a Tag" v
 
 
 let attr_opt_ns (name : Xmlm.name) : string option decoder =
@@ -165,8 +165,8 @@ let pick_children (child : 'a decoder decoder) : 'a list decoder = function
       |> My_result.combine_l
       |> My_result.map_err
            (Error.tag_group (Format.asprintf "In tag %a" pp_name name))
-  | `Data _ ->
-      assert false
+  | `Data _ as v ->
+      fail "Expected a Tag" v
 
 
 let children (child : 'a decoder) : 'a list decoder = pick_children (pure child)
