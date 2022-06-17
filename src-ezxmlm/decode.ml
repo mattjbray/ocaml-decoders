@@ -64,7 +64,7 @@ let tag_ns (name : Xmlm.name) : unit decoder =
            (Format.asprintf "Expected a tag with name %a" pp_name name)
            ~context:v )
   | `Data _ ->
-      Error (Error.make "Expected a tag" ~context:v)
+      fail "Expected a Tag" v
 
 
 let tag (name : string) : unit decoder =
@@ -78,7 +78,7 @@ let tag (name : string) : unit decoder =
            (Format.asprintf "Expected a tag with name %S" name)
            ~context:v )
   | `Data _ ->
-      Error (Error.make "Expected a tag" ~context:v)
+      fail "Expected a Tag" v
 
 
 let any_tag_ns : Xmlm.name decoder =
@@ -87,7 +87,7 @@ let any_tag_ns : Xmlm.name decoder =
   | `El ((name, _), _) ->
       Ok name
   | `Data _ ->
-      Error (Error.make "Expected a Tag" ~context:v)
+      fail "Expected a Tag" v
 
 
 let any_tag : string decoder =
@@ -96,16 +96,12 @@ let any_tag : string decoder =
   | `El (((_ns, name), _), _) ->
       Ok name
   | `Data _ ->
-      Error (Error.make "Expected a Tag" ~context:v)
+      fail "Expected a Tag" v
 
 
 let data : string decoder =
  fun (v : value) ->
-  match v with
-  | `Data s ->
-      Ok s
-  | `El _ ->
-      Error (Error.make "Expected Data" ~context:v)
+  match v with `Data s -> Ok s | `El _ -> fail "Expected Data" v
 
 
 let attrs_ns : Xmlm.attribute list decoder = function

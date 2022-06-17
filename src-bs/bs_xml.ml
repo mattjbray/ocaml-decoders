@@ -167,10 +167,7 @@ module Decode = struct
     | `El el when Element.tagName el = name ->
         Ok ()
     | _ ->
-        Error
-          (Error.make
-             (Format.asprintf "Expected a tag with name %S" name)
-             ~context:v )
+        fail (Format.asprintf "Expected a tag with name %S" name) v
 
 
   let any_tag : string decoder =
@@ -179,7 +176,7 @@ module Decode = struct
     | `El el ->
         Ok (Element.tagName el)
     | _ ->
-        Error (Error.make "Expected a Tag" ~context:v)
+        fail "Expected a Tag" v
 
 
   let data : string decoder =
@@ -188,7 +185,7 @@ module Decode = struct
     | `Data text ->
         Ok (Text.data text)
     | `El _ ->
-        Error (Error.make "Expected Data" ~context:v)
+        fail "Expected Data" v
 
 
   let attr_opt name : string option decoder =
@@ -197,7 +194,7 @@ module Decode = struct
     | `El el ->
         Ok (Element.get_attribute el name)
     | `Data _ ->
-        Error (Error.make "Expected a Tag")
+        fail "Expected a Tag" v
 
 
   let attr name : string decoder =
@@ -228,7 +225,7 @@ module Decode = struct
         in
         Ok attrs
     | `Data _ ->
-        Error (Error.make "Expected a Tag")
+        fail "Expected a Tag" v
 
 
   let pick_children (child : 'a decoder decoder) : 'a list decoder = function
