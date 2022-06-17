@@ -308,10 +308,10 @@ A similar decoders interface exists for decoding XML. See the interface file [`s
 
 ### XML implementations
 
-| Platform | Package         | Module                       | Example usage                                                                    |
-|----------|-----------------|------------------------------|----------------------------------------------------------------------------------|
-| opam     | decoders-ezxmlm | `Decoders_ezxmlm.Decode`     | [`src-ezxmlm/test/test_ezxmlm_decode.ml`](src-ezxmlm/test/test_ezxmlm_decode.ml) |
-| npm      | bs-decoders     | `Decoders_bs.Xml_dom.Decode` | [`__tests__/decoders_bs_xml_test.ml`](__tests__/decoders_bs_xml_test.ml)         |
+| Platform | Package         | Module                   | Example usage                                                                    |
+|----------|-----------------|--------------------------|----------------------------------------------------------------------------------|
+| opam     | decoders-ezxmlm | `Decoders_ezxmlm.Decode` | [`src-ezxmlm/test/test_ezxmlm_decode.ml`](src-ezxmlm/test/test_ezxmlm_decode.ml) |
+| npm      | bs-decoders     | `Decoders.Bs_xml.Decode` | [`__tests__/decoders_bs_xml_test.ml`](__tests__/decoders_bs_xml_test.ml)         |
 
 # Release
 

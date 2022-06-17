@@ -2,8 +2,8 @@
 
 * Extract and expose `Decoder.t`, useful for "decoding" things outside of the JSON family (#40, @mattjbray).
 * Add `Decoders.Xml.S` to `decoders`, create `decoders-ezxmlm`, and add `Decoders_bs_xml` to `bs-decoders` (#49, @mattjbray).
-* BREAKING: namespace `bs-decoders` modules under `Decoders_bs`. To upgrade,
-  replace `Decoders_bs` with `Decoders_bs.Json` (#49, @mattjbray).
+* BREAKING: namespace `bs-decoders` modules under `Decoders`. To upgrade,
+  replace `Decoders_bs` with `Decoders.Bs_json` (#49, @mattjbray).
 
 ## 0.7.0 (2022-05-11)
 

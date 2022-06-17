@@ -1,6 +1,6 @@
 {
   "name": "bs-decoders",
-  "namespace": "decoders_bs",
+  "namespace": "decoders",
   "version": "0.1.0",
   "sources": [{
     "dir" : "src",

@@ -1,5 +1,5 @@
 open Jest
-open Xml_dom
+open Bs_xml
 
 let () =
   describe
