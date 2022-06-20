@@ -14,3 +14,5 @@ val pp : (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
 val to_string : (Format.formatter -> 'a -> unit) -> 'a t -> string
 
 val map_tag : (string -> string) -> 'a t -> 'a t
+
+val map_context : ('a -> 'b) -> 'a t -> 'b t

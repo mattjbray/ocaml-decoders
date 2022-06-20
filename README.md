@@ -302,6 +302,17 @@ For more details, see the API documentation:
 * [`Decoders.Decode.S`](https://mattjbray.github.io/ocaml-decoders/decoders/Decoders/Decode/module-type-S/index.html) interface
 * [`Decoders.Encode.S`](https://mattjbray.github.io/ocaml-decoders/decoders/Decoders/Encode/module-type-S/index.html) interface
 
+# Decoding XML
+
+A similar decoders interface exists for decoding XML. See the interface file [`src/xml.ml`](src/xml.ml) for documentation.
+
+### XML implementations
+
+| Platform | Package         | Module                   | Example usage                                                                    |
+|----------|-----------------|--------------------------|----------------------------------------------------------------------------------|
+| opam     | decoders-ezxmlm | `Decoders_ezxmlm.Decode` | [`src-ezxmlm/test/test_ezxmlm_decode.ml`](src-ezxmlm/test/test_ezxmlm_decode.ml) |
+| npm      | bs-decoders     | `Decoders.Bs_xml.Decode` | [`__tests__/decoders_bs_xml_test.ml`](__tests__/decoders_bs_xml_test.ml)         |
+
 # Release
 
 After updating CHANGES.md:

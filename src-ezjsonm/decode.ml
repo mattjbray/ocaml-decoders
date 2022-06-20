@@ -27,7 +27,7 @@ struct
 
 
   let of_file (file : string) : (value, string) result =
-    try Ok (Decoders_util.with_file_in file Ezjsonm.from_channel) with
+    try Ok (Util.with_file_in file Ezjsonm.from_channel) with
     | e ->
         Error (Printexc.to_string e)
 

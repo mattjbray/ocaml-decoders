@@ -35,14 +35,14 @@ module Sexplib_decodeable : Decode.Decodeable with type value = Sexp.t = struct
   let get_key_value_pairs = function
     | Sexp.List lst ->
         lst
-        |> Decoders_util.My_list.map (function
+        |> Util.My_list.map (function
                | Sexp.List [ key; value ] ->
                    Some (key, value)
                | Sexp.List (key :: values) ->
                    Some (key, Sexp.List values)
                | _ ->
                    None )
-        |> Decoders_util.My_list.all_some
+        |> Util.My_list.all_some
     | _ ->
         None
 

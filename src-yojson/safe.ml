@@ -77,7 +77,7 @@ module Json_encodeable = struct
   let of_key_value_pairs xs =
     `Assoc
       ( xs
-      |> Decoders_util.My_list.filter_map (fun (k, v) ->
+      |> Util.My_list.filter_map (fun (k, v) ->
              match k with `String k -> Some (k, v) | _ -> None ) )
 end
 

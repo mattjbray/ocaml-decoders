@@ -1,4 +1,6 @@
-type ('good, 'bad) result = ('good, 'bad) Decoders_util.My_result.t =
+open Util
+
+type ('good, 'bad) result = ('good, 'bad) My_result.t =
   | Ok of 'good
   | Error of 'bad
 

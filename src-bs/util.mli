@@ -21,6 +21,8 @@ end
 module My_opt : sig
   val return : 'a -> 'a option
 
+  val map : ('a -> 'b) -> 'a option -> 'b option
+
   val flat_map : ('a -> 'b option) -> 'a option -> 'b option
 end
 
@@ -30,6 +32,10 @@ module My_list : sig
   val map : ('a -> 'b) -> 'a list -> 'b list
 
   val mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
+
+  val filter_map : ('a -> 'b option) -> 'a list -> 'b list
+
+  val filter_mapi : (int -> 'a -> 'b option) -> 'a list -> 'b list
 
   val find_map : ('a -> 'b option) -> 'a list -> 'b option
 

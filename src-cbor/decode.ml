@@ -13,8 +13,8 @@ struct
   let of_file (file : string) : (value, string) result =
     try
       Ok
-        (Decoders_util.with_file_in file (fun chan ->
-             Decoders_util.read_all chan |> CBOR.Simple.decode ) )
+        (Util.with_file_in file (fun chan ->
+             Util.read_all chan |> CBOR.Simple.decode ) )
     with
     | e ->
         Error (Printexc.to_string e)

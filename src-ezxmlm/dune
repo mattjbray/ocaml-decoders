@@ -1,0 +1,4 @@
+(library
+ (name decoders_ezxmlm)
+ (public_name decoders-ezxmlm)
+ (libraries decoders ezxmlm))

@@ -1,6 +1,6 @@
 (** Functors for creating Decoders. *)
 
-open Decoders_util
+open Util
 
 type ('good, 'bad) result = ('good, 'bad) My_result.t =
   | Ok of 'good
@@ -42,9 +42,9 @@ module Make (Decodeable : Decodeable) :
 
   let succeed x = Decoder.pure x
 
-  let fail msg input = Error (Error.make msg ~context:input)
+  let fail = Decoder.fail
 
-  let fail_with error = Decoder.fail error
+  let fail_with = Decoder.fail_with
 
   let from_result = Decoder.of_result
 
@@ -103,7 +103,7 @@ module Make (Decodeable : Decodeable) :
          (Error.tag "I tried the following decoders but they all failed")
 
 
-  let decode_sub v dec = from_result (dec v)
+  let decode_sub = Decoder.decode_sub
 
   let primitive_decoder (get_value : value -> 'a option) (message : string) :
       'a decoder =

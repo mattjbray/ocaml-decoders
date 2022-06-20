@@ -1,5 +1,6 @@
 {
   "name": "bs-decoders",
+  "namespace": "decoders",
   "version": "0.1.0",
   "sources": [{
     "dir" : "src",
@@ -13,7 +14,8 @@
       "encode.mli",
       "error.ml",
       "error.mli",
-      "sig.ml"
+      "sig.ml",
+      "xml.ml"
     ]
   }, {
     "dir" : "src-bs"
@@ -30,6 +32,7 @@
   ],
   "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "warnings": {
+    "number": "-44",
     "error" : "+101"
   },
   "refmt": 3

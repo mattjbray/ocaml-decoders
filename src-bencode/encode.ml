@@ -19,7 +19,7 @@ module Bencode_encodeable = struct
 
   let of_key_value_pairs xs =
     let xs =
-      Decoders_util.My_list.filter_map
+      Util.My_list.filter_map
         (function Bencode.String s, v -> Some (s, v) | _ -> None)
         xs
     in

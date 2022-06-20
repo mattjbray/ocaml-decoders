@@ -12,9 +12,13 @@ build:
 test:
 	dune runtest
 
-.PHONY: watch
-watch:
+.PHONY: watch-check
+watch-check:
 	dune build @check --watch
+
+.PHONY: watch-test
+watch-test:
+	dune build @runtest --watch
 
 .PHONY: doc
 doc:
@@ -56,6 +60,12 @@ build-bs:
 
 test-bs:
 	npm test
+
+watch-build-bs:
+	npm run build-watch
+
+watch-test-bs:
+	npm run test-watch
 
 clean-bs:
 	npm run clean
