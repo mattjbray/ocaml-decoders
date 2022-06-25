@@ -181,6 +181,7 @@ let jsonaf_decode_suite =
        ; grouping_errors_test
        ]
 
+
 let jsonaf_encode_suite =
   let open Decoders_jsonaf.Encode in
   let encoder_test ~encoder ~input ~expected ?printer _test_ctxt =
@@ -188,23 +189,16 @@ let jsonaf_encode_suite =
   in
 
   let float_test_0 =
-    "float test 0"
-    >:: encoder_test
-          ~encoder:float
-          ~input:123.
-          ~expected:"123"
+    "float test 0" >:: encoder_test ~encoder:float ~input:123. ~expected:"123"
   in
   let float_test_1 =
     "float test 1"
-    >:: encoder_test 
-          ~encoder:float
-          ~input:123.456
-          ~expected:"123.456"
+    >:: encoder_test ~encoder:float ~input:123.456 ~expected:"123.456"
   in
-  "Jsonaf"
-  >::: [ float_test_0
-       ; float_test_1
-       ]
+  "Jsonaf" >::: [ float_test_0; float_test_1 ]
 
 
-let () = "decoders" >::: [ jsonaf_decode_suite; jsonaf_encode_suite ] |> run_test_tt_main
+let () =
+  "decoders"
+  >::: [ jsonaf_decode_suite; jsonaf_encode_suite ]
+  |> run_test_tt_main
