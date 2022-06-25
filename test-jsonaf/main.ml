@@ -4,7 +4,7 @@ type tree =
   | Leaf of int
   | Node of tree * tree
 
-let jsonaf_suite =
+let jsonaf_decode_suite =
   let open Decoders_jsonaf.Decode in
   let decoder_test ~decoder ~input ~expected ?printer _test_ctxt =
     match decode_string decoder input with
@@ -181,5 +181,30 @@ let jsonaf_suite =
        ; grouping_errors_test
        ]
 
+let jsonaf_encode_suite =
+  let open Decoders_jsonaf.Encode in
+  let encoder_test ~encoder ~input ~expected ?printer _test_ctxt =
+    assert_equal (encode_string encoder input) expected ?printer
+  in
 
-let () = "decoders" >::: [ jsonaf_suite ] |> run_test_tt_main
+  let float_test_0 =
+    "float test 0"
+    >:: encoder_test
+          ~encoder:float
+          ~input:123.
+          ~expected:"123"
+  in
+  let float_test_1 =
+    "float test 1"
+    >:: encoder_test 
+          ~encoder:float
+          ~input:123.456
+          ~expected:"123.456"
+  in
+  "Jsonaf"
+  >::: [ float_test_0
+       ; float_test_1
+       ]
+
+
+let () = "decoders" >::: [ jsonaf_decode_suite; jsonaf_encode_suite ] |> run_test_tt_main
