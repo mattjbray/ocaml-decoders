@@ -1,0 +1,4 @@
+(library
+ (name decoders_jsonaf)
+ (public_name decoders-jsonaf)
+ (libraries decoders jsonaf))

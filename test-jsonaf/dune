@@ -1,0 +1,4 @@
+(test
+ (name main)
+ (package decoders-jsonaf)
+ (libraries decoders-jsonaf oUnit))
