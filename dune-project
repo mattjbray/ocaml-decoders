@@ -54,7 +54,7 @@
  (description
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
-  (ocaml (>= 4.03.0))
+  (ocaml (>= 4.10.0))
   (decoders (= :version))
   (jsonaf (>= 0.15.0))
   (odoc :with-doc)

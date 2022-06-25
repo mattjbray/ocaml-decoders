@@ -11,7 +11,7 @@ let of_number n = `Number n
 let of_float f =
   let s = string_of_float f in
   let len = String.length s in
-  if String.ends_with ~suffix:"." s
+  if String.get s (len - 1) = '.'
   then `Number (String.sub s 0 (len - 1))
   else `Number s
 
