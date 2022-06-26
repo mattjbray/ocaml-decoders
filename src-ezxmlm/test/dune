@@ -1,3 +1,4 @@
 (tests
  (names test_ezxmlm_decode)
+ (package decoders-ezxmlm)
  (libraries decoders-ezxmlm containers))
