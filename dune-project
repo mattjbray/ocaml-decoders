@@ -98,6 +98,7 @@
   (ocaml (>= 4.03.0))
   (decoders (= :version))
    ezxmlm
+  (containers (and :with-test (>= 0.16)))
   (odoc :with-doc)))
 
 (package
