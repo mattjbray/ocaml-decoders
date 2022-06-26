@@ -16,7 +16,6 @@ jobs:
           - windows-latest
           - macos-latest
         ocaml-compiler:
-          - 4.08.x
           - 4.14.x
         package:
           - decoders-bencode
@@ -27,13 +26,10 @@ jobs:
           - decoders-msgpck
           - decoders-sexplib
           - decoders-yojson
-        exclude:
-          # To cut down the number of jobs, only run windows/macos with recent
-          # compiler.
-          - os: macos-latest
+        include:
+          - os: ubuntu-latest
             ocaml-compiler: 4.08.x
-          - os: windows-latest
-            ocaml-compiler: 4.08.x
+            package: decoders-yojson
 
 
     runs-on: ${{ matrix.os }}
