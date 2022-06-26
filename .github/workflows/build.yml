@@ -16,8 +16,21 @@ jobs:
           - windows-latest
           - macos-latest
         ocaml-compiler:
-          - 4.08.x
-          - 4.13.x
+          - 4.14.x
+        package:
+          - decoders-bencode
+          - decoders-cbor
+          - decoders-ezjsonm
+          - decoders-ezxmlm
+          - decoders-jsonm
+          - decoders-msgpck
+          - decoders-sexplib
+          - decoders-yojson
+        include:
+          - os: ubuntu-latest
+            ocaml-compiler: 4.08.x
+            package: decoders-yojson
+
 
     runs-on: ${{ matrix.os }}
 
@@ -30,11 +43,7 @@ jobs:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           opam-depext-flags: --with-test
 
-      - run: opam install . --deps-only --with-test
-
-      - run: opam exec -- make build
-
-      - run: opam exec -- make test
+      - run: opam install ./decoders.opam "./${{ matrix.package }}.opam" --with-test
 
   build-node:
     strategy:
