@@ -17,7 +17,7 @@ jobs:
           - macos-latest
         ocaml-compiler:
           - 4.08.x
-          - 4.13.x
+          - 4.14.x
         package:
           - decoders-bencode
           - decoders-cbor
