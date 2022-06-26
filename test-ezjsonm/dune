@@ -1,4 +1,4 @@
 (test
  (name main)
  (package decoders-ezjsonm)
- (libraries decoders-ezjsonm containers oUnit))
+ (libraries decoders-ezjsonm containers ounit2))

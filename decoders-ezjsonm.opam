@@ -16,7 +16,7 @@ depends: [
   "ezjsonm" {>= "0.4.0"}
   "odoc" {with-doc}
   "containers" {with-test & >= "0.16"}
-  "ounit" {with-test}
+  "ounit2" {with-test}
 ]
 build: [
   ["dune" "subst"] {dev}

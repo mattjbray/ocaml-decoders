@@ -19,7 +19,7 @@ depends: [
   "ocplib-endian" {>= "0.6"}
   "odoc" {with-doc}
   "containers" {with-test & >= "0.16"}
-  "ounit" {with-test}
+  "ounit2" {with-test}
 ]
 dev-repo: "git+https://github.com/mattjbray/ocaml-decoders.git"
 build: [
