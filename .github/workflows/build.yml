@@ -27,6 +27,14 @@ jobs:
           - decoders-msgpck
           - decoders-sexplib
           - decoders-yojson
+        exclude:
+          # To cut down the number of jobs, only run windows/macos with recent
+          # compiler.
+          - os: macos-latest
+            ocaml-compiler: 4.08.x
+          - os: windows-latest
+            ocaml-compiler: 4.08.x
+
 
     runs-on: ${{ matrix.os }}
 
