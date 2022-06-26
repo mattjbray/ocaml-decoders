@@ -22,6 +22,7 @@ jobs:
           - decoders-cbor
           - decoders-ezjsonm
           - decoders-ezxmlm
+          - decoders-jsonaf
           - decoders-jsonm
           - decoders-msgpck
           - decoders-sexplib

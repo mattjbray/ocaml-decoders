@@ -48,6 +48,19 @@
   (ounit2 :with-test)))
 
 (package
+ (name decoders-jsonaf)
+ (synopsis "Jsonaf backend for decoders")
+ (authors "Vlad Dumitru <vlad@dumitru.net>" "Matt Bray <mattjbray@gmail.com>")
+ (description
+   "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
+ (depends
+  (ocaml (>= 4.10.0))
+  (decoders (= :version))
+  (jsonaf (>= 0.15.0))
+  (odoc :with-doc)
+  (ounit :with-test)))
+
+(package
  (name decoders-jsonm)
  (synopsis "Jsonm backend for decoders")
  (description
