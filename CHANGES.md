@@ -4,6 +4,7 @@
 * Add `Decoders.Xml.S` to `decoders`, create `decoders-ezxmlm`, and add `Decoders_bs_xml` to `bs-decoders` (#49, @mattjbray).
 * BREAKING: namespace `bs-decoders` modules under `Decoders`. To upgrade,
   replace `Decoders_bs` with `Decoders.Bs_json` (#49, @mattjbray).
+* Add `decoders-jsonaf` (#50, @dvmitrv).
 
 ## 0.7.0 (2022-05-11)
 
