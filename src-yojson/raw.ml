@@ -31,7 +31,7 @@ struct
 
   let get_int = function
     | `Intlit value ->
-        Some (int_of_string value)
+      (try Some (int_of_string value) with _ -> None)
     | _ ->
         None
 
