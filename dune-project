@@ -1,4 +1,4 @@
-(lang dune 2.7)
+(lang dune 3.1)
 (name decoders)
 (generate_opam_files true)
 (license ISC)
