@@ -24,7 +24,9 @@
   },
   "homepage": "https://github.com/mattjbray/ocaml-decoders#readme",
   "devDependencies": {
-    "@glennsl/bs-jest": "^0.7.0",
+    "@glennsl/bs-jest": "^0.7.0"
+  },
+  "peerDependencies": {
     "bs-platform": "^9.0.2"
   },
   "jest": {
