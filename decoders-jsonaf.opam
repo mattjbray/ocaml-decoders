@@ -12,7 +12,7 @@ homepage: "https://github.com/mattjbray/ocaml-decoders"
 doc: "https://mattjbray.github.io/ocaml-decoders/"
 bug-reports: "https://github.com/mattjbray/ocaml-decoders/issues"
 depends: [
-  "dune" {>= "2.7"}
+  "dune" {>= "3.1"}
   "ocaml" {>= "4.10.0"}
   "decoders" {= version}
   "jsonaf" {>= "0.15.0"}
