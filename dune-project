@@ -58,7 +58,7 @@
   (decoders (= :version))
   (jsonaf (>= 0.15.0))
   (odoc :with-doc)
-  (ounit :with-test)))
+  (ounit2 :with-test)))
 
 (package
  (name decoders-jsonm)
