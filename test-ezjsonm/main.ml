@@ -1,9 +1,5 @@
 open OUnit2
 
-type tree =
-  | Leaf of int
-  | Node of tree * tree
-
 let ezjsonm_suite =
   let open Decoders_ezjsonm.Decode in
   let decoder_test ~decoder ~input ~expected _test_ctxt =
