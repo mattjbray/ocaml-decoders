@@ -95,6 +95,13 @@ let root : root decoder =
   >>= fun trees -> succeed { main; trees }
 
 
+let pp_print_result ~ok ~error fmt = function
+  | Ok x ->
+      ok fmt x
+  | Error e ->
+      error fmt e
+
+
 let () =
   printf
     "%a@."
