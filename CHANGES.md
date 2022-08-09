@@ -1,4 +1,4 @@
-## 1.0.0 (2022-08-08)
+## v1.0.0 (2022-08-08)
 
 * Extract and expose `Decoder.t`, useful for "decoding" things outside of the JSON family (#40, @mattjbray).
 * Add `Decoders.Xml.S` to `decoders`, create `decoders-ezxmlm`, and add `Decoders_bs_xml` to `bs-decoders` (#49, @mattjbray).
