@@ -110,7 +110,7 @@
  (depends
   (ocaml (>= 4.03.0))
   (decoders (= :version))
-   ezxmlm
+  (ezxmlm (>= 1.1.0))
   (containers (and :with-test (>= 0.16)))
   (odoc :with-doc)))
 
