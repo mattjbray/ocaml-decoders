@@ -100,6 +100,21 @@ let () =
               expect decoded |> toEqual (Belt.Result.Ok "1")))
 
 
+let () =
+  describe
+    "decoders-bs-xml decode"
+    Expect.(
+      fun () ->
+        test
+          "skip comments"
+          Decode.(
+            fun () ->
+              let xml_str = {|<root><!-- a comment --> Some data </root>|} in
+              let decoder = tag "root" >>= fun () -> children data in
+              let decoded = decode_string decoder xml_str in
+              expect decoded |> toEqual (Belt.Result.Ok [ " Some data " ])))
+
+
 let xml_str =
   {|
 <root main_tree_to_execute="MainTree">

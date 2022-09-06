@@ -107,3 +107,12 @@ let () =
     "%a@."
     (pp_print_result ~ok:pp_root ~error:pp_error)
     (decode_string root xml_str)
+
+
+let () =
+  let xml_str = {|<root><!-- a comment --> Some data </root>|} in
+  let decoder = tag "root" >>= fun () -> children data in
+  printf
+    "@.@[<v 2>Comments are skipped:@ %a@]"
+    (pp_print_result ~ok:(list string_quoted) ~error:pp_error)
+    (decode_string decoder xml_str)

@@ -4,3 +4,6 @@
                         ((:action "Open") (:action "Approach")
                          (:action "Close") (:subtree "DestroyObject"))))
          (:DestroyObject (:sequence ((:action "Booom"))))))
+
+Comments are skipped:
+  " Some data "

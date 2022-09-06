@@ -23,6 +23,8 @@ module Node = struct
 
   external text_node : int = "TEXT_NODE" [@@bs.val] [@@bs.scope "Node"]
 
+  external comment_node : int = "COMMENT_NODE" [@@bs.val] [@@bs.scope "Node"]
+
   external nodeType : Dom.node -> int = "nodeType" [@@bs.get]
 
   external of_element : Dom.element -> Dom.node = "%identity"
@@ -47,12 +49,14 @@ module Node_list = struct
     nodesList
     |> to_array_like
     |> Js.Array.from
-    |> Array.map (fun node ->
+    |. Belt.Array.keepMap (fun node ->
            let ty = Node.nodeType node in
            if ty = Node.element_node
-           then `El (Node.to_element_unsafe node)
+           then Some (`El (Node.to_element_unsafe node))
            else if ty = Node.text_node
-           then `Data (Node.to_text_unsafe node)
+           then Some (`Data (Node.to_text_unsafe node))
+           else if ty = Node.comment_node
+           then None
            else failwith (Format.asprintf "Unexpected node type %i" ty) )
 end
 
