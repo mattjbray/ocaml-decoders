@@ -11,10 +11,21 @@ module DOMParser = struct
     = "firstElementChild"
     [@@bs.get]
 
+  external querySelector :
+    Dom.element -> string -> Dom.element Js.null_undefined = "querySelector"
+    [@@bs.send]
+
+  external textContent : Dom.element -> string = "textContent" [@@bs.get]
+
   let parse_xml text =
     let parser = create () in
     let doc = parseFromString parser text "text/xml" in
-    firstElementChildUnsafe doc
+    let e = querySelector doc "parsererror" in
+    match Js.toOption e with
+    | None ->
+        firstElementChildUnsafe doc
+    | Some e ->
+        failwith (textContent e)
 end
 
 module Node = struct
