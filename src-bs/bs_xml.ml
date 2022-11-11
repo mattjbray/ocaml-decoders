@@ -177,39 +177,43 @@ module Decode = struct
   let from_result = of_result
 
   let tag (name : string) : unit decoder =
-   fun (v : value) ->
+    {{Decoder.dec=fun (v : value) ->
     match v with
     | `El el when Element.tagName el = name ->
         Ok ()
     | _ ->
-        fail (Format.asprintf "Expected a tag with name %S" name) v
+        (fail (Format.asprintf "Expected a tag with name %S" name)).dec v
+    }
 
 
   let any_tag : string decoder =
-   fun (v : value) ->
+   {Decoder.dec=fun (v : value) ->
     match v with
     | `El el ->
         Ok (Element.tagName el)
     | _ ->
-        fail "Expected a Tag" v
+        (fail "Expected a Tag").dec v
+   }
 
 
   let data : string decoder =
-   fun (v : value) ->
+   {Decoder.dec=fun (v : value) ->
     match v with
     | `Data text ->
         Ok (Text.data text)
     | `El _ ->
-        fail "Expected Data" v
+        (fail "Expected Data").dec v
+   }
 
 
   let attr_opt name : string option decoder =
-   fun (v : value) ->
+   {Decoder.dec=fun (v : value) ->
     match v with
     | `El el ->
         Ok (Element.get_attribute el name)
     | `Data _ ->
-        fail "Expected a Tag" v
+        (fail "Expected a Tag").dec v
+   }
 
 
   let attr name : string decoder =
@@ -222,7 +226,7 @@ module Decode = struct
 
 
   let attrs : (string * string) list decoder =
-   fun (v : value) ->
+   {Decoder.dec=fun (v : value) ->
     match v with
     | `El el ->
         let names = Element.getAttributeNames el |> Array.to_list in
@@ -240,10 +244,11 @@ module Decode = struct
         in
         Ok attrs
     | `Data _ ->
-        fail "Expected a Tag" v
+        (fail "Expected a Tag").dec v
+   }
 
 
-  let pick_children (child : 'a decoder decoder) : 'a list decoder = function
+  let pick_children (child : 'a decoder decoder) : 'a list decoder = {Decoder.dec=function
     | `El el ->
         Element.child_nodes el
         |> My_list.filter_mapi (fun i v ->
@@ -252,7 +257,7 @@ module Decode = struct
                    None
                | Ok dec ->
                    Some
-                     ( dec v
+                     ( dec.dec v
                      |> My_result.map_err
                           (Error.tag
                              (Format.asprintf "While decoding child %i" i) ) ) )
@@ -261,7 +266,8 @@ module Decode = struct
              (Error.tag_group
                 (Format.asprintf "In tag %s" (Element.tagName el)) )
     | `Data _ as v ->
-        fail "Expected a Tag" v
+        (fail "Expected a Tag").dec v
+  }
 
 
   let children (child : 'a decoder) : 'a list decoder =
