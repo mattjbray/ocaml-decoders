@@ -60,16 +60,17 @@ module Decode = struct
   include D
 
   let array : 'a decoder -> 'a array decoder =
-   fun decoder t ->
+   fun decoder ->
+     {Decoder.dec=fun t ->
     match Js.Json.decodeArray t with
     | None ->
-        (fail "Expected an array") t
+        (fail "Expected an array").dec t
     | Some arr ->
         let oks, errs =
           arr
           |> Js.Array.reducei
                (fun (oks, errs) x i ->
-                 match decoder x with
+                 match decoder.dec x with
                  | Ok a ->
                      let _ = Js.Array.push a oks in
                      (oks, errs)
@@ -87,6 +88,7 @@ module Decode = struct
           Error
             (Error.tag_group "while decoding an array" (errs |> Array.to_list))
         else Ok oks
+     }
 end
 
 module Json_encodeable = struct
