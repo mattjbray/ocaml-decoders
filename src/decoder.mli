@@ -31,7 +31,7 @@ module Infix : sig
 
   val ( <*> ) : ('i, 'a -> 'b) t -> ('i, 'a) t -> ('i, 'b) t
 
-  include Shims_let_ops_.S with type ('i, 'o) t_let = ('i, 'o) t
+  include Shims_let_ops_.S with type ('i, 'o) t_let := ('i, 'o) t
 end
 
 val fix : (('i, 'a) t -> ('i, 'a) t) -> ('i, 'a) t
