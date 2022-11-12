@@ -61,34 +61,37 @@ module Decode = struct
 
   let array : 'a decoder -> 'a array decoder =
    fun decoder ->
-     {Decoder.dec=fun t ->
-    match Js.Json.decodeArray t with
-    | None ->
-        (fail "Expected an array").dec t
-    | Some arr ->
-        let oks, errs =
-          arr
-          |> Js.Array.reducei
-               (fun (oks, errs) x i ->
-                 match decoder.dec x with
-                 | Ok a ->
-                     let _ = Js.Array.push a oks in
-                     (oks, errs)
-                 | Error e ->
-                     let _ =
-                       Js.Array.push
-                         (Error.tag ("element " ^ Js.Int.toString i) e)
-                         errs
-                     in
-                     (oks, errs) )
-               ([||], [||])
-        in
-        if Js.Array.length errs > 0
-        then
-          Error
-            (Error.tag_group "while decoding an array" (errs |> Array.to_list))
-        else Ok oks
-     }
+    { Decoder.dec =
+        (fun t ->
+          match Js.Json.decodeArray t with
+          | None ->
+              (fail "Expected an array").dec t
+          | Some arr ->
+              let oks, errs =
+                arr
+                |> Js.Array.reducei
+                     (fun (oks, errs) x i ->
+                       match decoder.dec x with
+                       | Ok a ->
+                           let _ = Js.Array.push a oks in
+                           (oks, errs)
+                       | Error e ->
+                           let _ =
+                             Js.Array.push
+                               (Error.tag ("element " ^ Js.Int.toString i) e)
+                               errs
+                           in
+                           (oks, errs) )
+                     ([||], [||])
+              in
+              if Js.Array.length errs > 0
+              then
+                Error
+                  (Error.tag_group
+                     "while decoding an array"
+                     (errs |> Array.to_list) )
+              else Ok oks )
+    }
 end
 
 module Json_encodeable = struct

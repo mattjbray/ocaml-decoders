@@ -177,43 +177,48 @@ module Decode = struct
   let from_result = of_result
 
   let tag (name : string) : unit decoder =
-    {Decoder.dec=fun (v : value) ->
-    match v with
-    | `El el when Element.tagName el = name ->
-        Ok ()
-    | _ ->
-        (fail (Format.asprintf "Expected a tag with name %S" name)).dec v
+    { Decoder.dec =
+        (fun (v : value) ->
+          match v with
+          | `El el when Element.tagName el = name ->
+              Ok ()
+          | _ ->
+              (fail (Format.asprintf "Expected a tag with name %S" name)).dec v
+          )
     }
 
 
   let any_tag : string decoder =
-   {Decoder.dec=fun (v : value) ->
-    match v with
-    | `El el ->
-        Ok (Element.tagName el)
-    | _ ->
-        (fail "Expected a Tag").dec v
-   }
+    { Decoder.dec =
+        (fun (v : value) ->
+          match v with
+          | `El el ->
+              Ok (Element.tagName el)
+          | _ ->
+              (fail "Expected a Tag").dec v )
+    }
 
 
   let data : string decoder =
-   {Decoder.dec=fun (v : value) ->
-    match v with
-    | `Data text ->
-        Ok (Text.data text)
-    | `El _ ->
-        (fail "Expected Data").dec v
-   }
+    { Decoder.dec =
+        (fun (v : value) ->
+          match v with
+          | `Data text ->
+              Ok (Text.data text)
+          | `El _ ->
+              (fail "Expected Data").dec v )
+    }
 
 
   let attr_opt name : string option decoder =
-   {Decoder.dec=fun (v : value) ->
-    match v with
-    | `El el ->
-        Ok (Element.get_attribute el name)
-    | `Data _ ->
-        (fail "Expected a Tag").dec v
-   }
+    { Decoder.dec =
+        (fun (v : value) ->
+          match v with
+          | `El el ->
+              Ok (Element.get_attribute el name)
+          | `Data _ ->
+              (fail "Expected a Tag").dec v )
+    }
 
 
   let attr name : string decoder =
@@ -226,48 +231,52 @@ module Decode = struct
 
 
   let attrs : (string * string) list decoder =
-   {Decoder.dec=fun (v : value) ->
-    match v with
-    | `El el ->
-        let names = Element.getAttributeNames el |> Array.to_list in
-        let attrs =
-          names
-          |> List.map (fun name ->
-                 let value =
-                   match Element.get_attribute el name with
-                   | Some v ->
-                       v
-                   | None ->
-                       assert false
-                 in
-                 (name, value) )
-        in
-        Ok attrs
-    | `Data _ ->
-        (fail "Expected a Tag").dec v
-   }
+    { Decoder.dec =
+        (fun (v : value) ->
+          match v with
+          | `El el ->
+              let names = Element.getAttributeNames el |> Array.to_list in
+              let attrs =
+                names
+                |> List.map (fun name ->
+                       let value =
+                         match Element.get_attribute el name with
+                         | Some v ->
+                             v
+                         | None ->
+                             assert false
+                       in
+                       (name, value) )
+              in
+              Ok attrs
+          | `Data _ ->
+              (fail "Expected a Tag").dec v )
+    }
 
 
-  let pick_children (child : 'a decoder decoder) : 'a list decoder = {Decoder.dec=function
-    | `El el ->
-        Element.child_nodes el
-        |> My_list.filter_mapi (fun i v ->
-               match child.dec v with
-               | Error _ ->
-                   None
-               | Ok dec ->
-                   Some
-                     ( dec.dec v
-                     |> My_result.map_err
-                          (Error.tag
-                             (Format.asprintf "While decoding child %i" i) ) ) )
-        |> My_result.combine_l
-        |> My_result.map_err
-             (Error.tag_group
-                (Format.asprintf "In tag %s" (Element.tagName el)) )
-    | `Data _ as v ->
-        (fail "Expected a Tag").dec v
-  }
+  let pick_children (child : 'a decoder decoder) : 'a list decoder =
+    { Decoder.dec =
+        (function
+        | `El el ->
+            Element.child_nodes el
+            |> My_list.filter_mapi (fun i v ->
+                   match child.dec v with
+                   | Error _ ->
+                       None
+                   | Ok dec ->
+                       Some
+                         ( dec.dec v
+                         |> My_result.map_err
+                              (Error.tag
+                                 (Format.asprintf "While decoding child %i" i) )
+                         ) )
+            |> My_result.combine_l
+            |> My_result.map_err
+                 (Error.tag_group
+                    (Format.asprintf "In tag %s" (Element.tagName el)) )
+        | `Data _ as v ->
+            (fail "Expected a Tag").dec v )
+    }
 
 
   let children (child : 'a decoder) : 'a list decoder =

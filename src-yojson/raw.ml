@@ -74,30 +74,34 @@ module Decode = struct
 
   (* Yojson.Raw specific decoders *)
 
-  let stringlit : string decoder = {Decoder.dec=function
-    | `Stringlit value ->
-        Ok value
-    | json ->
-        (fail "Expected a string").dec json
-
-  }
-
-  let intlit : string decoder = {Decoder.dec=function
-    | `Intlit value ->
-        Ok value
-    | json ->
-        (fail "Expected an int").dec json
-  }
+  let stringlit : string decoder =
+    { Decoder.dec =
+        (function
+        | `Stringlit value ->
+            Ok value
+        | json ->
+            (fail "Expected a string").dec json )
+    }
 
 
-  let floatlit : string decoder = {Decoder.dec=function
-    | `Floatlit value ->
-        Ok value
-    | `Intlit value ->
-        Ok value
-    | json ->
-        (fail "Expected a float").dec json
-  }
+  let intlit : string decoder =
+    { Decoder.dec =
+        (function
+        | `Intlit value -> Ok value | json -> (fail "Expected an int").dec json
+        )
+    }
+
+
+  let floatlit : string decoder =
+    { Decoder.dec =
+        (function
+        | `Floatlit value ->
+            Ok value
+        | `Intlit value ->
+            Ok value
+        | json ->
+            (fail "Expected a float").dec json )
+    }
 end
 
 module Json_encodeable = struct

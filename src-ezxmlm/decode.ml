@@ -54,7 +54,8 @@ let and_then = bind
 let from_result = of_result
 
 let tag_ns (name : Xmlm.name) : unit decoder =
- Decoder.of_decode_fun @@ fun (v : value) ->
+  Decoder.of_decode_fun
+  @@ fun (v : value) ->
   match v with
   | `El ((name', _), _) when name = name' ->
       Ok ()
@@ -68,7 +69,8 @@ let tag_ns (name : Xmlm.name) : unit decoder =
 
 
 let tag (name : string) : unit decoder =
- Decoder.of_decode_fun @@ fun (v : value) ->
+  Decoder.of_decode_fun
+  @@ fun (v : value) ->
   match v with
   | `El (((_ns, name'), _), _) when name = name' ->
       Ok ()
@@ -82,7 +84,8 @@ let tag (name : string) : unit decoder =
 
 
 let any_tag_ns : Xmlm.name decoder =
- Decoder.of_decode_fun @@ fun (v : value) ->
+  Decoder.of_decode_fun
+  @@ fun (v : value) ->
   match v with
   | `El ((name, _), _) ->
       Ok name
@@ -91,7 +94,8 @@ let any_tag_ns : Xmlm.name decoder =
 
 
 let any_tag : string decoder =
- Decoder.of_decode_fun @@ fun (v : value) ->
+  Decoder.of_decode_fun
+  @@ fun (v : value) ->
   match v with
   | `El (((_ns, name), _), _) ->
       Ok name
@@ -100,11 +104,14 @@ let any_tag : string decoder =
 
 
 let data : string decoder =
- Decoder.of_decode_fun @@ fun (v : value) ->
+  Decoder.of_decode_fun
+  @@ fun (v : value) ->
   match v with `Data s -> Ok s | `El _ -> (fail "Expected Data").dec v
 
 
-let attrs_ns : Xmlm.attribute list decoder = Decoder.of_decode_fun @@ function
+let attrs_ns : Xmlm.attribute list decoder =
+  Decoder.of_decode_fun
+  @@ function
   | `El ((_tag, attrs), _children) ->
       Ok attrs
   | `Data _ as v ->
@@ -145,7 +152,9 @@ let attr (name : string) : string decoder =
       fail (Format.asprintf "Expected an attribute named %s" name)
 
 
-let pick_children (child : 'a decoder decoder) : 'a list decoder = Decoder.of_decode_fun @@ function
+let pick_children (child : 'a decoder decoder) : 'a list decoder =
+  Decoder.of_decode_fun
+  @@ function
   | `El ((name, _attrs), els) ->
       els
       |> My_list.filter_mapi (fun i el ->
@@ -162,8 +171,7 @@ let pick_children (child : 'a decoder decoder) : 'a list decoder = Decoder.of_de
       |> My_result.map_err
            (Error.tag_group (Format.asprintf "In tag %a" pp_name name))
   | `Data _ as v ->
-      (
-      fail "Expected a Tag").dec v
+      (fail "Expected a Tag").dec v
 
 
 let children (child : 'a decoder) : 'a list decoder = pick_children (pure child)
