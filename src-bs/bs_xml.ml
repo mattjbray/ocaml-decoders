@@ -177,7 +177,7 @@ module Decode = struct
   let from_result = of_result
 
   let tag (name : string) : unit decoder =
-    {{Decoder.dec=fun (v : value) ->
+    {Decoder.dec=fun (v : value) ->
     match v with
     | `El el when Element.tagName el = name ->
         Ok ()
@@ -252,7 +252,7 @@ module Decode = struct
     | `El el ->
         Element.child_nodes el
         |> My_list.filter_mapi (fun i v ->
-               match child v with
+               match child.dec v with
                | Error _ ->
                    None
                | Ok dec ->
@@ -274,7 +274,7 @@ module Decode = struct
     pick_children (pure child)
 
 
-  let decode_value decoder v = decoder v
+  let decode_value decoder v = decoder.dec v
 
   let of_string str =
     try Ok (`El (DOMParser.parse_xml str)) with
