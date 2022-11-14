@@ -68,9 +68,11 @@ end
 include Decode.Make (Bencode_decodeable)
 
 let int64 : int64 decoder =
- fun t ->
-  match t with
-  | Bencode.Integer value ->
-      Ok value
-  | _ ->
-      (fail "Expected an int64") t
+  { Decoder.dec =
+      (fun t ->
+        match t with
+        | Bencode.Integer value ->
+            Ok value
+        | _ ->
+            (fail "Expected an int64").dec t )
+  }
