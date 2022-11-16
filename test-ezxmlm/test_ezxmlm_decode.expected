@@ -9,3 +9,10 @@ Decode a tree:
 Comments are skipped:
   " Some data "
 
+Comments are skipped:
+  " Some data in nested node "
+
+Comments are skipped:
+  
+
+More data, even more data 
