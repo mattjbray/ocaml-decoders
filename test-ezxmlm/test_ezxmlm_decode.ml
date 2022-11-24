@@ -221,7 +221,7 @@ let () =
   let ret = decode_string root_decoder xml_str in
   match ret with
   | Ok fld ->
-      printf "%a" CCFormat.(list ~sep:(return ",") string) fld
+      printf "%a@.@." CCFormat.(list ~sep:(return ",") string) fld
       (* this prints "More data, even more data" *)
   | Error e ->
       failwith @@ string_of_error e
@@ -244,7 +244,7 @@ let () =
   let root_decoder : float list decoder =
     tag "root"
     >>= fun () ->
-    pick_children (tag "node" >>= fun () -> pure @@ children float_decoder)
+    pick_children (tag "node" >>= fun () -> pure @@ children float)
     >|= List.concat
   in
   let ret = decode_string root_decoder xml_str in
