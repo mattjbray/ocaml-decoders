@@ -109,6 +109,16 @@ let data : string decoder =
   match v with `Data s -> Ok s | `El _ -> (fail "Expected Data").dec v
 
 
+let float_decoder : float decoder =
+  Decoder.of_decode_fun
+  @@ fun (v : value) ->
+  match v with
+  | `Data s ->
+      Ok (s |> String.trim |> float_of_string)
+  | `El _ ->
+      (fail "Expected Data").dec v
+
+
 let attrs_ns : Xmlm.attribute list decoder =
   Decoder.of_decode_fun
   @@ function

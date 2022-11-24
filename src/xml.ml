@@ -26,6 +26,10 @@ module type Decode = sig
   val data : string decoder
   (** Decode a [string]. *)
 
+  val float_decoder : float decoder
+  (** Decode a [float] in a data node after stripping whitespace. The advantage of using [float_decoder] is that it automatically takes care of trimming whitespace, 
+   which is useful since a float is not whitespace sensitive.  *)
+
   val tag : string -> unit decoder
   (** Assert the name of the current tag. *)
 
