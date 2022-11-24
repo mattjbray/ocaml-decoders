@@ -221,7 +221,37 @@ let () =
   let ret = decode_string root_decoder xml_str in
   match ret with
   | Ok fld ->
-      printf "%a" CCFormat.(list ~sep:(return ",") string) fld
+      printf "%a@.@." CCFormat.(list ~sep:(return ",") string) fld
       (* this prints "More data, even more data" *)
   | Error e ->
       failwith @@ string_of_error e
+
+
+(* Example 5 *)
+
+let () =
+  let open Decoders_ezxmlm.Decode in
+  let xml_str = {|<root> 
+  <node>
+
+
+
+  0.75
+
+  </node>
+  
+  </root>|} in
+  let root_decoder : float list decoder =
+    tag "root"
+    >>= fun () ->
+    pick_children (tag "node" >>= fun () -> pure @@ children float)
+    >|= List.concat
+  in
+  let ret = decode_string root_decoder xml_str in
+  match ret with
+  | Ok [ fld ] ->
+      printf "%f" fld
+  | Error e ->
+      failwith @@ string_of_error e
+  | _ ->
+      failwith "failed!"

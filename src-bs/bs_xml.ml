@@ -210,6 +210,36 @@ module Decode = struct
     }
 
 
+  let float : float decoder =
+    data
+    >>= fun s ->
+    match s |> String.trim |> float_of_string_opt with
+    | None ->
+        fail "Expected a float"
+    | Some f ->
+        succeed f
+
+
+  let int : int decoder =
+    data
+    >>= fun s ->
+    match s |> String.trim |> int_of_string_opt with
+    | None ->
+        fail "Expected an int"
+    | Some f ->
+        succeed f
+
+
+  let bool : bool decoder =
+    data
+    >>= fun s ->
+    match s |> String.trim |> bool_of_string_opt with
+    | None ->
+        fail "Expected a bool"
+    | Some f ->
+        succeed f
+
+
   let attr_opt name : string option decoder =
     { Decoder.dec =
         (fun (v : value) ->
