@@ -1,5 +1,5 @@
 open Jest
-open Bs_xml
+open Js_xml
 
 let () =
   describe
@@ -257,7 +257,7 @@ let () =
         test "tree" (fun () ->
             let encoded = encode_string root xml_tree in
             let expected =
-              Js.String.splitByRe [%re "/\\n/"] xml_str
+              Js.String.splitByRe (Js.Re.fromString "\\n") xml_str
               |> Array.to_list
               |> Decoders.Util.My_list.filter_map (function
                      | None ->

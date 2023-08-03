@@ -1,0 +1,11 @@
+(melange.emit
+ (target decoders_json_test)
+  (modules decoders_json_test)
+ (compile_flags :standard -open Decoders_mel)
+ (libraries decoders_mel melange-jest.jest))
+
+(melange.emit
+ (target decoders_xml_test)
+ (modules decoders_xml_test)
+ (compile_flags :standard -open Decoders_mel)
+ (libraries decoders_mel melange-jest.jest))

@@ -1,1 +1,1 @@
-(dirs :standard \ node_modules)
+(dirs :standard __tests__ \ node_modules)

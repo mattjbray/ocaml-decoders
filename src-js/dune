@@ -1,0 +1,6 @@
+(library
+ (name decoders_mel)
+ (flags :standard -warn-error -a+8)
+ (public_name decoders-mel)
+ (modes melange)
+ (libraries decoders))

@@ -1,4 +1,7 @@
-(lang dune 3.1)
+(lang dune 3.8)
+
+(using melange 0.1)
+
 (name decoders)
 (generate_opam_files true)
 (license ISC)
@@ -126,6 +129,18 @@
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
   (ounit2 :with-test)))
+
+(package
+ (name decoders-mel)
+ (synopsis "Melange backend for decoders")
+ (description
+   "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
+ (depends
+  (ocaml (>= 4.03.0))
+  (decoders (= :version))
+  (odoc :with-doc)
+  (containers (and :with-test (>= 0.16)))
+  (melange-jest :with-test)))
 
 (package
  (name decoders)

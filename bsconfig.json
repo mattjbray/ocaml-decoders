@@ -18,14 +18,13 @@
       "xml.ml"
     ]
   }, {
-    "dir" : "src-bs"
+    "dir" : "src-js"
   }, {
     "dir": "__tests__",
     "type": "dev"
   }],
   "package-specs": {
-    "module": "commonjs",
-    "in-source": true
+    "module": "commonjs"
   },
   "suffix": ".bs.js",
   "bs-dependencies": [
