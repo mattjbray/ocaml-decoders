@@ -20,6 +20,8 @@
   }, {
     "dir" : "src-js"
   }, {
+    "dir" : "src-bs"
+  }, {
     "dir": "__tests__",
     "type": "dev"
   }],

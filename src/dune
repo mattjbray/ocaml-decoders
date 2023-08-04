@@ -2,7 +2,7 @@
  (name decoders)
  (flags :standard -warn-error -a+8)
  (public_name decoders)
- (modes native byte melange))
+ (modes native byte))
 
 (rule
  (targets shims_let_ops_.ml)
