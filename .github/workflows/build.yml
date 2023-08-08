@@ -46,6 +46,7 @@ jobs:
           opam-local-packages: |
             decoders.opam
             ${{ matrix.package }}.opam
+          cache-prefix: v2
 
       - run: opam install "${{ matrix.package }}" --with-test
 
