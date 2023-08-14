@@ -23,9 +23,9 @@ module DOMParser = struct
     let e = querySelector doc "parsererror" in
     match Js.toOption e with
     | None ->
-        firstElementChildUnsafe doc
+        Ok (firstElementChildUnsafe doc)
     | Some e ->
-        failwith (textContent e)
+        Error (textContent e)
 end
 
 module Node = struct
@@ -316,10 +316,9 @@ module Decode = struct
   let decode_value decoder v = decoder.dec v
 
   let of_string str =
-    try Ok (`El (DOMParser.parse_xml str)) with
-    | e ->
-        Error (Error.tag "Parse error" (Error.make (Printexc.to_string e)))
-
+    match DOMParser.parse_xml str with
+    | Ok el -> Ok (`El el)
+    | Error e -> Error (Error.tag "Parse error" (Error.make e))
 
   let decode_string decoder str =
     My_result.Infix.(of_string str >>= decode_value decoder)
