@@ -107,7 +107,7 @@ jobs:
           opam pin -y -n melange-fetch git+https://github.com/melange-community/melange-fetch.git
           opam pin -y -n melange-webapi git+https://github.com/melange-community/melange-webapi.git
 
-      - run: opam install decoders-melange.opam --with-test
+      - run: opam install melange-decoders.opam --with-test
         working-directory: js
 
       - run: dune build
