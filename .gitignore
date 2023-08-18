@@ -7,3 +7,4 @@ _opam
 /lib/
 /node_modules/
 .DS_Store
+melange-decoders.install

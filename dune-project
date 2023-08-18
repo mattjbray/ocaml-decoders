@@ -137,3 +137,13 @@
   (ocaml (>= 4.03.0))
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))))
+
+(package
+ (name melange-decoders)
+ (synopsis "Melange backend for decoders")
+ (description
+   "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
+ (depends
+  (ocaml (>= 4.13.0))
+  (odoc :with-doc)
+  (melange-jest :with-test)))

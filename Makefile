@@ -69,3 +69,9 @@ watch-test-bs:
 
 clean-bs:
 	npm run clean
+
+
+melange-decoders.install:
+	cd js && dune build -p melange-decoders
+	perl -i -pe s#_build#js/_build# js/melange-decoders.install
+	cp js/melange-decoders.install .
