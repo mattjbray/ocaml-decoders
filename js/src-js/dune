@@ -1,7 +1,7 @@
-(copy_files# ../src/*.ml{,i})
+(copy_files# ../../src/*.ml{,i})
 
 (library
  (name decoders_mel)
  (flags :standard -warn-error -a+8)
- (public_name decoders-mel)
+ (public_name melange-decoders)
  (modes melange))

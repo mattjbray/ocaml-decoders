@@ -18,12 +18,16 @@
       "xml.ml"
     ]
   }, {
-    "dir" : "src-js"
-  }, {
-    "dir" : "src-bs"
-  }, {
-    "dir": "__tests__",
-    "type": "dev"
+    "dir": "js",
+    "subdirs": [{
+      "dir" : "src-js",
+      "exclude": ["shims_let_ops_.ml"]
+    }, {
+      "dir" : "src-bs"
+    }, {
+      "dir": "__tests__",
+      "type": "dev"
+    }]
   }],
   "package-specs": {
     "module": "commonjs"

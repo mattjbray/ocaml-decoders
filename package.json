@@ -9,7 +9,7 @@
   "scripts": {
     "build": "bsb -make-world",
     "build-watch": "bsb -make-world -w",
-    "test": "bsb -make-world && jest",
+    "test": "jest",
     "test-watch": "jest --watch",
     "clean": "bsb -clean-world"
   },
