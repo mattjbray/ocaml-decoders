@@ -7,8 +7,6 @@ depends: [
   "dune" {>= "3.8"}
   "ocaml" {>= "4.13.0"}
   "odoc" {with-doc}
-  "melange-fetch" {= "dev"}
-  "melange-webapi" {= "dev"}
   "melange-jest" {with-test}
 ]
 build: [

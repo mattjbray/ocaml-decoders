@@ -100,15 +100,13 @@ jobs:
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          opam-local-packages: |
-            js/melange-decoders.opam
+          opam-pin: false
+          opam-depext: false
           cache-prefix: v2
 
       - working-directory: js
         run: |
           opam pin -y -n melange-jest git+https://github.com/melange-community/melange-jest.git
-          opam pin -y -n melange-fetch git+https://github.com/melange-community/melange-fetch.git
-          opam pin -y -n melange-webapi git+https://github.com/melange-community/melange-webapi.git
 
       - run: opam install melange-decoders.opam --with-test
         working-directory: js
