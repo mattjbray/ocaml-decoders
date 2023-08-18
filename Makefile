@@ -72,6 +72,6 @@ clean-bs:
 
 
 melange-decoders.install:
-	cd js && dune build -p melange-decoders
+	cd js && touch melange-decoders.opam && dune build -p melange-decoders && rm melange-decoders.opam
 	perl -i -pe s#_build#js/_build# js/melange-decoders.install
 	cp js/melange-decoders.install .
