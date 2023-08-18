@@ -108,10 +108,12 @@ jobs:
         run: |
           opam pin -y -n melange-jest git+https://github.com/melange-community/melange-jest.git
 
+      - run: opam install js/melange-decoders.opam --deps-only --with-test
+
       - run: dune build
         working-directory: js
 
       - run: npx jest _build
         working-directory: js
 
-      - run: opam install js/melange-decoders.opam --with-test
+      - run: opam install js/melange-decoders.opam
