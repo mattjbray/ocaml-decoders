@@ -111,6 +111,6 @@ jobs:
           opam pin -y -n melange-jest git+https://github.com/melange-community/melange-jest.git
           opam pin -y -n melange-webapi git+https://github.com/melange-community/melange-webapi.git
 
-      - run: opam install ./melange-decoders.opam
+      - run: opam install ./melange-decoders.opam --with-test
 
       - run: make melange-decoders-test
