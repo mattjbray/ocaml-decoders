@@ -71,7 +71,7 @@ clean-bs:
 	npm run clean
 
 js/melange-decoders.opam:
-	touch js/melange-decoders.opam
+	cp melange-decoders.opam js/melange-decoders.opam
 
 melange-decoders-test: js/melange-decoders.opam
 	cd js && dune build __tests__
