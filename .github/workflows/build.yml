@@ -107,6 +107,7 @@ jobs:
       - working-directory: js
         run: |
           opam pin -y -n melange-jest git+https://github.com/melange-community/melange-jest.git
+          opam pin -y -n melange-webapi git+https://github.com/melange-community/melange-webapi.git
 
       - run: opam install js/melange-decoders.opam --deps-only --with-test
 
