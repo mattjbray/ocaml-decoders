@@ -100,6 +100,9 @@ jobs:
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          opam-local-packages: |
+            js/melange-decoders.opam
+          cache-prefix: v2
 
       - working-directory: js
         run: |
