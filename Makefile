@@ -74,7 +74,7 @@ js/melange-decoders.opam:
 	cp melange-decoders.opam js/melange-decoders.opam
 
 melange-decoders-test: js/melange-decoders.opam
-	cd js && dune build __tests__
+	cd js && opam exec -- dune build __tests__
 	npx jest js/_build
 
 melange-decoders.install: js/melange-decoders.opam
