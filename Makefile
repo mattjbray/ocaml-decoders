@@ -70,8 +70,14 @@ watch-test-bs:
 clean-bs:
 	npm run clean
 
+js/melange-decoders.opam:
+	touch js/melange-decoders.opam
 
-melange-decoders.install:
-	cd js && touch melange-decoders.opam && dune build -p melange-decoders && rm melange-decoders.opam
+melange-decoders-test: js/melange-decoders.opam
+	cd js && dune build __tests__
+	npx jest js/_build
+
+melange-decoders.install: js/melange-decoders.opam
+	cd js && dune build -p melange-decoders
 	perl -i -pe s#_build#js/_build# js/melange-decoders.install
-	cp js/melange-decoders.install .
+	mv js/melange-decoders.install .
