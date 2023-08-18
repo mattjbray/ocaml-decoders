@@ -21,7 +21,9 @@
     "dir": "js",
     "subdirs": [{
       "dir" : "src-js",
-      "exclude": ["shims_let_ops_.ml"]
+      "files": {
+        "excludes": ["shims_let_ops_.ml"]
+      }
     }, {
       "dir" : "src-bs"
     }, {
