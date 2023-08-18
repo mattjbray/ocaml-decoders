@@ -146,4 +146,5 @@
  (depends
   (ocaml (>= 4.13.0))
   (odoc :with-doc)
+   melange
   (melange-jest :with-test)))
