@@ -101,13 +101,10 @@ jobs:
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          opam-pin: false
-          opam-depext: false
-          cache-prefix: v2
+          opam-depext-flags: --with-test
+          opam-local-packages: |
+            decoders.opam
+            melange-decoders.opam
 
-      - run: |
-          opam pin -y -n melange-jest git+https://github.com/melange-community/melange-jest.git
-          opam pin -y -n melange-webapi git+https://github.com/melange-community/melange-webapi.git
-
-      - run: opam install ./decoders.opam ./melange-decoders.opam --with-test
+      - run: opam exec -- dune build src-js
       - run: npx jest _build/default/__tests__

@@ -1,0 +1,5 @@
+pin-depends: [
+  ["melange-jest.~dev" "git+https://github.com/melange-community/melange-jest.git"]
+  ["melange-fetch.~dev" "git+https://github.com/melange-community/melange-fetch.git"]
+  ["melange-webapi.~dev" "git+https://github.com/melange-community/melange-webapi.git"]
+]

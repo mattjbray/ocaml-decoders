@@ -33,3 +33,8 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/mattjbray/ocaml-decoders.git"
+pin-depends: [
+  ["melange-jest.~dev" "git+https://github.com/melange-community/melange-jest.git"]
+  ["melange-fetch.~dev" "git+https://github.com/melange-community/melange-fetch.git"]
+  ["melange-webapi.~dev" "git+https://github.com/melange-community/melange-webapi.git"]
+]
