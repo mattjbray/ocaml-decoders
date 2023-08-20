@@ -131,7 +131,7 @@
   (ounit2 :with-test)))
 
 (package
- (name decoders-mel)
+ (name melange-decoders)
  (synopsis "Melange backend for decoders")
  (description
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
