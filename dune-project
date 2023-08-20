@@ -136,7 +136,8 @@
  (description
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
-  (ocaml (>= 4.03.0))
+  (ocaml (>= 4.13.0))
+   melange
   (decoders (= :version))
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))
@@ -149,5 +150,6 @@
    "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
  (depends
   (ocaml (>= 4.03.0))
+   melange
   (odoc :with-doc)
   (containers (and :with-test (>= 0.16)))))
