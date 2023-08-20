@@ -107,5 +107,5 @@ jobs:
             melange-decoders.opam
 
       - run: opam install ./melange-decoders.opam --with-test
-      - run: opam exec -- dune build src-js
+      - run: opam exec -- dune build @melange
       - run: npx jest _build/default/__tests__
