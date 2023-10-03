@@ -18,7 +18,10 @@
       "xml.ml"
     ]
   }, {
-    "dir" : "src-bs"
+    "dir" : "src-js",
+    "files": {
+        "excludes": ["decoders_mel.ml"]
+    }
   }, {
     "dir": "__tests__",
     "type": "dev"

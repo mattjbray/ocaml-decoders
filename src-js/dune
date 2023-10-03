@@ -1,0 +1,6 @@
+(library
+ (name decoders_mel)
+ (public_name melange-decoders)
+ (preprocess (pps melange.ppx))
+ (modes melange)
+ (libraries decoders))

@@ -1,5 +1,5 @@
 open Jest
-open Bs_xml
+open Js_xml
 
 let () =
   describe
