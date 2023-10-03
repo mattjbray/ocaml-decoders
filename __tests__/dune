@@ -1,0 +1,11 @@
+(subdir
+  melange
+ (library
+ (name decoders_tests_melange)
+ (modes melange)
+ (libraries decoders_mel melange-jest.jest)
+ (preprocess (pps melange.ppx))
+ (flags -open Decoders_mel)
+ (wrapped false))
+ (copy_files# "../*.ml")
+ (copy_files# "../*.re"))

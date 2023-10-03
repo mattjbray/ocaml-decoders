@@ -1,1 +1,6 @@
-(dirs :standard \ node_modules)
+(dirs :standard __tests__ \ node_modules)
+
+(melange.emit
+ (target out)
+ (preprocess (pps melange.ppx))
+ (libraries decoders_mel decoders_tests_melange))
