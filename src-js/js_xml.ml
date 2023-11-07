@@ -1,21 +1,21 @@
 module DOMParser = struct
   type t
 
-  external create : unit -> t = "DOMParser" [@@bs.new]
+  external create : unit -> t = "DOMParser" [@@mel.new]
 
   external parseFromString : t -> string -> string -> Dom.element
     = "parseFromString"
-    [@@bs.send]
+    [@@mel.send]
 
   external firstElementChildUnsafe : Dom.element -> Dom.element
     = "firstElementChild"
-    [@@bs.get]
+    [@@mel.get]
 
   external querySelector :
     Dom.element -> string -> Dom.element Js.null_undefined = "querySelector"
-    [@@bs.send]
+    [@@mel.send]
 
-  external textContent : Dom.element -> string = "textContent" [@@bs.get]
+  external textContent : Dom.element -> string = "textContent" [@@mel.get]
 
   let parse_xml text =
     let parser = create () in
@@ -30,13 +30,13 @@ end
 
 module Node = struct
   (* See https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType *)
-  external element_node : int = "ELEMENT_NODE" [@@bs.val] [@@bs.scope "Node"]
+  external element_node : int = "ELEMENT_NODE" [@@mel.scope "Node"]
 
-  external text_node : int = "TEXT_NODE" [@@bs.val] [@@bs.scope "Node"]
+  external text_node : int = "TEXT_NODE" [@@mel.scope "Node"]
 
-  external comment_node : int = "COMMENT_NODE" [@@bs.val] [@@bs.scope "Node"]
+  external comment_node : int = "COMMENT_NODE" [@@mel.scope "Node"]
 
-  external nodeType : Dom.node -> int = "nodeType" [@@bs.get]
+  external nodeType : Dom.node -> int = "nodeType" [@@mel.get]
 
   external of_element : Dom.element -> Dom.node = "%identity"
 
@@ -72,23 +72,23 @@ module Node_list = struct
 end
 
 module Text = struct
-  external data : Dom.text -> string = "data" [@@bs.get]
+  external data : Dom.text -> string = "data" [@@mel.get]
 end
 
 module Element = struct
-  external childNodes : Dom.element -> Dom.nodeList = "childNodes" [@@bs.get]
+  external childNodes : Dom.element -> Dom.nodeList = "childNodes" [@@mel.get]
 
   let child_nodes elt = childNodes elt |> Node_list.to_array |> Array.to_list
 
-  external tagName : Dom.element -> string = "tagName" [@@bs.get]
+  external tagName : Dom.element -> string = "tagName" [@@mel.get]
 
   external getAttribute : Dom.element -> string -> string Js.Nullable.t
     = "getAttribute"
-    [@@bs.send]
+    [@@mel.send]
 
   external getAttributeNames : Dom.element -> string Js.Array.t
     = "getAttributeNames"
-    [@@bs.send]
+    [@@mel.send]
 
   let get_attribute elt attr =
     let v = getAttribute elt attr in
@@ -96,28 +96,28 @@ module Element = struct
 
 
   external append : Dom.element -> Dom.node array -> unit = "append"
-    [@@bs.send] [@@variadic]
+    [@@mel.send] [@@variadic]
 
   external setAttribute : Dom.element -> string -> string -> unit
     = "setAttribute"
-    [@@bs.send]
+    [@@mel.send]
 end
 
 module XMLSerializer = struct
   type t
 
-  external create : unit -> t = "XMLSerializer" [@@bs.new]
+  external create : unit -> t = "XMLSerializer" [@@mel.new]
 
   external serializeToString : t -> Dom.node -> string = "serializeToString"
-    [@@bs.send]
+    [@@mel.send]
 end
 
 module Document = struct
   external createElementNS : string -> string -> Dom.element = "createElementNS"
-    [@@val] [@@scope "window", "document"]
+    [@@scope "window", "document"]
 
   external createTextNode : string -> Dom.text = "createTextNode"
-    [@@val] [@@scope "window", "document"]
+    [@@scope "window", "document"]
 end
 
 module Encode = struct
