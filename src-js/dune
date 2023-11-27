@@ -3,4 +3,4 @@
  (public_name melange-decoders)
  (preprocess (pps melange.ppx))
  (modes melange)
- (libraries decoders melange.dom))
+ (libraries decoders melange.dom melange.belt))
