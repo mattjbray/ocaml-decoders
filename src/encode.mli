@@ -22,6 +22,10 @@ module type S = sig
 
   val array : 'a encoder -> 'a array encoder
 
+  val key_value_pairs' : 'k encoder -> 'v encoder -> ('k * 'v) list encoder
+
+  val key_value_pairs : 'v encoder -> (string * 'v) list encoder
+
   val obj : (string * value) list encoder
 
   val obj' : (value * value) list encoder
