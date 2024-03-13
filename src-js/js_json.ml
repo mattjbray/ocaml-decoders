@@ -70,10 +70,10 @@ module Decode = struct
               let oks, errs =
                 arr
                 |> Js.Array.reducei
-                     (fun (oks, errs) x i ->
+                     ~f:(fun (oks, errs) x i ->
                        match decoder.dec x with
                        | Ok a ->
-                           let _ = Js.Array.push a oks in
+                           let _ = Js.Array.push ~value:a oks in
                            (oks, errs)
                        | Error e ->
                            let _ =
@@ -82,7 +82,7 @@ module Decode = struct
                                errs
                            in
                            (oks, errs) )
-                     ([||], [||])
+                     ~init:([||], [||])
               in
               if Js.Array.length errs > 0
               then
@@ -123,5 +123,5 @@ module Encode = struct
   include Encode.Make (Json_encodeable)
 
   let array encoder xs =
-    xs |> Js.Array.map (fun x -> encoder x) |> Js.Json.array
+    xs |> Js.Array.map ~f:(fun x -> encoder x) |> Js.Json.array
 end
