@@ -12,7 +12,7 @@ module DOMParser = struct
     [@@mel.get]
 
   external querySelector :
-    Dom.element -> string -> Dom.element Js.null_undefined = "querySelector"
+    Dom.element -> string -> Dom.element Js.nullable = "querySelector"
     [@@mel.send]
 
   external textContent : Dom.element -> string = "textContent" [@@mel.get]
@@ -96,7 +96,7 @@ module Element = struct
 
 
   external append : Dom.element -> Dom.node array -> unit = "append"
-    [@@mel.send] [@@variadic]
+    [@@mel.send] [@@mel.variadic]
 
   external setAttribute : Dom.element -> string -> string -> unit
     = "setAttribute"
@@ -114,10 +114,10 @@ end
 
 module Document = struct
   external createElementNS : string -> string -> Dom.element = "createElementNS"
-    [@@scope "window", "document"]
+    [@@mel.scope "window", "document"]
 
   external createTextNode : string -> Dom.text = "createTextNode"
-    [@@scope "window", "document"]
+    [@@mel.scope "window", "document"]
 end
 
 module Encode = struct
