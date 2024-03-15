@@ -34,9 +34,9 @@ clean:
 
 _opam:
 	opam switch create . --empty
-	opam switch set-invariant ocaml-base-compiler.4.14.1
 
 install-dependencies: _opam
+	opam switch set-invariant ocaml-base-compiler.5.1.1
 	opam install . --deps-only --with-test
 
 DOCS_WORKTREE_PATH=../ocaml-decoders-doc

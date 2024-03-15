@@ -150,7 +150,7 @@
   (ocaml (>= 4.14.1))
   (odoc :with-doc)
   (decoders (= :version))
-   melange
+  (melange (>= 3.0.0))
   (melange-fetch :with-test)
   (melange-jest :with-test)
   (melange-webapi :with-test)))
