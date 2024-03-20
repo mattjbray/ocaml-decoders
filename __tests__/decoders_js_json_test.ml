@@ -1,7 +1,7 @@
 open Jest
-open Bs_json
+open Js_json
 
-external parse_int : string -> int = "parseInt" [@@bs.scope "window"] [@@bs.val]
+external parse_int : string -> int = "parseInt" [@@mel.scope "window"] [@@mel.val]
 
 let () =
   describe

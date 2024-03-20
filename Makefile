@@ -1,5 +1,5 @@
 .PHONY: all
-all: build test build-bs test-bs
+all: build test build-bs test-bs test-mel
 
 .PHONY: clean-all
 clean-all: clean clean-bs
@@ -34,9 +34,9 @@ clean:
 
 _opam:
 	opam switch create . --empty
-	opam install -y ocaml-base-compiler.4.12.0 utop ocaml-lsp-server
 
 install-dependencies: _opam
+	opam switch set-invariant ocaml-base-compiler.5.1.1
 	opam install . --deps-only --with-test
 
 DOCS_WORKTREE_PATH=../ocaml-decoders-doc
@@ -61,11 +61,11 @@ build-bs:
 test-bs:
 	npm test
 
-watch-build-bs:
-	npm run build-watch
-
-watch-test-bs:
-	npm run test-watch
-
 clean-bs:
 	npm run clean
+
+build-mel:
+	dune build @melange
+
+test-mel:
+	npx jest _build/default/out/

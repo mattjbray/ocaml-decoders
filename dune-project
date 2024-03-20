@@ -1,4 +1,5 @@
-(lang dune 3.1)
+(lang dune 3.8)
+(using melange 0.1)
 (name decoders)
 (generate_opam_files true)
 (license ISC)
@@ -135,4 +136,21 @@
  (depends
   (ocaml (>= 4.03.0))
   (odoc :with-doc)
+   melange
   (containers (and :with-test (>= 0.16)))))
+
+;; melange lib convention is to put `melange-` as the prefix, rather than the
+;; suffix, which unfortunately contradicts the `decoders-` prefix convention
+(package
+ (name melange-decoders)
+ (synopsis "Melange backend for decoders")
+ (description
+   "A combinator library for \"decoding\" JSON-like values into your own Ocaml types, inspired by Elm's `Json.Decode` and `Json.Encode`.")
+ (depends
+  (ocaml (>= 4.14.1))
+  (odoc :with-doc)
+  (decoders (= :version))
+  (melange (>= 3.0.0))
+  (melange-fetch :with-test)
+  (melange-jest :with-test)
+  (melange-webapi :with-test)))

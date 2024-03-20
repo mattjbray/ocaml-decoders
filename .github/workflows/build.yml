@@ -41,6 +41,7 @@ jobs:
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
         uses: ocaml/setup-ocaml@v2
         with:
+          cache-prefix: v2
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           opam-depext-flags: --with-test
           opam-local-packages: |
@@ -49,14 +50,16 @@ jobs:
 
       - run: opam install "${{ matrix.package }}" --with-test
 
-  build-node:
+  build-melange:
     strategy:
       fail-fast: false
       matrix:
         os:
           - ubuntu-latest
-        node-version:
-          - 16.x
+        ocaml-compiler:
+          - 5.1.x
+        package:
+          - melange-decoders
 
     runs-on: ${{ matrix.os }}
 
@@ -66,9 +69,20 @@ jobs:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 16.x
           cache: 'npm'
 
       - run: npm ci
-      - run: npm run build
-      - run: npm test
+
+      - name: Use OCaml ${{ matrix.ocaml-compiler }}
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          opam-depext-flags: --with-test
+          opam-local-packages: |
+            decoders.opam
+            ${{ matrix.package }}.opam
+
+      - run: opam install "${{ matrix.package }}" --with-test
+      - run: opam exec -- dune build @melange
+      - run: npx jest
