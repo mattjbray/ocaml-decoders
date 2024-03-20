@@ -56,8 +56,17 @@ module Infix = struct
 end
 
 let fix (f : ('i, 'a) t -> ('i, 'a) t) : ('i, 'a) t =
+  let m = Mutex.create () in
   let rec p = lazy (f r)
-  and r = { dec = (fun value -> (Lazy.force p).dec value) } in
+  and r =
+    { dec =
+        (fun value ->
+          Mutex.lock m ;
+          let v = Lazy.force p in
+          Mutex.unlock m ;
+          v.dec value )
+    }
+  in
   r
 
 
