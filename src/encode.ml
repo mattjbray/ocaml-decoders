@@ -90,9 +90,7 @@ module Make (E : Encodeable) : S with type value = E.value = struct
 
   let key_value_pairs' : 'k encoder -> 'v encoder -> ('k * 'v) list encoder =
    fun key_encoder value_encoder xs ->
-    xs
-    |> List.map (fun (k, v) -> (key_encoder k, value_encoder v))
-    |> obj'
+    xs |> List.map (fun (k, v) -> (key_encoder k, value_encoder v)) |> obj'
 
 
   let obj xs = key_value_pairs' string (fun x -> x) xs

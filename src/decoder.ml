@@ -56,8 +56,8 @@ module Infix = struct
 end
 
 let fix (f : ('i, 'a) t -> ('i, 'a) t) : ('i, 'a) t =
-  let rec p = lazy (f r)
-  and r = { dec = (fun value -> (Lazy.force p).dec value) } in
+  let rec p () = f r
+  and r = { dec = (fun value -> (p ()).dec value) } in
   r
 
 
