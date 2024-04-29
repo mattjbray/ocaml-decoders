@@ -38,14 +38,14 @@ struct
     let get_null = function T.TomlString "" -> Some () | _ -> None
 
     let get_list : value -> value list option = function
-      | T.TomlArray l ->
+      | T.TomlArray l | T.TomlTableArray l ->
           Some l
       | _ ->
           None
 
 
     let get_key_value_pairs : value -> (value * value) list option = function
-      | T.TomlTable assoc ->
+      | T.TomlTable assoc | T.TomlInlineTable assoc ->
           Some (List.map (fun (key, value) -> (T.string key, value)) assoc)
       | _ ->
           None
@@ -74,7 +74,7 @@ struct
     let of_list = Toml.array
 
     let of_key_value_pairs xs =
-      Toml.table
+      Toml.inline_table
         ( xs
         |> Util.My_list.filter_map (fun (k, v) ->
                match k with Toml.TomlString k -> Some (k, v) | _ -> None ) )
