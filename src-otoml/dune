@@ -1,0 +1,6 @@
+
+(library
+ (name decoders_otoml)
+ (public_name decoders-otoml)
+ (flags :standard -warn-error -a+8)
+ (libraries decoders otoml))
