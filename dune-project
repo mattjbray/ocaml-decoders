@@ -115,6 +115,16 @@
   (odoc :with-doc)))
 
 (package
+ (name decoders-otoml)
+ (synopsis "Otoml backend for decoders")
+ (depends
+  (ocaml (>= 4.03.0))
+  (decoders (= :version))
+  (otoml (>= 1.0))
+  (containers (and :with-test (>= 0.16)))
+  (odoc :with-doc)))
+
+(package
  (name decoders-yojson)
  (synopsis "Yojson backend for decoders")
  (description

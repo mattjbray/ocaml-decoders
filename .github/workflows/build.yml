@@ -43,6 +43,8 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           opam-depext-flags: --with-test
+          allow-prerelease-opam: true
+          dune-cache: true
           opam-local-packages: |
             decoders.opam
             ${{ matrix.package }}.opam

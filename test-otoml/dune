@@ -1,0 +1,4 @@
+(test
+ (name main)
+ (package decoders-otoml)
+ (libraries decoders-otoml containers ounit2))
