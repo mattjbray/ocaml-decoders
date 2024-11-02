@@ -172,6 +172,24 @@ let yojson_basic_suite =
             Format.asprintf "@,@[%a@]" pp_error e )
   in
 
+  let tuple_helper_test =
+    "Tuple helper"
+    >:: fun _ ->
+    let module M = struct
+      type t2 = int * string
+
+      let t2_to_string ((i, s) : t2) = Printf.sprintf "(%i, %s)" i s
+    end in
+    let open M in
+    let open TupleHelper in
+    decoder_test
+      ()
+      ~decoder:(tuple2 int string)
+      ~input:{|[149, "my string"]|}
+      ~expected:(149, "my string")
+      ~printer:t2_to_string
+  in
+
   "Yojson.Basic"
   >::: [ list_string_test
        ; array_string_test
@@ -179,6 +197,7 @@ let yojson_basic_suite =
        ; mut_rec_test
        ; string_or_floatlit_test
        ; grouping_errors_test
+       ; tuple_helper_test
        ]
 
 
