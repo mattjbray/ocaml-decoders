@@ -300,9 +300,24 @@ module type S = sig
   (** Helpers for decoding tuples which are encoded as lists *)
   module TupleHelper : sig
     val tuple2 : 'a decoder -> 'b decoder -> ('a * 'b) decoder
+    (** Decode a collection into an OCaml 2-tuple.
+
+      For example, to decode this json:
+
+      {[
+          [true, "string"]
+      ]}
+
+      we can use this decoder:
+
+      {[
+         tuple2 bool string
+      ]}
+     *)
 
     val tuple3 :
       'a decoder -> 'b decoder -> 'c decoder -> ('a * 'b * 'c) decoder
+    (** Decode a collection into an OCaml 3-tuple. *)
 
     val tuple4 :
          'a decoder
@@ -310,6 +325,7 @@ module type S = sig
       -> 'c decoder
       -> 'd decoder
       -> ('a * 'b * 'c * 'd) decoder
+    (** Decode a collection into an OCaml 4-tuple. *)
   end
 end
 
