@@ -471,5 +471,26 @@ module Make (Decodeable : Decodeable) :
       custom (optional_decoder (at path value) val_decoder default) next
   end
 
+  module TupleHelper = struct
+    let ( >>=:: ) fst rest = uncons rest fst
+
+    let tuple2 d0 d1 =
+      d0 >>=:: fun arg0 -> d1 >>=:: fun arg1 -> succeed (arg0, arg1)
+
+
+    let tuple3 d0 d1 d2 =
+      d0
+      >>=:: fun arg0 ->
+      d1 >>=:: fun arg1 -> d2 >>=:: fun arg2 -> succeed (arg0, arg1, arg2)
+
+
+    let tuple4 d0 d1 d2 d3 =
+      d0
+      >>=:: fun arg0 ->
+      d1
+      >>=:: fun arg1 ->
+      d2 >>=:: fun arg2 -> d3 >>=:: fun arg3 -> succeed (arg0, arg1, arg2, arg3)
+  end
+
   include Infix
 end

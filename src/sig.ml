@@ -296,6 +296,21 @@ module type S = sig
 
     val custom : 'a decoder -> ('a -> 'b) decoder -> 'b decoder
   end
+
+  (** Helpers for decoding tuples which are encoded as lists *)
+  module TupleHelper : sig
+    val tuple2 : 'a decoder -> 'b decoder -> ('a * 'b) decoder
+
+    val tuple3 :
+      'a decoder -> 'b decoder -> 'c decoder -> ('a * 'b * 'c) decoder
+
+    val tuple4 :
+         'a decoder
+      -> 'b decoder
+      -> 'c decoder
+      -> 'd decoder
+      -> ('a * 'b * 'c * 'd) decoder
+  end
 end
 
 (** Signature of things that can be decoded. *)
