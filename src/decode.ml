@@ -329,6 +329,38 @@ module Make (Decodeable : Decodeable) :
         (fail "Expected a list").dec value
 
 
+  let ( >>=:: ) fst rest = uncons rest fst
+
+  let empty_list =
+    Decoder.of_decode_fun
+    @@ fun value ->
+    match Decodeable.get_list value with
+    | Some [] ->
+        Ok ()
+    | Some _ ->
+        (fail "Expected an empty list").dec value
+    | None ->
+        (fail "Expected a list").dec value
+
+
+  let tuple2 d0 d1 =
+    d0 >>=:: fun arg0 -> d1 >>=:: fun arg1 -> succeed (arg0, arg1)
+
+
+  let tuple3 d0 d1 d2 =
+    d0
+    >>=:: fun arg0 ->
+    d1 >>=:: fun arg1 -> d2 >>=:: fun arg2 -> succeed (arg0, arg1, arg2)
+
+
+  let tuple4 d0 d1 d2 d3 =
+    d0
+    >>=:: fun arg0 ->
+    d1
+    >>=:: fun arg1 ->
+    d2 >>=:: fun arg2 -> d3 >>=:: fun arg3 -> succeed (arg0, arg1, arg2, arg3)
+
+
   let rec at : string list -> 'a decoder -> 'a decoder =
    fun path decoder ->
     match path with
@@ -469,27 +501,6 @@ module Make (Decodeable : Decodeable) :
         string list -> 'a decoder -> 'a -> ('a -> 'b) decoder -> 'b decoder =
      fun path val_decoder default next ->
       custom (optional_decoder (at path value) val_decoder default) next
-  end
-
-  module TupleHelper = struct
-    let ( >>=:: ) fst rest = uncons rest fst
-
-    let tuple2 d0 d1 =
-      d0 >>=:: fun arg0 -> d1 >>=:: fun arg1 -> succeed (arg0, arg1)
-
-
-    let tuple3 d0 d1 d2 =
-      d0
-      >>=:: fun arg0 ->
-      d1 >>=:: fun arg1 -> d2 >>=:: fun arg2 -> succeed (arg0, arg1, arg2)
-
-
-    let tuple4 d0 d1 d2 d3 =
-      d0
-      >>=:: fun arg0 ->
-      d1
-      >>=:: fun arg1 ->
-      d2 >>=:: fun arg2 -> d3 >>=:: fun arg3 -> succeed (arg0, arg1, arg2, arg3)
   end
 
   include Infix
