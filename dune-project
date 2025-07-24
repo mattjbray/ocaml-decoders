@@ -56,7 +56,7 @@
  (depends
   (ocaml (>= 4.10.0))
   (decoders (= :version))
-  (jsonaf (>= 0.15.0))
+  (jsonaf (>= v0.15.0))
   (odoc :with-doc)
   (ounit2 :with-test)))
 
